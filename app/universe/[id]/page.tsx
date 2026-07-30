@@ -16,10 +16,7 @@ export async function generateMetadata({
   const { id } = await params;
   const company = getCompany(id);
   if (!company) return { title: "Company not found" };
-  return {
-    title: company.name,
-    description: company.description,
-  };
+  return { title: company.name, description: company.description };
 }
 
 export default async function CompanyPage({

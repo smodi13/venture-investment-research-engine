@@ -9,46 +9,45 @@ import {
 import { MANDATES } from "@/lib/mandates";
 import { SOURCES } from "@/lib/sources";
 import { UNIVERSE_STATS } from "@/lib/companies";
-import { PROVENANCE_LABEL, PROVENANCE_NOTE } from "@/lib/types";
-import type { Provenance } from "@/lib/types";
-import { ProvenanceBadge } from "@/components/Provenance";
-import { BulletList, DisclosureNote, PageHeader, Section } from "@/components/ui";
+import { MARKET_SIGNAL_DISCLOSURE } from "@/lib/data/market-signals";
+import { DATA_CONFIDENCE_LEVELS, DATA_CONFIDENCE_MEANING } from "@/lib/types";
+import { ConfidenceBadge } from "@/components/Provenance";
+import {
+  BulletList,
+  DisclosureNote,
+  GitHubLink,
+  PageHeader,
+  Section,
+} from "@/components/ui";
 import { formatDate } from "@/lib/format";
+import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Methodology and source registry",
   description:
-    "How companies are sourced, how mandates change the scoring, how estimates are labelled, and every source the research rests on.",
+    "How real private companies are sourced and verified, how mandates affect ranking, how data confidence is assigned, and every source the research rests on.",
 };
-
-const PROVENANCE_ORDER: Provenance[] = [
-  "reported",
-  "estimate",
-  "unverified",
-  "demonstration",
-  "not-disclosed",
-];
 
 const LIMITATIONS = [
   {
-    title: "Public information is incomplete and lagging",
-    body: "Filings describe a quarter that has already ended. Segment reporting is aggregated to a level the company chooses. Anything a company is not required to disclose, and would rather not, is generally absent. Every public-company figure here should be read as a starting point for verification.",
+    title: "Public information about private companies is thin and uneven",
+    body: "Private companies do not file. What is public is what the company chose to announce, filtered through what a publication chose to cover. Revenue, margins, customer counts, and unit economics are almost never available, and this platform shows them as not publicly disclosed rather than estimating them.",
   },
   {
-    title: "Funding databases are not a source of truth",
-    body: "Private funding figures in commercial databases are frequently incomplete, delayed, or reported by an interested party. This platform does not use them. That is a large part of why the private companies here are demonstration records rather than real companies carrying database-derived numbers.",
+    title: "Funding data is incomplete and often reported by an interested party",
+    body: "Announced round sizes are self-reported, valuations are frequently unconfirmed, and total raised figures omit unannounced financings. Where a company states a figure, this platform attributes it to the company rather than presenting it as established fact. Commercial funding databases were used only as a discovery aid and are not cited as evidence.",
   },
   {
-    title: "Market-size estimates are the least reliable input available",
-    body: "Top-down sizing for emerging technology markets has been wrong in both directions repeatedly, often by an order of magnitude. No market-size figure is published anywhere in this platform. Sector analysis argues from value chain structure and margin position instead, both of which are observable.",
+    title: "Technical benchmarks are configuration dependent and expire",
+    body: "A vendor benchmark describes a configuration the vendor selected. Almost none of the technical claims in this universe has been independently reproduced, and the technical evidence factor is rated accordingly rather than accepting the claim.",
   },
   {
-    title: "Technical benchmarks are configuration dependent",
-    body: "Accelerator, alignment, and manipulation benchmarks all depend heavily on setup, software version, and the specific workload. A benchmark more than two quarters old should generally be treated as expired, and any single number should be read as a claim about a specific configuration rather than about a technology.",
+    title: "Scoring models compress judgment into a number",
+    body: "A score of 74 built mostly from verified inputs is a materially different object from a score of 74 built mostly from judgment, and the number alone does not distinguish them. Every company page shows the proportion, and the factor table shows the basis, confidence, and source per factor.",
   },
   {
-    title: "This is a static snapshot",
-    body: "There is no live data feed. Public-market figures are dated as of 31 March 2026 and the intelligence tracker was assembled on 28 July 2026. A production version of this platform would carry an explicit refresh cadence per data type, with staleness surfaced in the interface.",
+    title: "This is a dated research snapshot",
+    body: `Everything was verified on ${formatDate(SITE.snapshotDate)}. Private status in particular expires: one company was excluded during this research because a public acquirer completed its purchase mid-review. Any record should be re-verified before it informs a decision.`,
   },
 ];
 
@@ -58,100 +57,118 @@ export default function MethodologyPage() {
       <PageHeader
         eyebrow="Methodology"
         title="How this platform reaches its conclusions"
-        intro="Everything on this page exists so that a reader can disagree with a specific step rather than with the output as a whole. The weights are published, the evidence behind each rating is shown, the provenance of every figure is attached to the figure, and the limitations are stated rather than implied."
+        intro="Everything here exists so that a reader can disagree with a specific step rather than with the output as a whole. The weights are published, the evidence behind each rating is shown with its source, and the limitations are stated rather than implied."
       />
 
       <div className="container-page space-y-12 py-10">
         <Section
-          title="How companies are sourced"
-          description="Two different processes, because public and private companies cannot be researched the same way."
+          title="Four statements about this dataset"
+          description="Stated first because they govern how everything else should be read."
         >
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div className="card p-5">
-              <h3 className="text-sm font-semibold text-ink">
-                Public companies ({UNIVERSE_STATS.publicCount})
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                Selected by working along the value chain of the featured
-                thesis and identifying the listed companies operating at each
-                layer, then adding public comparison anchors for the other
-                sectors. Qualitative profiles are drawn from widely published
-                information about what the company sells and how it competes.
-                Financial figures are expressed as dated ranges labelled as
-                analyst estimates.
-              </p>
-            </div>
-            <div className="card p-5">
-              <h3 className="text-sm font-semibold text-ink">
-                Private companies ({UNIVERSE_STATS.privateCount})
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                All are fictional demonstration records, modelled on real
-                archetypes at each layer of the same value chains. This is a
-                deliberate integrity decision. A private company does not file,
-                so a research record on a real one would consist of database
-                figures and inference presented with unwarranted confidence.
-                Writing invented revenue or customers onto a real private
-                company would be indefensible, so the platform models instead.
-              </p>
-            </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[
+              {
+                t: "No fictional companies are used",
+                b: `All ${UNIVERSE_STATS.total} companies in the sourcing universe are real and were confirmed as independently private on ${formatDate(SITE.snapshotDate)}.`,
+              },
+              {
+                t: "Missing information is not invented",
+                b: "Revenue, margins, customer counts, valuations, ownership, burn, and runway appear only where a company disclosed them publicly. Everything else reads not publicly disclosed.",
+              },
+              {
+                t: "Public companies are market signals only",
+                b: MARKET_SIGNAL_DISCLOSURE,
+              },
+              {
+                t: "Workflow statuses are demonstration data",
+                b: "Pipeline status, priority, and notes show how the tool is used and do not indicate that any meeting, outreach, or investment occurred. Company facts are sourced and dated.",
+              },
+            ].map((x) => (
+              <div key={x.t} className="card p-5">
+                <h3 className="text-sm font-semibold text-ink">{x.t}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                  {x.b}
+                </p>
+              </div>
+            ))}
           </div>
         </Section>
 
         <Section
-          title="How mandate selection works"
-          description="The mandate is not a filter. It is the configuration the scoring model reads from."
+          title="How real private companies are sourced"
+          description="Sourcing starts from an observable event, not from a company list."
         >
           <div className="content-column space-y-3 text-sm leading-relaxed text-ink-soft">
             <p>
-              Selecting a mandate does four things. It replaces the weight
-              assigned to each of the twelve quality factors. It supplies the
-              sector and stage affinities that determine the relevance tier, and
-              therefore the multiplier and score ceiling applied to that
-              company. It determines which sectors the interface emphasises. And
-              it appends additional diligence questions that every company under
-              that mandate must answer.
+              Each company entered the universe through a specific, dated signal:
+              a financing, a product launch, a government contract, a published
+              technical result, a manufacturing commitment, or an industry
+              bottleneck that made a category worth examining. That signal is
+              recorded on every company page under the heading{" "}
+              <span className="font-medium text-ink">
+                why this company entered the pipeline
+              </span>
+              , together with why it may be timely and why it may be overlooked.
             </p>
             <p>
-              The relevance rating takes the weaker of sector affinity and
-              stage affinity, so a company must be both in the right sector and
-              at the right stage to be treated as core. The section below sets
-              out how that rating becomes a multiplier and a score ceiling.
+              Where the evidence does not support an overlooked claim, the record
+              says so directly and explains why the company remains relevant
+              anyway. Several companies here are widely covered, and the sourcing
+              originality factor scores them near zero rather than pretending
+              otherwise.
             </p>
             <p>
-              Companies outside the active mandate are deliberately retained in
-              the universe rather than hidden, so that the effect of switching
-              mandates stays visible. A low score under one mandate is a
-              statement about fit, not about quality.
+              Companies were excluded if they were publicly traded, acquired, no
+              longer operating independently, or impossible to verify as
+              currently private. Commercial databases were used to discover
+              candidates and were never used as evidence.
+            </p>
+          </div>
+        </Section>
+
+        <Section
+          title="How company status is verified"
+          description="Every record required a working official website, one primary source, and one independent corroborating source."
+        >
+          <div className="content-column space-y-3 text-sm leading-relaxed text-ink-soft">
+            <p>
+              Primary sources are the company&apos;s own site, its own announcements,
+              or an official record such as a government or laboratory
+              publication. Corroborating sources are independent technology or
+              business publications. Both are registered below with a
+              publication date, an access date, and the specific fact each
+              supports.
+            </p>
+            <p>
+              Private status was checked individually rather than assumed. During
+              this research a private optical interconnect company was found to
+              have been acquired by a public semiconductor company in February
+              2026, and was excluded from the universe as a result. That case is
+              documented on the market signals page, because it is the clearest
+              argument for why this check has to be repeated rather than
+              inherited.
             </p>
           </div>
         </Section>
 
         <Section
           title="How a score is produced: two stages, in this order"
-          description="Relevance is settled before quality is scored. This is the most important design decision in the platform and it exists because the first version got it wrong."
+          description="Relevance is settled before quality is scored."
         >
           <div className="content-column space-y-3 text-sm leading-relaxed text-ink-soft">
             <p>
-              An earlier version of this model treated mandate fit as one
-              weighted factor among thirteen. That produced an indefensible
-              result. Under the healthcare mandate, the highest ranked company
-              was a semiconductor business, because eleven strong quality
-              factors will always outvote one weak fit factor. The company was
-              excellent and the arithmetic was correct, and the answer was still
-              wrong.
+              Relevance is not a quality to be traded against other qualities. It
+              is a precondition. A fund with a healthcare mandate cannot buy a
+              semiconductor company however good it is, so the model must not be
+              able to rank one first.
             </p>
             <p>
-              The error was conceptual. Relevance is not a quality to be traded
-              against other qualities. It is a precondition. A fund with a
-              healthcare mandate cannot buy a semiconductor company however good
-              it is, so the model must not be able to rank one first.
-            </p>
-            <p>
-              Scoring therefore runs in two stages. Stage one asks whether the
-              company is in scope. Stage two asks how good it is. The final
-              score is the quality score multiplied by a relevance multiplier,
-              and each relevance tier is capped at the top of a scoring band.
+              Stage one asks whether the company is in scope. The relevance
+              rating is the weaker of the mandate&apos;s sector affinity and its
+              stage affinity, because a company has to be both in the right
+              sector and at the right stage to be core to a mandate. Stage two
+              scores twelve quality factors. The final score is quality
+              multiplied by the relevance multiplier.
             </p>
           </div>
 
@@ -206,49 +223,34 @@ export default function MethodologyPage() {
 
           <div className="content-column mt-6 space-y-3 text-sm leading-relaxed text-ink-soft">
             <p>
-              <span className="font-medium text-ink">
-                The relevance rating is the weaker of sector affinity and stage
-                affinity, not their average.
-              </span>{" "}
-              This is a conjunction rather than a trade-off: a company has to be
-              both in the right sector and at the right stage to be core to a
-              mandate. Averaging would let an excellent sector match compensate
-              for a company being fifteen years and one public listing past the
-              stage the mandate invests at, which is not how any real mandate
-              works.
+              The ceilings are chosen so each tier stops at the top of a scoring
+              band. Only a company core to the active mandate can reach priority
+              research. Nothing is hardcoded per company: sector and stage
+              affinities live on the mandate, quality ratings live on the
+              company, and neither knows about the other.
             </p>
-            <p>
-              <span className="font-medium text-ink">
-                The ceilings are chosen so each tier stops at the top of a band.
-              </span>{" "}
-              An adjacent company can reach the top of strong watchlist and no
-              further. Only a company core to the active mandate can reach
-              priority research. That is the entire adjustment: one multiplier
-              per tier, published above, rather than a rule buried in code.
-            </p>
-            <p>
-              <span className="font-medium text-ink">
-                Nothing is hardcoded per company.
-              </span>{" "}
-              Sector and stage affinities live on the mandate, quality ratings
-              live on the company, and neither knows about the other. Every
-              ranking in the platform is the product of those two independent
-              inputs, which is why switching mandates reorders the universe
-              without any company record changing.
-            </p>
-            <p>
-              A consequence worth stating plainly: an off-thesis company can
-              still be an excellent company, and the interface says so. Each
-              company page shows the quality score before adjustment alongside
-              the tier that reduced it, so a reader can see that a score of 47
-              means low relevance rather than a poor business.
-            </p>
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {SCORE_BANDS.map((b) => (
+              <div key={b.label} className="card p-4">
+                <p className="font-mono text-xs font-semibold text-ink-muted">
+                  {b.range}
+                </p>
+                <h3 className="mt-1 text-sm font-semibold text-ink">
+                  {b.label}
+                </h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">
+                  {b.meaning}
+                </p>
+              </div>
+            ))}
           </div>
         </Section>
 
         <Section
-          title="How scoring weights change"
-          description="Quality weights only. Each column sums to 100, and relevance is applied afterwards. The differences between columns are each mandate's argument about what matters."
+          title="How scoring weights change by mandate"
+          description="Quality weights only. Each column sums to 100, and relevance is applied afterwards."
         >
           <div className="card overflow-x-auto">
             <table className="w-full min-w-[42rem] border-collapse text-sm">
@@ -307,117 +309,93 @@ export default function MethodologyPage() {
             </table>
           </div>
           <p className="mt-4 max-w-3xl text-sm leading-relaxed text-ink-soft">
-            The twelve quality factors are rated 0 to 5, deliberately coarse,
-            so the model cannot manufacture precision the evidence does not
-            support.
-            Ratings are oriented so that 5 is always the most favourable
-            reading, which on the four risk factors means 5 signals low risk.
-            The weighted total is rounded to a whole number.
+            Factors are rated 0 to 5, deliberately coarse, so the model cannot
+            manufacture precision the evidence does not support. Ratings are
+            oriented so 5 is always most favourable, which on the three risk
+            factors means 5 signals low risk. Raising more capital is never
+            itself rewarded, and neither is publishing more information.
           </p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {SCORE_BANDS.map((b) => (
-              <div key={b.label} className="card p-4">
-                <p className="font-mono text-xs font-semibold text-ink-muted">
-                  {b.range}
-                </p>
-                <h3 className="mt-1 text-sm font-semibold text-ink">
-                  {b.label}
-                </h3>
-                <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">
-                  {b.meaning}
-                </p>
-              </div>
-            ))}
-          </div>
         </Section>
 
         <Section
-          title="How analyst judgment is identified"
-          description="Every factor rating is labelled as resting on verified information or on analyst judgment, and the label is shown next to the rating."
-        >
-          <div className="content-column space-y-3 text-sm leading-relaxed text-ink-soft">
-            <p>
-              A rating is marked verified when it rests on something a reader
-              could check: a disclosed figure, a reported segment, a published
-              filing. It is marked judgment when it rests on an assessment that
-              reasonable analysts could disagree about, such as how defensible a
-              position will prove or how a competitive field will develop.
-            </p>
-            <p>
-              Most private-company ratings are judgment by necessity, and every
-              company page shows the proportion. This matters because a score of
-              74 built mostly from verified inputs is a materially different
-              object from a score of 74 built mostly from judgment, and the
-              number alone does not distinguish them.
-            </p>
-          </div>
-        </Section>
-
-        <Section
-          title="How estimates are labelled"
-          description="Every figure in the platform carries one of five provenance labels, attached to the figure itself rather than to a legend elsewhere on the page."
+          title="How data confidence is assigned"
+          description="Confidence describes how certain the conclusion is, not how good the company is."
         >
           <div className="space-y-2">
-            {PROVENANCE_ORDER.map((p) => (
+            {DATA_CONFIDENCE_LEVELS.map((level) => (
               <div
-                key={p}
+                key={level}
                 className="flex flex-col gap-2 rounded-lg border border-line bg-surface p-4 sm:flex-row sm:items-start sm:gap-4"
               >
                 <div className="sm:w-44 sm:shrink-0">
-                  <ProvenanceBadge provenance={p} />
-                  <p className="mt-1.5 text-sm font-medium text-ink">
-                    {PROVENANCE_LABEL[p]}
-                  </p>
+                  <ConfidenceBadge confidence={level} />
                 </div>
                 <p className="text-sm leading-relaxed text-ink-soft">
-                  {PROVENANCE_NOTE[p]}
+                  {DATA_CONFIDENCE_MEANING[level]}
                 </p>
               </div>
             ))}
           </div>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-ink-soft">
+            A company with limited public disclosure may still be an excellent
+            investment. The platform separates the two judgments deliberately, so
+            that a low score can be read as low relevance or thin evidence rather
+            than as a poor business. Companies are not rewarded for disclosing
+            more.
+          </p>
         </Section>
 
         <Section
-          title="How public and private companies are compared"
-          description="They are compared on the dimensions where comparison is meaningful, and explicitly not on the ones where it is not."
+          title="How missing information is treated"
+          description="Every gap is shown as a gap."
         >
           <div className="content-column space-y-3 text-sm leading-relaxed text-ink-soft">
             <p>
-              Categorical dimensions such as capital intensity, commercial
-              readiness, market maturity, and technical differentiation are
-              analyst assessments applied on the same scale to both, so they
-              compare directly. Scores compare directly for the same reason.
+              Where a fact is unavailable, the interface displays{" "}
+              <span className="font-medium text-ink">not publicly disclosed</span>{" "}
+              rather than an estimate. Each financing assessment additionally
+              lists what is absent from the public record, so a reader can see
+              the shape of the gap rather than inferring it.
             </p>
             <p>
-              Financial dimensions do not. A public company reports revenue
-              growth and gross margin; a private company does not report
-              anything. The comparison view states this in each affected row
-              rather than leaving a blank cell, because an empty cell reads as a
-              small number rather than as an absence.
+              No estimate appears anywhere in this dataset. An estimate would be
+              permitted only if the calculation and its assumptions were shown
+              and it were labelled as analyst judgment, and no case in this
+              universe met a standard where an estimate was more useful than an
+              honest gap.
             </p>
+          </div>
+        </Section>
+
+        <Section
+          title="How public companies are separated from venture candidates"
+          description="Structurally, not by a filter."
+        >
+          <div className="content-column space-y-3 text-sm leading-relaxed text-ink-soft">
             <p>
-              No private-company valuation is published anywhere in this
-              platform. A funding-database valuation is a post-money figure from
-              a single negotiated transaction, often stale and frequently
-              reported by an interested party, and treating it as comparable to
-              a market capitalisation would be a category error.
+              Private companies and public companies use different types. The
+              private type has no ticker and its financing stage type has no
+              public member, so a listed company cannot be represented as a
+              sourcing candidate at all. The public type carries no score, no
+              relevance tier, and no pipeline status, so it cannot be ranked.
             </p>
+            <p>{MARKET_SIGNAL_DISCLOSURE}</p>
           </div>
         </Section>
 
         <Section
           title="Data refresh requirements"
-          description="What a production version of this platform would need to re-verify, and how often."
+          description="What a production version would need to re-verify, and how often."
         >
           <div className="content-column">
             <BulletList
               items={[
-                "Public-company financials: every quarter, on filing, from the primary document rather than from a summary",
-                "Market capitalisation and valuation multiples: daily, and never stored in a static file",
-                "Technical benchmarks: every two quarters, since results expire with software versions",
-                "Regulatory and export control status: on change, since these have moved at short notice",
-                "Private-company records: on each direct contact with the company, since there is no filing to rely on",
-                "Source registry links: quarterly, to catch reorganised investor relations sites",
+                "Private status: before any decision, and at minimum quarterly. This is the fact most likely to expire.",
+                "Financing and investors: on each announcement, from the company's own release rather than from a summary",
+                "Founders and leadership: annually, and on any public change",
+                "Technical claims and benchmarks: every two quarters, since results expire with software and hardware versions",
+                "Official website and source links: quarterly, to catch reorganised sites and removed announcements",
+                "Market signals: each reporting period for public companies referenced as context",
               ]}
             />
           </div>
@@ -425,7 +403,7 @@ export default function MethodologyPage() {
 
         <Section
           title="Limitations"
-          description="The constraints that apply to this research, stated directly rather than left for a reader to discover."
+          description="The constraints that apply to this research, stated directly."
         >
           <div className="grid gap-3 md:grid-cols-2">
             {LIMITATIONS.map((l) => (
@@ -439,74 +417,81 @@ export default function MethodologyPage() {
           </div>
         </Section>
 
-        <Section
-          title="Why this supports rather than replaces judgment"
-          description=""
-        >
+        <Section title="Why this supports rather than replaces investor judgment">
           <div className="content-column space-y-3 text-sm leading-relaxed text-ink-soft">
             <p>
               The scoring model does not decide anything. It organises evidence
-              so that a disagreement can be located precisely: not &ldquo;I do
-              not like this company&rdquo; but &ldquo;I think defensibility is a
-              4 rather than a 2, and here is why&rdquo;. That is a more
-              productive argument, and it is
-              the only real justification for putting a number on a company at
-              all.
+              so that a disagreement can be located precisely: not that a company
+              looks uninteresting, but that technical evidence is a 3 rather than
+              a 5, and here is the source that decides it.
             </p>
             <p>
               The bands reinforce this. The highest band is called priority
               research, not buy. It means the company has earned analyst time
-              this week. No score in this platform is a recommendation, and the
-              factor that measures how overlooked a company is carries the
-              smallest weight in every mandate, because being early is only
-              valuable when the other twelve factors already hold.
+              this week. The sourcing originality factor carries the smallest
+              weight in every mandate, because being early is only valuable when
+              the other eleven factors already hold.
             </p>
+            <div className="pt-2">
+              <GitHubLink variant="button" />
+            </div>
           </div>
         </Section>
 
         <Section
           title="Source registry"
-          description="Every external source the research rests on, with what it supports and when it was last checked. Demonstration companies carry no external sources, because a fictional company cannot have a real filing behind it."
+          description="Every external source the research rests on, with what it supports and when it was checked. Only primary sources and independent corroborating publications are registered. Commercial funding databases are excluded."
         >
           <div className="card overflow-x-auto">
-            <table className="w-full min-w-[48rem] border-collapse text-sm">
+            <table className="w-full min-w-[56rem] border-collapse text-sm">
               <thead>
                 <tr className="border-b border-line-strong text-left">
                   <th className="py-3 pl-4 pr-3 font-semibold text-ink">
-                    Source
+                    Company or sector
                   </th>
+                  <th className="py-3 px-3 font-semibold text-ink">Source</th>
+                  <th className="py-3 px-3 font-semibold text-ink">Publisher</th>
                   <th className="py-3 px-3 font-semibold text-ink">Type</th>
-                  <th className="py-3 px-3 font-semibold text-ink">Subject</th>
-                  <th className="py-3 px-3 font-semibold text-ink">
-                    Fact supported
-                  </th>
+                  <th className="py-3 px-3 font-semibold text-ink">Published</th>
+                  <th className="py-3 px-3 font-semibold text-ink">Accessed</th>
                   <th className="py-3 pl-3 pr-4 font-semibold text-ink">
-                    Accessed
+                    Fact supported
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {SOURCES.map((s) => (
                   <tr key={s.id} className="border-b border-line align-top">
-                    <td className="py-3 pl-4 pr-3">
+                    <td className="py-3 pl-4 pr-3 whitespace-nowrap font-medium text-ink">
+                      {s.subject}
+                    </td>
+                    <td className="py-3 px-3">
                       <a
                         href={s.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="font-medium text-accent hover:underline"
                       >
-                        {s.name}
+                        {s.title}
                       </a>
+                      {s.primary && (
+                        <span className="ml-2 text-xs text-ink-muted">
+                          primary
+                        </span>
+                      )}
                     </td>
+                    <td className="py-3 px-3 text-ink-soft">{s.publisher}</td>
                     <td className="py-3 px-3 whitespace-nowrap text-ink-soft">
                       {s.type}
                     </td>
-                    <td className="py-3 px-3 text-ink-soft">{s.subject}</td>
-                    <td className="max-w-md py-3 px-3 text-xs leading-relaxed text-ink-muted">
-                      {s.supports}
+                    <td className="py-3 px-3 whitespace-nowrap text-ink-muted">
+                      {formatDate(s.published)}
                     </td>
-                    <td className="py-3 pl-3 pr-4 whitespace-nowrap text-ink-muted">
-                      {formatDate(s.accessDate)}
+                    <td className="py-3 px-3 whitespace-nowrap text-ink-muted">
+                      {formatDate(s.accessed)}
+                    </td>
+                    <td className="max-w-md py-3 pl-3 pr-4 text-xs leading-relaxed text-ink-muted">
+                      {s.supports}
                     </td>
                   </tr>
                 ))}
@@ -514,10 +499,9 @@ export default function MethodologyPage() {
             </table>
           </div>
           <p className="mt-3 text-xs leading-relaxed text-ink-muted">
-            {SOURCES.length} registered sources. Only primary sources are used:
-            company investor relations material and the SEC EDGAR filing system.
-            Secondary coverage and commercial funding databases are deliberately
-            excluded.
+            {SOURCES.length} registered sources, {SOURCES.filter((s) => s.primary).length}{" "}
+            of them primary. Every link was checked on{" "}
+            {formatDate(SITE.snapshotDate)}.
           </p>
         </Section>
 

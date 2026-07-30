@@ -23,10 +23,10 @@ export const metadata: Metadata = {
     default: SITE.name,
     template: `%s | ${SITE.name}`,
   },
-  description: SITE.subtitle,
+  description: SITE.description,
   openGraph: {
     title: SITE.name,
-    description: SITE.subtitle,
+    description: SITE.description,
     type: "website",
   },
 };

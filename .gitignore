@@ -1,11 +1,26 @@
-# Secrets. The application needs none, but the rule stays so it can never
-# become possible to commit one by accident.
+# Secrets. The application needs none, but the rules stay so one can never be
+# committed by accident.
 .env
 .env.*
-.env*
-# The template carries no real values, so it is tracked. Re-asserted after the
-# broad rule above, because a later pattern would otherwise override it.
 !.env.example
+*.pem
+*.key
+*.p12
+*.crt
+secrets/
+credentials/
+tokens/
+
+# Private or scraped research data
+private-data/
+raw-data/
+scraped-data/
+/data/
+/research/
+/private/
+*.db
+*.sqlite
+*.sqlite3
 
 # Node and Next.js
 node_modules/
@@ -20,32 +35,24 @@ next-env.d.ts
 .vercel
 .vercel/
 
-# Local databases and any scraped or private research data.
-# These are anchored to the repository root with a leading slash. An unanchored
-# "data/" would also match lib/data/, which is source code and must be tracked.
-*.db
-*.sqlite
-*.sqlite3
-/data/
-/research/
-/private/
+# Test artifacts
+playwright-report/
+test-results/
+coverage/
+tests/.tmp-downloads/
 
-# Screenshots, browser automation artifacts, and test output
+# Screenshots and browser automation artifacts
 *.png
 *.jpg
 *.jpeg
 *.gif
 .playwright-mcp/
-playwright-report/
-test-results/
-coverage/
 
-# Python tooling, in case any is ever reintroduced
+# Python tooling, in case any is ever added
 __pycache__/
 *.py[cod]
 .venv/
 venv/
-*.egg-info/
 .pytest_cache/
 .mypy_cache/
 
@@ -60,6 +67,3 @@ tmp/
 Thumbs.db
 .vscode/
 .idea/
-
-# End-to-end test artifacts
-tests/.tmp-downloads/

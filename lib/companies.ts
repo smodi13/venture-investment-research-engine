@@ -1,69 +1,53 @@
-import { PUBLIC_COMPANIES } from "./data/public-companies";
-import { PRIVATE_COMPANIES } from "./data/private-companies";
-import type { Company, Sector } from "./types";
+import { COMPANIES_A } from "./data/companies-a";
+import { COMPANIES_B } from "./data/companies-b";
+import { COMPANIES_C } from "./data/companies-c";
+import { COMPANIES_D } from "./data/companies-d";
+import type { PrivateCompany, Sector } from "./types";
 
 /**
- * The research universe.
+ * The sourcing universe.
  *
- * Public companies are real, and carry qualitative profiles drawn from widely
- * published information with financial figures expressed as dated, labelled
- * ranges. Private companies are fictional demonstration records, because a
- * private company cannot be researched to the same standard from public
- * sources and inventing facts about a real one would be indefensible.
+ * Every company here is a real, independently private company verified against
+ * public sources on 30 July 2026. There are no fictional records, and by
+ * construction there are no public companies: the PrivateCompany type has no
+ * ticker and the Stage type has no public member, so a listed company cannot
+ * be represented here at all.
  *
- * That split is stated on every surface where a company appears, so a reader
- * always knows which kind of record they are looking at.
+ * Public companies live in market-signals.ts with a different type, no score,
+ * and no pipeline status.
  */
-export const COMPANIES: Company[] = [...PUBLIC_COMPANIES, ...PRIVATE_COMPANIES];
+export const COMPANIES: PrivateCompany[] = [
+  ...COMPANIES_A,
+  ...COMPANIES_B,
+  ...COMPANIES_C,
+  ...COMPANIES_D,
+];
 
-export const COMPANY_BY_ID: Record<string, Company> = Object.fromEntries(
+export const COMPANY_BY_ID: Record<string, PrivateCompany> = Object.fromEntries(
   COMPANIES.map((c) => [c.id, c]),
 );
 
-export function getCompany(id: string): Company | undefined {
+export function getCompany(id: string): PrivateCompany | undefined {
   return COMPANY_BY_ID[id];
 }
 
-/** Sectors actually present in the universe. */
 export function activeSectors(): Sector[] {
   return [...new Set(COMPANIES.map((c) => c.sector))];
 }
 
-/** Subsectors present, used to populate the filter control. */
 export function activeSubsectors(): string[] {
   return [...new Set(COMPANIES.map((c) => c.subsector))].sort();
 }
 
+export function activeRegions(): string[] {
+  return [...new Set(COMPANIES.map((c) => c.region))].sort();
+}
+
 export const UNIVERSE_STATS = {
   total: COMPANIES.length,
-  publicCount: COMPANIES.filter((c) => c.marketType === "Public").length,
-  privateCount: COMPANIES.filter((c) => c.marketType === "Private").length,
   sectorCount: new Set(COMPANIES.map((c) => c.sector)).size,
-  demonstrationCount: COMPANIES.filter((c) => c.isDemonstration).length,
+  regionCount: new Set(COMPANIES.map((c) => c.region)).size,
+  headquartersCount: new Set(COMPANIES.map((c) => c.headquarters)).size,
+  highConfidence: COMPANIES.filter((c) => c.dataConfidence === "High").length,
+  sourceCount: new Set(COMPANIES.flatMap((c) => c.sourceIds)).size,
 };
-
-/**
- * Free-text search across the fields a researcher would actually search on.
- * Deliberately includes the technical description, because most useful
- * searches in this universe are for a technology rather than for a name.
- */
-export function matchesQuery(company: Company, query: string): boolean {
-  const q = query.trim().toLowerCase();
-  if (!q) return true;
-  const haystack = [
-    company.name,
-    company.sector,
-    company.subsector,
-    company.description,
-    company.technicalDifferentiation,
-    company.businessModel,
-    company.primaryCustomer,
-    company.hq,
-    company.financials.kind === "public" ? company.financials.ticker : "",
-    company.technology.howItWorks,
-    company.technology.coreAdvantage,
-  ]
-    .join(" ")
-    .toLowerCase();
-  return haystack.includes(q);
-}

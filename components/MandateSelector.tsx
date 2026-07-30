@@ -86,7 +86,7 @@ export function MandateSelector({
                 {m.summary}
               </p>
               <p className="mt-2 text-[11px] font-medium text-ink-muted">
-                {m.typicalStages}
+                {m.targetStages}
               </p>
             </button>
           );

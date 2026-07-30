@@ -1,134 +1,111 @@
 /**
- * Core domain types for the Venture Investment Research Engine.
+ * Core domain types for the Venture Sourcing Engine.
  *
- * The central idea in this file is `Fact<T>`. Every number and every material
- * claim in the platform carries its own provenance, as-of date, and optional
- * source reference, so the interface can never present an analyst estimate as
- * a reported figure. Rendering code reads the provenance, not just the value.
+ * Two rules shape this file.
+ *
+ * First, the sourcing universe contains only real, currently private
+ * companies. There is no `isDemonstration` flag and no public company in the
+ * sourcing type at all, because the type system should make it impossible to
+ * put a mature public company into a venture sourcing ranking. Public
+ * companies have their own type and their own route.
+ *
+ * Second, every material claim carries a source. A field that cannot be
+ * sourced is set to NOT_DISCLOSED rather than estimated, because a plausible
+ * invented number is worse than an honest gap.
  */
 
-/** Where a value came from, and therefore how much weight it can carry. */
-export type Provenance =
-  | "reported" // Disclosed by the company or a filing. Cite a source.
-  | "estimate" // Analyst estimate built on public information. Approximate.
-  | "demonstration" // Illustrative value on a fictional company.
-  | "unverified" // A public figure exists but was not verified in this build.
-  | "not-disclosed"; // Genuinely unavailable in public sources.
+/** The exact string shown wherever a fact could not be verified. */
+export const NOT_DISCLOSED = "Not publicly disclosed" as const;
+export type NotDisclosed = typeof NOT_DISCLOSED;
 
-export const PROVENANCE_LABEL: Record<Provenance, string> = {
-  reported: "Reported",
-  estimate: "Analyst estimate",
-  demonstration: "Demonstration data",
-  unverified: "Requires verification",
-  "not-disclosed": "Not publicly disclosed",
-};
+/** A value that is either sourced or explicitly absent. */
+export type Sourced<T> = T | NotDisclosed;
 
-export const PROVENANCE_NOTE: Record<Provenance, string> = {
-  reported:
-    "Disclosed by the company or drawn from a public filing. Confirm against the cited source before relying on it.",
-  estimate:
-    "An analyst estimate assembled from public information, expressed as a range rather than a point value. Directional, not a reported figure.",
-  demonstration:
-    "An illustrative value on a fictional company, included to exercise the workflow. It describes no real business.",
-  unverified:
-    "A figure exists in public filings but has not been verified inside this build. Populate it from the primary source before using it in a decision.",
-  "not-disclosed":
-    "No reliable public figure exists. The field is deliberately left empty rather than filled with a guess.",
-};
-
-/**
- * A single value plus everything needed to judge it. `value` is null when the
- * figure is genuinely unavailable, which the interface renders explicitly
- * rather than hiding.
- */
-export interface Fact<T> {
-  value: T | null;
-  provenance: Provenance;
-  /** ISO date the value was accurate as of. Every figure is dated. */
-  asOf: string;
-  /** Optional qualifier shown alongside the value. */
-  note?: string;
-  /** Id into the source registry in lib/sources.ts. */
-  sourceId?: string;
+export function isDisclosed<T>(value: Sourced<T>): value is T {
+  return value !== NOT_DISCLOSED;
 }
 
-/** Convenience constructors, used heavily by the dataset. */
-export const reported = <T>(
-  value: T,
-  asOf: string,
-  sourceId?: string,
-  note?: string,
-): Fact<T> => ({ value, provenance: "reported", asOf, sourceId, note });
-
-export const estimate = <T>(
-  value: T,
-  asOf: string,
-  note?: string,
-  sourceId?: string,
-): Fact<T> => ({ value, provenance: "estimate", asOf, note, sourceId });
-
-export const demo = <T>(value: T, asOf: string, note?: string): Fact<T> => ({
-  value,
-  provenance: "demonstration",
-  asOf,
-  note,
-});
-
-export const undisclosed = <T>(asOf: string, note?: string): Fact<T> => ({
-  value: null,
-  provenance: "not-disclosed",
-  asOf,
-  note,
-});
+/* -------------------------------------------------------------------------- */
+/* Evidence and confidence                                                    */
+/* -------------------------------------------------------------------------- */
 
 /**
- * For figures that genuinely exist in public filings but were not verified
- * inside this build. The interface renders these as an explicit gap with a
- * link to the primary source, which is more useful than a confident guess.
+ * Whether a rating rests on something a reader can check, or on the analyst's
+ * reading of it. Shown next to every factor.
  */
-export const unverified = <T>(
-  asOf: string,
-  sourceId?: string,
-  note?: string,
-): Fact<T> => ({ value: null, provenance: "unverified", asOf, sourceId, note });
+export type Basis = "verified" | "judgment";
+
+/**
+ * How much of a company's record is supported by primary sources.
+ *
+ * This is not a quality signal. A company with thin public disclosure can be
+ * an excellent company, and the platform says so. It is a statement about how
+ * certain the conclusion is, nothing more.
+ */
+export type DataConfidence = "High" | "Medium" | "Low";
+
+export const DATA_CONFIDENCE_LEVELS: DataConfidence[] = [
+  "High",
+  "Medium",
+  "Low",
+];
+
+export const DATA_CONFIDENCE_MEANING: Record<DataConfidence, string> = {
+  High: "Financing, founders, product, and technical claims are each supported by a primary source, with corroboration from an independent publication.",
+  Medium:
+    "The core facts are sourced, but at least one material area rests on a single source or on the company's own description.",
+  Low: "Public disclosure is thin. The company may still be interesting, and the conclusion is correspondingly less certain.",
+};
+
+/** A claim with the source that supports it. */
+export interface Evidence {
+  claim: string;
+  /** Id into the source registry. */
+  sourceId: string;
+  basis: Basis;
+}
 
 /* -------------------------------------------------------------------------- */
 /* Classification                                                             */
 /* -------------------------------------------------------------------------- */
 
-export type MarketType = "Public" | "Private";
-
-export const MARKET_TYPES: MarketType[] = ["Public", "Private"];
-
 export type Sector =
   | "AI Infrastructure"
-  | "Semiconductors"
+  | "Semiconductors & Advanced Computing"
   | "Robotics & Autonomy"
-  | "Quantum Technology"
+  | "Quantum Computing"
   | "Biotechnology & Research Tools"
-  | "Energy & Advanced Materials"
-  | "Enterprise Software"
+  | "Energy Systems"
+  | "Advanced Materials"
+  | "Space & Aerospace"
+  | "Enterprise Infrastructure Software"
   | "Healthcare Technology";
 
 export const SECTORS: Sector[] = [
   "AI Infrastructure",
-  "Semiconductors",
+  "Semiconductors & Advanced Computing",
   "Robotics & Autonomy",
-  "Quantum Technology",
+  "Quantum Computing",
   "Biotechnology & Research Tools",
-  "Energy & Advanced Materials",
-  "Enterprise Software",
+  "Energy Systems",
+  "Advanced Materials",
+  "Space & Aerospace",
+  "Enterprise Infrastructure Software",
   "Healthcare Technology",
 ];
 
+/**
+ * Financing stages a venture sourcing engine can act on. There is deliberately
+ * no "Public" member: a public company cannot be a sourcing candidate, and the
+ * type prevents one being recorded as such.
+ */
 export type Stage =
   | "Pre-Seed"
   | "Seed"
   | "Series A"
   | "Series B"
   | "Series C"
-  | "Growth"
-  | "Public";
+  | "Later stage";
 
 export const STAGES: Stage[] = [
   "Pre-Seed",
@@ -136,8 +113,7 @@ export const STAGES: Stage[] = [
   "Series A",
   "Series B",
   "Series C",
-  "Growth",
-  "Public",
+  "Later stage",
 ];
 
 export type Region =
@@ -153,11 +129,6 @@ export const REGIONS: Region[] = [
   "Middle East & Africa",
 ];
 
-/**
- * How much capital the business model consumes before it can scale. A decisive
- * variable in frontier technology, where two companies with identical revenue
- * can need an order of magnitude different amounts of money to get there.
- */
 export type CapitalIntensity = "Low" | "Moderate" | "High" | "Very High";
 
 export const CAPITAL_INTENSITIES: CapitalIntensity[] = [
@@ -167,23 +138,302 @@ export const CAPITAL_INTENSITIES: CapitalIntensity[] = [
   "Very High",
 ];
 
-/** How close the company is to selling a repeatable product. */
 export type CommercialReadiness =
   | "Research"
   | "Prototype"
   | "Early Deployment"
-  | "Scaling"
-  | "Established";
+  | "Scaling";
 
 export const COMMERCIAL_READINESS: CommercialReadiness[] = [
   "Research",
   "Prototype",
   "Early Deployment",
   "Scaling",
-  "Established",
 ];
 
 export type MarketMaturity = "Emerging" | "Developing" | "Mature";
+
+/* -------------------------------------------------------------------------- */
+/* Sourcing                                                                   */
+/* -------------------------------------------------------------------------- */
+
+/** The observable event that caused a company to enter the pipeline. */
+export type SourcingSignal =
+  | "Recent financing"
+  | "Product launch"
+  | "Research publication"
+  | "Technical benchmark"
+  | "Patent activity"
+  | "Regulatory milestone"
+  | "Government grant"
+  | "Government contract"
+  | "Manufacturing milestone"
+  | "Founder background"
+  | "Open-source adoption"
+  | "Major partnership"
+  | "Customer announcement"
+  | "Hiring pattern"
+  | "New facility"
+  | "Industry bottleneck"
+  | "Strategic investor participation";
+
+export const SOURCING_SIGNALS: SourcingSignal[] = [
+  "Recent financing",
+  "Product launch",
+  "Research publication",
+  "Technical benchmark",
+  "Patent activity",
+  "Regulatory milestone",
+  "Government grant",
+  "Government contract",
+  "Manufacturing milestone",
+  "Founder background",
+  "Open-source adoption",
+  "Major partnership",
+  "Customer announcement",
+  "Hiring pattern",
+  "New facility",
+  "Industry bottleneck",
+  "Strategic investor participation",
+];
+
+export interface SourcingRationale {
+  /** The primary signal type that surfaced the company. */
+  signal: SourcingSignal;
+  /** ISO date the signal was observed. */
+  dateSourced: string;
+  /** How the company was found. */
+  channel: string;
+  /** Specific, evidenced statement of why this entered the pipeline. */
+  whyEntered: string;
+  whyTimely: string;
+  /**
+   * Why the company may be under-examined. When the evidence does not support
+   * an overlooked claim, this states plainly that the company is already well
+   * recognised and explains why it remains relevant.
+   */
+  whyOverlooked: string;
+  /** True when the company is widely covered and the platform says so. */
+  wellRecognised: boolean;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Assessments                                                                */
+/* -------------------------------------------------------------------------- */
+
+export interface TechnologyAssessment {
+  howItWorks: string;
+  coreAdvantage: string;
+  supportingEvidence: Evidence[];
+  benchmarks: Sourced<string>;
+  intellectualProperty: Sourced<string>;
+  thirdPartyDependency: string;
+  milestoneForScale: string;
+  failurePoints: string[];
+}
+
+export interface MarketAssessment {
+  painPoint: string;
+  structure: string;
+  adoptionDrivers: string[];
+  competitors: string[];
+  substitutes: string[];
+  regulatoryEnvironment: string;
+  maturity: MarketMaturity;
+  currentCatalyst: string;
+}
+
+export interface CommercialAssessment {
+  customerType: string;
+  pricingModel: Sourced<string>;
+  salesMotion: string;
+  adoptionEvidence: Evidence[];
+  implementationBurden: string;
+  expansionOpportunity: string;
+  goToMarketRisk: string;
+}
+
+export interface FinancingAssessment {
+  stage: Stage;
+  /** Human-readable description of the latest disclosed round. */
+  latestRound: string;
+  /** ISO date the latest round was announced. */
+  latestRoundDate: string;
+  latestRoundSourceId: string;
+  totalDisclosedFunding: Sourced<string>;
+  namedInvestors: string[];
+  capitalIntensity: CapitalIntensity;
+  futureCapitalRequirement: string;
+  financingRisk: string;
+  /** What a reader should know is absent from the public record. */
+  missingInformation: string[];
+}
+
+export interface InvestmentView {
+  thesis: string;
+  bullCase: string;
+  baseCase: string;
+  bearCase: string;
+  catalysts: string[];
+  risks: string[];
+  invalidators: string[];
+  recommendedNextStep: string;
+  confidence: DataConfidence;
+}
+
+export interface DiligenceSet {
+  technology: string[];
+  product: string[];
+  customers: string[];
+  competition: string[];
+  unitEconomics: string[];
+  capitalRequirements: string[];
+  regulation: string[];
+  team: string[];
+  financing: string[];
+  commercialization: string[];
+}
+
+/* -------------------------------------------------------------------------- */
+/* Scoring                                                                    */
+/* -------------------------------------------------------------------------- */
+
+export type FactorKey =
+  | "technicalDifferentiation"
+  | "technicalEvidence"
+  | "defensibility"
+  | "marketImportance"
+  | "commercialReadiness"
+  | "customerEvidence"
+  | "teamCredibility"
+  | "capitalEfficiency"
+  | "competitiveIntensity"
+  | "financingRisk"
+  | "regulatoryRisk"
+  | "sourcingOriginality";
+
+/**
+ * A per-factor assessment. Ratings are 0 to 5 and deliberately coarse, so the
+ * model cannot manufacture precision the evidence does not support.
+ *
+ * Ratings are oriented so 5 is always the most favourable reading. On the
+ * three risk factors that means 5 signals low risk.
+ */
+export interface FactorAssessment {
+  rating: number;
+  evidence: string;
+  explanation: string;
+  basis: Basis;
+  confidence: DataConfidence;
+  /** Source supporting the evidence, where one exists. */
+  sourceId?: string;
+}
+
+export type FactorSet = Record<FactorKey, FactorAssessment>;
+
+/** Terse constructor used throughout the dataset. */
+export const fa = (
+  rating: number,
+  basis: Basis,
+  confidence: DataConfidence,
+  evidence: string,
+  explanation: string,
+  sourceId?: string,
+): FactorAssessment => ({
+  rating,
+  basis,
+  confidence,
+  evidence,
+  explanation,
+  sourceId,
+});
+
+/* -------------------------------------------------------------------------- */
+/* The private company                                                        */
+/* -------------------------------------------------------------------------- */
+
+export interface PrivateCompany {
+  id: string;
+  name: string;
+  /** Official company website. Verified to resolve. */
+  website: string;
+  /**
+   * Always true, and asserted by the data-integrity tests. The field exists so
+   * that the check is explicit in the data rather than implied by the type.
+   */
+  currentlyPrivate: true;
+  /** How private status was confirmed, and when. */
+  privateStatusNote: string;
+  headquarters: string;
+  region: Region;
+  foundedYear: Sourced<number>;
+  founders: string[];
+  sector: Sector;
+  subsector: string;
+  description: string;
+  targetCustomer: string;
+  businessModel: string;
+  technicalDifferentiation: string;
+  tractionSignal: Sourced<string>;
+  recentCatalyst: string;
+  primaryCompetitors: string[];
+  mainTechnicalRisk: string;
+  mainCommercialRisk: string;
+  mainFinancingRisk: string;
+  sourcing: SourcingRationale;
+  financing: FinancingAssessment;
+  technology: TechnologyAssessment;
+  market: MarketAssessment;
+  commercial: CommercialAssessment;
+  investment: InvestmentView;
+  diligence: DiligenceSet;
+  outreach: string;
+  factors: FactorSet;
+  dataConfidence: DataConfidence;
+  /** Why the record carries the confidence rating it does. */
+  dataConfidenceNote: string;
+  /** Source registry ids. At least one primary and one corroborating. */
+  sourceIds: string[];
+  /** ISO date the record was last reviewed against its sources. */
+  lastReviewed: string;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Public companies, used only as market signals                              */
+/* -------------------------------------------------------------------------- */
+
+export type SignalUse =
+  | "Capital expenditure trend"
+  | "Earnings read-through"
+  | "Customer demand indicator"
+  | "Supply-chain signal"
+  | "Technology adoption signal"
+  | "Valuation context"
+  | "Competitive context"
+  | "Market maturity";
+
+/**
+ * A public company. Structurally separate from PrivateCompany and carrying no
+ * score, no pipeline status, and no sourcing rationale, because it is not a
+ * sourcing candidate and cannot be turned into one.
+ */
+export interface MarketSignalCompany {
+  id: string;
+  name: string;
+  ticker: string;
+  exchange: string;
+  website: string;
+  sector: Sector;
+  /** What this company tells a venture investor. */
+  signalUses: SignalUse[];
+  whatItSignals: string;
+  /** How to read it, including what it does not tell you. */
+  howToRead: string;
+  /** Private companies in the universe whose thesis this bears on. */
+  relatedPrivateIds: string[];
+  sourceIds: string[];
+  lastReviewed: string;
+}
 
 /* -------------------------------------------------------------------------- */
 /* Pipeline                                                                   */
@@ -214,230 +464,16 @@ export const PIPELINE_STAGES: PipelineStage[] = [
   "Invested",
 ];
 
-/** Stages that represent an active position in the funnel. */
-export const ACTIVE_PIPELINE_STAGES: PipelineStage[] = PIPELINE_STAGES.filter(
-  (s) => s !== "Passed" && s !== "Monitoring" && s !== "Invested",
-);
-
 export type Priority = "High" | "Medium" | "Low";
 
 export const PRIORITIES: Priority[] = ["High", "Medium", "Low"];
 
-/* -------------------------------------------------------------------------- */
-/* Research detail                                                            */
-/* -------------------------------------------------------------------------- */
-
-/** A claim carrying its own confidence label, shown next to the claim itself. */
-export interface Evidence {
-  claim: string;
-  provenance: Provenance;
-  asOf: string;
-  sourceId?: string;
-}
-
-export interface TechnologyAssessment {
-  howItWorks: string;
-  coreAdvantage: string;
-  supportingEvidence: Evidence[];
-  benchmarks: string;
-  intellectualProperty: string;
-  thirdPartyDependency: string;
-  milestoneForScale: string;
-  failurePoints: string[];
-}
-
-export interface MarketAssessment {
-  painPoint: string;
-  structure: string;
-  adoptionDrivers: string[];
-  whyNow: string;
-  competitors: string[];
-  substitutes: string[];
-  regulatoryEnvironment: string;
-  maturity: MarketMaturity;
-}
-
-export interface CommercialAssessment {
-  pricingModel: string;
-  salesMotion: string;
-  customerType: string;
-  adoptionEvidence: Evidence[];
-  implementationBurden: string;
-  expansionOpportunity: string;
-  goToMarketRisk: string;
-}
-
-/** Financing view for a private company. */
-export interface PrivateFinancials {
-  kind: "private";
-  stage: Stage;
-  capitalRaised: Fact<number>;
-  latestRound: Fact<string>;
-  capitalIntensity: CapitalIntensity;
-  futureFinancingNeed: string;
-  ownershipConsiderations: string;
-  financingRisk: string;
-}
-
-/**
- * Financing view for a public company.
- *
- * Every figure here is typed as a string rather than a number on purpose. This
- * build expresses public-market financials as dated ranges ("gross margin in
- * the low to mid seventies"), because a point value carried in a static file
- * would be stale within a quarter and would read as more precise than the
- * underlying verification supports.
- */
-export interface PublicFinancials {
-  kind: "public";
-  ticker: string;
-  marketCap: Fact<string>;
-  revenueGrowth: Fact<string>;
-  grossMargin: Fact<string>;
-  operatingMargin: Fact<string>;
-  cashPosition: Fact<string>;
-  valuationMultiple: Fact<string>;
-  marketExpectations: string;
-  earningsCatalysts: string[];
-}
-
-export type Financials = PrivateFinancials | PublicFinancials;
-
-export interface InvestmentView {
-  thesis: string;
-  bullCase: string;
-  baseCase: string;
-  bearCase: string;
-  catalysts: string[];
-  risks: string[];
-  invalidators: string[];
-  recommendedNextStep: string;
-}
-
-export interface DiligenceSet {
-  technology: string[];
-  product: string[];
-  customers: string[];
-  competition: string[];
-  unitEconomics: string[];
-  capitalRequirements: string[];
-  regulation: string[];
-  team: string[];
-  financing: string[];
-  commercialization: string[];
-}
-
-/* -------------------------------------------------------------------------- */
-/* Scoring                                                                    */
-/* -------------------------------------------------------------------------- */
-
-/**
- * The twelve quality factors.
- *
- * Mandate fit is deliberately absent. It is not a quality factor and is not
- * scored additively, because a weighted factor can always be outvoted by the
- * other eleven: a superb company outside a mandate would still rank near the
- * top, which is not how a mandate works. Relevance is handled as a separate
- * stage in lib/scoring.ts.
- */
-export type FactorKey =
-  | "differentiation"
-  | "defensibility"
-  | "marketPotential"
-  | "commercialReadiness"
-  | "customerEvidence"
-  | "teamCredibility"
-  | "capitalEfficiency"
-  | "competitiveIntensity"
-  | "technicalRisk"
-  | "regulatoryRisk"
-  | "financingRisk"
-  | "overlooked";
-
-/**
- * A per-factor assessment. `rating` is 0 to 5 and is deliberately coarse: the
- * weighted score is derived from it, so the model cannot manufacture precision
- * the underlying evidence does not support.
- *
- * Ratings are oriented so that 5 is always the most favourable reading. On the
- * four risk factors that means 5 signals low risk, which the methodology page
- * states explicitly so the direction is never ambiguous.
- */
-export interface FactorAssessment {
-  rating: number; // 0 to 5
-  evidence: string;
-  rationale: string;
-  /** Whether the rating rests on verified information or analyst judgment. */
-  basis: "verified" | "judgment";
-}
-
-export type FactorSet = Record<FactorKey, FactorAssessment>;
-
-/** Terse constructor for factor assessments, used throughout the dataset. */
-export const fa = (
-  rating: number,
-  basis: "verified" | "judgment",
-  evidence: string,
-  rationale: string,
-): FactorAssessment => ({ rating, basis, evidence, rationale });
-
-/* -------------------------------------------------------------------------- */
-/* Company                                                                    */
-/* -------------------------------------------------------------------------- */
-
-export interface Company {
-  id: string;
-  name: string;
-  /**
-   * True when the company is fictional. Every private company in this build is
-   * a demonstration record; the public companies are real, and their
-   * qualitative profiles are drawn from widely published information.
-   */
-  isDemonstration: boolean;
-  marketType: MarketType;
-  hq: string;
-  region: Region;
-  foundedYear: number;
-  sector: Sector;
-  subsector: string;
-  stage: Stage;
-  description: string;
-  businessModel: string;
-  primaryCustomer: string;
-  technicalDifferentiation: string;
-  tractionSignal: Fact<string>;
-  keyCatalyst: string;
-  investmentRisk: string;
-  technicalRisk: string;
-  competitiveThreat: string;
-  capitalIntensity: CapitalIntensity;
-  commercialReadiness: CommercialReadiness;
-  /** ISO date this record was last reviewed by the analyst. */
-  lastReviewed: string;
-  /** Ids into the source registry. Empty for demonstration companies. */
-  sourceIds: string[];
-  financials: Financials;
-  technology: TechnologyAssessment;
-  market: MarketAssessment;
-  commercial: CommercialAssessment;
-  investment: InvestmentView;
-  diligence: DiligenceSet;
-  outreach: string;
-  factors: FactorSet;
-}
-
-/** Locally editable workflow fields layered on top of a static company. */
+/** Locally editable workflow fields layered on top of a sourced company. */
 export interface PipelineFields {
   status: PipelineStage;
   priority: Priority;
-  owner: string;
-  dateSourced: string;
-  lastActivity: string;
+  keyUnansweredQuestion: string;
   nextStep: string;
   nextStepDate: string;
   notes: string;
-  keyRisk: string;
-  source: string;
 }
-
-export type CompanyRecord = Company & PipelineFields;

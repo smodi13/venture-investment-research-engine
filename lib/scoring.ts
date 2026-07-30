@@ -1,28 +1,19 @@
 import { getMandate, type Mandate, type MandateId } from "./mandates";
-import type { Company, FactorAssessment, FactorKey } from "./types";
+import type { FactorAssessment, FactorKey, PrivateCompany } from "./types";
 
 /**
  * The scoring framework.
  *
  * Scoring runs in two stages, and the order matters.
  *
- * Stage one asks whether the company is even in scope for the active mandate.
+ * Stage one asks whether the company is in scope for the active mandate.
  * Stage two asks how good the company is. The final score is the quality score
  * scaled by a relevance multiplier, so a company outside the mandate cannot
  * reach the top of the ranking on company quality alone.
  *
- * An earlier version of this model treated mandate fit as one weighted factor
- * among thirteen. That was wrong, and it produced an indefensible result: a
- * company with straight fives on quality outranked every genuinely on-thesis
- * company under a mandate it had nothing to do with, because eleven strong
- * factors will always outvote one weak one. Relevance is not a quality worth
- * trading against other qualities. It is a precondition, and it is now modelled
- * as one.
- *
- * Two rules still govern the quality stage. No score is produced without the
- * evidence and the basis that produced it. And the model refuses false
- * precision: factors are rated 0 to 5, weights are whole numbers, and totals
- * are rounded.
+ * Only verified private companies are ever passed to this module. Public
+ * companies have a separate type with no factors and no score, so they cannot
+ * be ranked here even by mistake.
  */
 
 export interface Factor {
@@ -30,20 +21,25 @@ export interface Factor {
   label: string;
   short: string;
   description: string;
-  /**
-   * Risk factors are rated so that 5 means low risk. Stating this on the
-   * factor itself keeps the direction unambiguous everywhere it is rendered.
-   */
+  /** Risk factors are rated so that 5 means low risk. */
   isRisk: boolean;
 }
 
 export const FACTORS: Factor[] = [
   {
-    key: "differentiation",
+    key: "technicalDifferentiation",
     label: "Technical differentiation",
     short: "Differentiation",
     description:
-      "Whether the hard part is genuinely hard: a novel method, a proprietary data or process loop, real physical systems work, or an integration surface that resists a quick rebuild.",
+      "Whether the hard part is genuinely hard: a novel method, a proprietary process, real physical systems work, or an integration surface that resists a quick rebuild.",
+    isRisk: false,
+  },
+  {
+    key: "technicalEvidence",
+    label: "Technical evidence",
+    short: "Evidence",
+    description:
+      "How much of the technical claim can be checked from outside the company: published results, government or laboratory validation, shipped product, or independent benchmarking. Rated separately from differentiation on purpose, because a strong claim with no external evidence is a different investment from the same claim with it.",
     isRisk: false,
   },
   {
@@ -51,15 +47,15 @@ export const FACTORS: Factor[] = [
     label: "Defensibility",
     short: "Defensibility",
     description:
-      "What stops a well-funded competitor from arriving at the same position in eighteen months. Switching costs, accumulated data, process knowledge, regulatory clearance, and supply agreements all count. Brand and first-mover status largely do not.",
+      "What stops a well-funded competitor reaching the same position in eighteen months. Switching costs, accumulated data, process knowledge, regulatory clearance, and supply agreements count. Brand and first-mover status largely do not.",
     isRisk: false,
   },
   {
-    key: "marketPotential",
-    label: "Market potential",
+    key: "marketImportance",
+    label: "Market importance",
     short: "Market",
     description:
-      "Size and durability of the market being entered, judged from the structure of the buying process rather than from a top-down market-size estimate.",
+      "Whether the bottleneck being addressed actually matters, judged from the structure of the buying process rather than from a top-down market-size estimate. This platform publishes no market-size figures.",
     isRisk: false,
   },
   {
@@ -75,12 +71,12 @@ export const FACTORS: Factor[] = [
     label: "Customer evidence",
     short: "Customers",
     description:
-      "Observable pull: paid deployments, named design partners, renewals, usage growth, or inbound demand. Weighted down sharply when the company itself is the only source for the claim.",
+      "Observable pull: named customers, disclosed contracts, government awards, or independent adoption. Weighted down sharply when the company itself is the only source for the claim.",
     isRisk: false,
   },
   {
     key: "teamCredibility",
-    label: "Team credibility",
+    label: "Founder and team credibility",
     short: "Team",
     description:
       "Evidence the team has lived this problem: research record, systems shipped, operating experience inside the industry they now sell into, or a prior company taken through the same transition.",
@@ -91,7 +87,7 @@ export const FACTORS: Factor[] = [
     label: "Capital efficiency",
     short: "Capital efficiency",
     description:
-      "Output achieved per dollar consumed, judged against what this category normally costs. A capital-hungry business is not penalised for its category, only for consuming more than its peers to reach the same point.",
+      "Output achieved per dollar consumed, judged against what this category normally costs. A capital-hungry business is not penalised for its category, only for consuming more than its peers to reach the same point. Raising more money is never itself rewarded.",
     isRisk: false,
   },
   {
@@ -103,11 +99,11 @@ export const FACTORS: Factor[] = [
     isRisk: true,
   },
   {
-    key: "technicalRisk",
-    label: "Technical risk",
-    short: "Technical risk",
+    key: "financingRisk",
+    label: "Financing risk",
+    short: "Financing risk",
     description:
-      "Probability that the technology does not reach the performance required at the cost required. Rated so that 5 means low technical risk.",
+      "The risk that the next round is hard to raise, heavily dilutive, or required before the proving milestone arrives. Rated so that 5 means low financing risk.",
     isRisk: true,
   },
   {
@@ -115,23 +111,15 @@ export const FACTORS: Factor[] = [
     label: "Regulatory risk",
     short: "Regulatory risk",
     description:
-      "Exposure to approval, certification, export control, or data governance decisions outside the company's control. Rated so that 5 means low regulatory risk.",
+      "Exposure to approval, certification, export control, licensing, or data governance decisions outside the company's control. Rated so that 5 means low regulatory risk.",
     isRisk: true,
   },
   {
-    key: "financingRisk",
-    label: "Financing or valuation risk",
-    short: "Financing risk",
+    key: "sourcingOriginality",
+    label: "Sourcing originality",
+    short: "Originality",
     description:
-      "For private companies, the risk that the next round is hard to raise or heavily dilutive. For public companies, the risk carried in the current valuation. Rated so that 5 means low financing risk.",
-    isRisk: true,
-  },
-  {
-    key: "overlooked",
-    label: "Degree to which the company appears overlooked",
-    short: "Overlooked",
-    description:
-      "Whether the opportunity is under-examined relative to its quality. Weighted lightly everywhere, because being early is only valuable if the other eleven factors already hold.",
+      "Whether the opportunity is under-examined relative to its quality. Weighted lightly everywhere, because being early is only valuable if the other eleven factors already hold. A widely covered company scores low here and the platform says so rather than pretending otherwise.",
     isRisk: false,
   },
 ];
@@ -157,9 +145,8 @@ export type RelevanceTierId =
 export interface RelevanceTier {
   id: RelevanceTierId;
   label: string;
-  /** Quality score is multiplied by this. */
   multiplier: number;
-  /** The highest final score this tier can reach, which is multiplier * 100. */
+  /** The highest final score this tier can reach. */
   ceiling: number;
   meaning: string;
 }
@@ -167,11 +154,9 @@ export interface RelevanceTier {
 /**
  * Five relevance tiers, each capped at the top of a scoring band.
  *
- * The multipliers are chosen so that each tier's ceiling lands exactly at the
- * top of a band. A company that is merely adjacent to the mandate can reach
- * the top of strong watchlist and no further; only a core company can reach
- * priority research. That is the whole adjustment, and it is one number per
- * tier rather than a rule buried in code.
+ * The multipliers are chosen so each tier's ceiling lands exactly at the top of
+ * a band. A company merely adjacent to the mandate can reach the top of strong
+ * watchlist and no further; only a core company can reach priority research.
  */
 export const RELEVANCE_TIERS: Record<RelevanceTierId, RelevanceTier> = {
   core: {
@@ -225,7 +210,6 @@ export const RELEVANCE_ORDER: RelevanceTierId[] = [
 ];
 
 export interface Relevance {
-  /** 0 to 5. The binding constraint of sector affinity and stage affinity. */
   rating: number;
   sectorAffinity: number;
   stageAffinity: number;
@@ -235,20 +219,15 @@ export interface Relevance {
 
 /**
  * Relevance is the weaker of sector affinity and stage affinity, not their
- * average.
- *
- * This is a conjunction, not a trade-off. A company has to be both in the
- * right sector and at the right stage to be core to a mandate. Averaging would
- * let an excellent sector match compensate for a company being fifteen years
- * and one public listing past the stage the mandate invests at, which is not
- * how any real mandate works.
+ * average. This is a conjunction, not a trade-off: a company has to be both in
+ * the right sector and at the right stage to be core to a mandate.
  */
 export function mandateRelevance(
-  company: Company,
+  company: PrivateCompany,
   mandate: Mandate,
 ): Relevance {
   const sectorAffinity = mandate.sectorAffinity[company.sector] ?? 0;
-  const stageAffinity = mandate.stageAffinity[company.stage] ?? 0;
+  const stageAffinity = mandate.stageAffinity[company.financing.stage] ?? 0;
   const rating = Math.min(sectorAffinity, stageAffinity);
 
   const tierId: RelevanceTierId =
@@ -266,7 +245,7 @@ export function mandateRelevance(
     sectorAffinity < stageAffinity
       ? `sector (${company.sector})`
       : stageAffinity < sectorAffinity
-        ? `stage (${company.stage})`
+        ? `stage (${company.financing.stage})`
         : "sector and stage equally";
 
   return {
@@ -286,9 +265,7 @@ export interface FactorContribution {
   factor: Factor;
   assessment: FactorAssessment;
   weight: number;
-  /** Points earned toward the quality score, out of `weight`. */
   points: number;
-  /** Points lost against this factor's weight. */
   deduction: number;
 }
 
@@ -296,14 +273,14 @@ export interface ScoreResult {
   /** Company quality out of 100, before the relevance adjustment. */
   quality: number;
   relevance: Relevance;
-  /** quality multiplied by the relevance multiplier, rounded. */
+  /** Quality multiplied by the relevance multiplier, rounded. */
   total: number;
   contributions: FactorContribution[];
   mandate: Mandate;
 }
 
 export function scoreCompany(
-  company: Company,
+  company: PrivateCompany,
   mandateId: MandateId,
 ): ScoreResult {
   const mandate = getMandate(mandateId);
@@ -327,8 +304,10 @@ export function scoreCompany(
   };
 }
 
-/** Total only. Used by tables and sorting, which do not need the breakdown. */
-export function companyScore(company: Company, mandateId: MandateId): number {
+export function companyScore(
+  company: PrivateCompany,
+  mandateId: MandateId,
+): number {
   return scoreCompany(company, mandateId).total;
 }
 
@@ -365,7 +344,7 @@ export const SCORE_BANDS: ScoreBand[] = [
     tone: "diligence",
     range: "55 to 69",
     meaning:
-      "Something specific is unresolved. Check the relevance tier first: a peripheral company sits here because of its fit, not because of its quality.",
+      "Something specific is unresolved. Check the relevance tier and the data confidence first: a company can sit here because of fit or because of thin public disclosure rather than because of quality.",
   },
   {
     label: "Low current priority",
@@ -406,13 +385,8 @@ export function topDeductions(
     .slice(0, count);
 }
 
-/**
- * A rationale sentence assembled from the active mandate's own weighting and
- * relevance tier, so the stated reason for a ranking always matches the
- * arithmetic behind it.
- */
 export function investmentRationale(
-  company: Company,
+  company: PrivateCompany,
   result: ScoreResult,
 ): string {
   const drivers = topContributors(result, 2).map((c) =>
@@ -451,7 +425,6 @@ export function evidenceMix(result: ScoreResult): {
   };
 }
 
-/** Weight totals per mandate, rendered on the methodology page as a check. */
 export function weightTotal(mandate: Mandate): number {
   return FACTORS.reduce((sum, f) => sum + mandate.weights[f.key], 0);
 }

@@ -7,97 +7,112 @@ import type { PipelineFields, PipelineStage, Priority } from "./types";
 /**
  * Workflow state.
  *
- * Everything a user changes lives in this browser only. There is no account,
- * no database, and no server-side write path anywhere in the application.
+ * Company facts are sourced and fixed. Only the workflow layer, meaning
+ * status, priority, notes, and next steps, is editable, and it lives in this
+ * browser only. There is no account, no database, and no server-side write
+ * path anywhere in the application.
  *
- * Local storage is treated as what it is: an external store outside React.
- * It is read through useSyncExternalStore rather than through an effect, so
- * the server render and the hydrated render agree without a mismatch and
- * without a cascading re-render on mount.
- *
- * This module imports the compact row type rather than the full company
- * dataset, so adding workflow state to a page does not drag the entire
- * research corpus into the client bundle.
+ * The starting statuses below are demonstration workflow data. They are a
+ * plausible arrangement of a research pipeline and do not indicate that any
+ * meeting, outreach, or investment actually took place.
  */
 
-const STORAGE_KEY = "vire.pipeline.v1";
-const MANDATE_KEY = "vire.mandate.v1";
+const STORAGE_KEY = "vse.pipeline.v1";
+const MANDATE_KEY = "vse.mandate.v1";
 
-export const TODAY = "2026-07-29";
+export const TODAY = "2026-07-30";
 
-/** Deterministic starting placement, so the platform opens in a considered state. */
+export const WORKFLOW_DISCLAIMER =
+  "Pipeline status, priority, and notes are demonstration workflow data showing how the tool is used. They do not indicate that any meeting, outreach, or investment activity occurred. Company facts on every record are sourced and dated.";
+
+/** Demonstration workflow placement. Company facts are unaffected by this. */
 const DEFAULT_STATUS: Record<string, PipelineStage> = {
-  nvda: "Monitoring",
-  amd: "Monitoring",
-  avgo: "Monitoring",
-  mu: "Initial research",
-  arm: "Monitoring",
-  alab: "Initial research",
-  crdo: "Monitoring",
-  vrt: "Deep diligence",
-  ionq: "Monitoring",
-  sdgr: "Initial research",
-  tem: "Monitoring",
-  be: "Passed",
-  "larkspur-systems": "First meeting",
-  "meridian-fabric": "Deep diligence",
-  "coldbrook-thermal": "Investment memo",
-  "halden-compute": "Passed",
-  "anvil-grid": "Partner review",
-  "wrenfield-robotics": "Founder outreach",
-  "tidewater-autonomy": "Deep diligence",
-  "palisade-quantum": "Monitoring",
-  "kestrel-bio": "Initial research",
-  "ferrule-photonics": "Founder outreach",
-  "ravelin-data": "First meeting",
-  "sable-health": "Initial research",
-  "halyard-systems": "Partner review",
-  "corvid-security": "Founder outreach",
-  "alder-clinical": "First meeting",
+  etched: "Monitoring",
+  "d-matrix": "Deep diligence",
+  "ayar-labs": "Initial research",
+  lightmatter: "Initial research",
+  quera: "Deep diligence",
+  "atom-computing": "Partner review",
+  "path-robotics": "Founder outreach",
+  "collaborative-robotics": "Initial research",
+  "oxide-computer": "First meeting",
+  chainguard: "Monitoring",
+  "sublime-systems": "Investment memo",
+  "base-power": "Passed",
+  "antora-energy": "Deep diligence",
+  "radiant-industries": "First meeting",
+  "k2-space": "Initial research",
+  "stoke-space": "Monitoring",
+  "cradle-bio": "Founder outreach",
+  openevidence: "Passed",
 };
 
 const DEFAULT_PRIORITY: Record<string, Priority> = {
-  vrt: "High",
-  "larkspur-systems": "High",
-  "meridian-fabric": "High",
-  "coldbrook-thermal": "High",
-  "anvil-grid": "High",
-  "ferrule-photonics": "High",
-  "ravelin-data": "High",
-  nvda: "Low",
-  amd: "Low",
-  arm: "Low",
-  crdo: "Low",
-  ionq: "Low",
-  tem: "Low",
-  be: "Low",
-  "halden-compute": "Low",
-  "palisade-quantum": "Low",
-  "halyard-systems": "High",
-  "alder-clinical": "High",
+  "d-matrix": "High",
+  "atom-computing": "High",
+  "path-robotics": "High",
+  "oxide-computer": "High",
+  "sublime-systems": "High",
+  "antora-energy": "High",
+  "cradle-bio": "High",
+  etched: "Low",
+  chainguard: "Low",
+  "base-power": "Low",
+  openevidence: "Low",
+  "stoke-space": "Low",
 };
 
-/** Notes written on the records where the analyst has an actual view. */
+/** Analyst notes. These are judgments about sourced facts, not invented facts. */
 const DEFAULT_NOTES: Record<string, string> = {
-  "anvil-grid":
-    "The strongest asset here is not the software, it is three utility approvals that took two years each. Ask a utility engineer, not the founder, whether the pending standard revision changes anything.",
-  "meridian-fabric":
-    "Everything depends on qualification data we have not seen. Do not progress past diligence until the in-rack thermal numbers arrive. Laboratory results are not the question.",
-  "halden-compute":
-    "Passed on structure rather than on quality. The preference stack means a good outcome returns very little to a new common holder, and the next tape-out must be funded before pilots convert.",
-  "coldbrook-thermal":
-    "Ready for memo. The open item is three-year coolant chemistry from the two oldest sites, which is the risk that would only appear long after we invested.",
-  "ferrule-photonics":
-    "Genuinely overlooked. Everyone funds photonic chips and nobody funds the alignment step that sets their cost. Timing risk on co-packaged optics is a reason to be careful, not a reason to pass.",
-  be: "Passed on capital efficiency and history rather than on current demand. Two decades of losses and repeated financing is a pattern, and the demand driver is a grid constraint utilities are actively working to remove.",
-  "halyard-systems":
-    "The clearest case in the pipeline. Break-even before the Series B, gross retention above ninety five percent, and four of six largest customers in a third contract year. The only real question is whether audit firms bundle this before the category sets.",
-  "corvid-security":
-    "Right primitive, no evidence. Do not price this until the first renewal cohort lands, which is roughly nine months out. Nothing else will tell us whether it is bought or merely trialled.",
-  "alder-clinical":
-    "The measurement work is already done, which is rare this early. The question is not whether it works but whether a sponsor will ever pay for it. Ask a sponsor, not a site.",
-  "ravelin-data":
-    "Best retention in the private set on the least capital. The single question that matters is retention among customers whose warehouse vendor has already shipped native lineage.",
+  "d-matrix":
+    "Best combination in the universe of a differentiated architecture and disclosed strategic backing. The gap is customer evidence: ecosystem partners are named, end customers are not. Do not progress past diligence until one is.",
+  "sublime-systems":
+    "Ready for memo. Two of the largest cement producers invested simultaneously and the product meets an external ASTM standard, which is stronger evidence than any vendor claim. Open item is whether the strategic investments carry offtake.",
+  "base-power":
+    "Passed on regulatory concentration rather than on quality. The entire customer proposition depends on grid services revenue set by regulators, and the model has not yet been proven in a second regulatory regime.",
+  openevidence:
+    "Passed on valuation and disclosure. Adoption is genuinely exceptional and independently reported. The business model is not public, which makes a twelve billion dollar reference point impossible to underwrite from outside.",
+  "atom-computing":
+    "Strongest published error-correction evidence in the quantum set. Note carefully that a third of the announced funding is a government letter of intent rather than committed capital, and the terms are not public.",
+  "path-robotics":
+    "Most genuinely overlooked position in the universe. Columbus based, unglamorous category, founders who welded before they built robots. The question is deployment cost for the second cell versus the first.",
+  "oxide-computer":
+    "Two national laboratories as named customers is a stronger reference than any enterprise logo. Ask them what they evaluated against.",
+  "antora-energy":
+    "Industrial heat is a larger emissions category than grid storage and attracts a fraction of the attention. ARPA-E documentation plus a commissioned project is a good evidence combination.",
+  etched:
+    "Monitoring rather than pursuing. Technically the most aggressive specialisation trade available, and at this valuation there is little left for a new investor unless the outcome is exceptional.",
+  "ayar-labs":
+    "Both major accelerator vendors on the same cap table is a rare signal. Record is low confidence: no founder names, no founding year, no total raised. Close those before anything else.",
+};
+
+/** The single question that most needs answering, per company. */
+const KEY_QUESTIONS: Record<string, string> = {
+  etched: "Has any customer confirmed a delivered and accepted rack?",
+  "d-matrix": "Which named end customer is running production traffic?",
+  "ayar-labs": "Who founded the company, and what is total capital raised?",
+  lightmatter: "Is there any design win at all?",
+  quera: "How is logical qubit progress tracking against the 2028 roadmap?",
+  "atom-computing":
+    "What conditions attach to the Department of Commerce letter of intent?",
+  "path-robotics":
+    "How long does the second cell take to deploy against the first?",
+  "collaborative-robotics": "Has any financing closed since April 2024?",
+  "oxide-computer": "How many customers have ordered a second rack?",
+  chainguard: "What is current revenue against the April 2025 disclosure?",
+  "sublime-systems":
+    "Do the strategic investments carry offtake commitments?",
+  "base-power":
+    "How does the model perform under a less favourable grid services regime?",
+  "antora-energy":
+    "How has the commissioned project performed through a full production year?",
+  "radiant-industries":
+    "What are the pass criteria for the fuelled test, and what is the licensing path?",
+  "k2-space": "Has the first production satellite flown, and how did it perform?",
+  "stoke-space": "What has slipped against the original first flight schedule?",
+  "cradle-bio":
+    "How do predictions compare with open source models on prospective tasks?",
+  openevidence: "What is the business model?",
 };
 
 function truncate(text: string, max: number): string {
@@ -108,15 +123,11 @@ export function baseFields(row: UniverseRow): PipelineFields {
   return {
     status: DEFAULT_STATUS[row.id] ?? "New lead",
     priority: DEFAULT_PRIORITY[row.id] ?? "Medium",
-    owner: "Sahil Modi",
-    dateSourced: row.lastReviewed,
-    lastActivity: row.lastReviewed,
+    keyUnansweredQuestion:
+      KEY_QUESTIONS[row.id] ?? truncate(row.keyUnansweredQuestion, 120),
     nextStep: truncate(row.recommendedNextStep, 150),
     nextStepDate: TODAY,
     notes: DEFAULT_NOTES[row.id] ?? "",
-    keyRisk: row.investmentRisk,
-    source:
-      row.marketType === "Public" ? "Public market screen" : "Sector research",
   };
 }
 
@@ -128,12 +139,10 @@ export type WorkflowRow = UniverseRow & PipelineFields;
 /* -------------------------------------------------------------------------- */
 
 const EMPTY_OVERRIDES: Overrides = Object.freeze({});
-
 const listeners = new Set<() => void>();
 
 function subscribe(onChange: () => void): () => void {
   listeners.add(onChange);
-  // Keep multiple tabs consistent with each other.
   window.addEventListener("storage", onChange);
   return () => {
     listeners.delete(onChange);
@@ -149,8 +158,6 @@ function readRaw(key: string): string | null {
   try {
     return window.localStorage.getItem(key);
   } catch {
-    // Storage can be unavailable in private browsing. Losing local workflow
-    // edits is acceptable; breaking the page is not.
     return null;
   }
 }
@@ -159,14 +166,11 @@ function writeRaw(key: string, value: string): void {
   try {
     window.localStorage.setItem(key, value);
   } catch {
-    // Non-fatal, as above.
+    // Storage can be unavailable in private browsing. Losing local workflow
+    // edits is acceptable; breaking the page is not.
   }
 }
 
-/**
- * useSyncExternalStore requires a referentially stable snapshot, so the parsed
- * overrides are cached and only re-parsed when the underlying string changes.
- */
 let cachedRaw: string | null = null;
 let cachedOverrides: Overrides = EMPTY_OVERRIDES;
 
@@ -190,7 +194,6 @@ function getOverridesServerSnapshot(): Overrides {
   return EMPTY_OVERRIDES;
 }
 
-/** The current workflow overrides, kept in sync with local storage. */
 export function useOverrides(): Overrides {
   return useSyncExternalStore(
     subscribe,
@@ -212,10 +215,7 @@ export function mergeRows(
 
 export function updateRecord(id: string, patch: Partial<PipelineFields>): void {
   const current = getOverridesSnapshot();
-  const next: Overrides = {
-    ...current,
-    [id]: { ...current[id], ...patch, lastActivity: TODAY },
-  };
+  const next: Overrides = { ...current, [id]: { ...current[id], ...patch } };
   writeRaw(STORAGE_KEY, JSON.stringify(next));
   emit();
 }
@@ -230,7 +230,7 @@ export function resetWorkflow(): void {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Mandate selection, also persisted locally                                  */
+/* Mandate selection                                                          */
 /* -------------------------------------------------------------------------- */
 
 function getMandateSnapshot(): string | null {
@@ -241,7 +241,6 @@ function getMandateServerSnapshot(): string | null {
   return null;
 }
 
-/** The stored mandate id, or null when the visitor has not chosen one. */
 export function useStoredMandate(): string | null {
   return useSyncExternalStore(
     subscribe,

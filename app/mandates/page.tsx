@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { MANDATES } from "@/lib/mandates";
 import { FACTORS, weightTotal } from "@/lib/scoring";
 import { UNIVERSE_ROWS } from "@/lib/rows";
-import { MandatePreview } from "@/components/OverviewPanels";
+import { TopSourced } from "@/components/OverviewPanels";
 import {
   BulletList,
   CrossLink,
@@ -13,7 +13,7 @@ import {
 export const metadata: Metadata = {
   title: "Investment mandates",
   description:
-    "Four configurable investment mandates, each with its own factor weights, sector and stage affinities, and required diligence.",
+    "Four configurable private-company mandates, each with its own quality weights, sector and stage affinities, and required diligence.",
 };
 
 export default function MandatesPage() {
@@ -22,21 +22,27 @@ export default function MandatesPage() {
       <PageHeader
         eyebrow="Configuration"
         title="Investment mandates"
-        intro="A mandate is the configuration object the entire platform reads from. It carries the quality weights, the sector and stage affinities that set each company's relevance tier and score ceiling, the sectors emphasised in the interface, and the additional diligence every company must answer. Changing it changes the ranking, the score composition, the stated rationale, and the diligence list."
+        intro="A mandate is the configuration object the entire platform reads from. It carries the quality weights, the sector and stage affinities that set each company's relevance tier and score ceiling, the sectors emphasised in the interface, and the additional diligence every company must answer."
       />
 
       <section className="container-page py-10">
-        <MandatePreview rows={UNIVERSE_ROWS} />
+        <TopSourced rows={UNIVERSE_ROWS} />
         <p className="mt-6 rounded-lg border border-line bg-canvas p-4 text-sm leading-relaxed text-ink-soft">
           <span className="font-medium text-ink">
             Relevance is applied before quality.{" "}
           </span>
           A company is rated on how well it matches the sectors and stages of
-          the mandate, taking the weaker of the two. That rating sets a multiplier
-          and a hard score ceiling, so a company outside the mandate cannot
-          reach the top of the ranking on company quality alone. Only companies
-          core to the active mandate can reach priority research.{" "}
+          the mandate, taking the weaker of the two. That rating sets a
+          multiplier and a hard score ceiling, so a company outside the mandate
+          cannot reach the top of the ranking on company quality alone. Only
+          companies core to the active mandate can reach priority research.{" "}
           <CrossLink href="/methodology">See the full adjustment</CrossLink>.
+        </p>
+        <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
+          Public companies have no stage affinity in any mandate, because the
+          financing stage type has no public member. A listed company cannot be
+          scored by a sourcing mandate here at all, which is a structural
+          exclusion rather than a filter that could later be forgotten.
         </p>
       </section>
 
@@ -46,10 +52,8 @@ export default function MandatesPage() {
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">
             These are the twelve quality weights, and each column sums to 100.
             They decide how good a company looks, not whether it is in scope.
-            Relevance is settled first, as a separate stage that caps the final
-            score, and is explained on the methodology page. The differences
-            between the columns are the argument each mandate makes about what
-            matters, published rather than hidden inside the scoring code.
+            The differences between the columns are the argument each mandate
+            makes about what matters.
           </p>
           <div className="mt-5 card overflow-x-auto">
             <table className="w-full min-w-[46rem] border-collapse text-sm">
@@ -142,9 +146,9 @@ export default function MandatesPage() {
                   <BulletList items={m.focusAreas} />
                 </div>
                 <div>
-                  <p className="label">Typical stages</p>
+                  <p className="label">Target stages</p>
                   <p className="text-sm leading-relaxed text-ink-soft">
-                    {m.typicalStages}
+                    {m.targetStages}
                   </p>
                   <p className="label mt-4">Emphasised sectors</p>
                   <BulletList items={m.emphasisedSectors} />

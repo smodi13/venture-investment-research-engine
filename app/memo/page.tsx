@@ -5,7 +5,7 @@ import { DisclosureNote } from "@/components/ui";
 export const metadata: Metadata = {
   title: "Investment memo",
   description:
-    "A complete demonstration investment memo, written on a fictional company so that every judgment can be stated with the confidence a memo requires.",
+    "A complete investment memo generated from a verified private company's sourced research record.",
 };
 
 export default function MemoPage() {

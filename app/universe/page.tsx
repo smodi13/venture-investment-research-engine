@@ -1,39 +1,48 @@
 import type { Metadata } from "next";
 import { UNIVERSE_ROWS } from "@/lib/rows";
-import { activeSectors, activeSubsectors, UNIVERSE_STATS } from "@/lib/companies";
+import {
+  activeSectors,
+  activeSubsectors,
+  UNIVERSE_STATS,
+} from "@/lib/companies";
 import { UniverseExplorer } from "@/components/UniverseExplorer";
 import { DisclosureNote, PageHeader } from "@/components/ui";
+import { formatDate } from "@/lib/format";
+import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Company universe",
+  title: "Private-company universe",
   description:
-    "Twenty seven companies across private and public markets, ranked by a transparent two-stage framework: mandate relevance first, then twelve weighted quality factors.",
+    "Verified private technology companies, ranked by mandate relevance and twelve weighted quality factors, each with dated sources and a data confidence rating.",
 };
 
 export default function UniversePage() {
   return (
     <div>
       <PageHeader
-        eyebrow="Research universe"
-        title="Company universe"
-        intro={`${UNIVERSE_STATS.total} companies across ${UNIVERSE_STATS.sectorCount} sectors, ${UNIVERSE_STATS.publicCount} public and ${UNIVERSE_STATS.privateCount} private. Search, filter, and sort the universe, then compare up to four companies side by side. Every score recalculates when the mandate changes.`}
+        eyebrow="Sourcing universe"
+        title="Private-company universe"
+        intro={`${UNIVERSE_STATS.total} real private companies across ${UNIVERSE_STATS.sectorCount} sectors and ${UNIVERSE_STATS.headquartersCount} headquarters locations. Every record was confirmed as an independently private company on ${formatDate(SITE.snapshotDate)} and carries at least one primary source and one corroborating source.`}
       />
 
       <section className="container-page py-8">
         <div className="mb-6 grid gap-3 sm:grid-cols-2">
           <p className="rounded-lg border border-line bg-surface p-4 text-xs leading-relaxed text-ink-soft">
-            <span className="font-semibold text-ink">Public companies. </span>
-            Real companies. Qualitative profiles are drawn from widely published
-            information. Financial figures are dated ranges labelled as analyst
-            estimates and should be reconciled against the primary filings
-            linked on each company page.
+            <span className="font-semibold text-ink">
+              Every company here is real and private.{" "}
+            </span>
+            There are no fictional records and no public companies. Financing,
+            founders, and technical claims are sourced. Facts that are not
+            publicly disclosed are shown as such rather than estimated.
           </p>
-          <p className="rounded-lg border border-violet-200 bg-violet-50 p-4 text-xs leading-relaxed text-violet-900">
-            <span className="font-semibold">Private companies. </span>
-            All {UNIVERSE_STATS.privateCount} are fictional demonstration
-            records, labelled everywhere they appear. They are modelled on real
-            archetypes so the workflow is realistic, but they describe no real
-            business.
+          <p className="rounded-lg border border-line bg-surface p-4 text-xs leading-relaxed text-ink-soft">
+            <span className="font-semibold text-ink">
+              Data confidence is separate from quality.{" "}
+            </span>
+            A company with thin public disclosure can be an excellent company.
+            The confidence rating describes how certain the conclusion is, not
+            how good the business is, and a company is never rewarded for
+            publishing more.
           </p>
         </div>
 

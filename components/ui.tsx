@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SITE } from "@/lib/site";
 
-/** Shared layout and typographic primitives used across the pages. */
+/** Shared layout and typographic primitives. */
 
 export function PageHeader({
   eyebrow,
@@ -72,15 +72,12 @@ export function StatTile({
       </div>
       <div className="mt-1 text-sm font-medium text-ink">{label}</div>
       {hint && (
-        <div className="mt-1 text-xs leading-relaxed text-ink-muted">
-          {hint}
-        </div>
+        <div className="mt-1 text-xs leading-relaxed text-ink-muted">{hint}</div>
       )}
     </div>
   );
 }
 
-/** A labelled block of prose, used throughout the research views. */
 export function Field({
   label,
   children,
@@ -124,7 +121,6 @@ export function BulletList({
   );
 }
 
-/** The disclosure block, rendered wherever conclusions are presented. */
 export function DisclosureNote({ className = "" }: { className?: string }) {
   return (
     <p
@@ -146,5 +142,33 @@ export function CrossLink({
     <Link href={href} className="font-medium text-accent hover:underline">
       {children}
     </Link>
+  );
+}
+
+/**
+ * The public repository link. Rendered on the homepage, in the footer, and on
+ * the methodology page so that a reviewer can inspect the data structure,
+ * scoring model, source registry, and tests directly.
+ */
+export function GitHubLink({
+  variant = "link",
+  className = "",
+}: {
+  variant?: "link" | "button";
+  className?: string;
+}) {
+  return (
+    <a
+      href={SITE.repository}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={
+        variant === "button"
+          ? `btn-secondary ${className}`
+          : `font-medium text-accent hover:underline ${className}`
+      }
+    >
+      {SITE.repositoryLabel}
+    </a>
   );
 }

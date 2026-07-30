@@ -5,13 +5,10 @@ import type { WorkflowRow } from "./storage";
 /**
  * CSV export.
  *
- * The export carries provenance columns alongside the values. A file that left
- * this application without them would let an analyst estimate be pasted into a
- * model as though it were a reported figure, which is the exact failure the
- * rest of the platform is built to prevent.
- *
- * It operates on the compact workflow row rather than the full company record,
- * because that is what both the universe table and the pipeline actually hold.
+ * The export carries data confidence, the sourcing rationale, and the source
+ * count alongside the score, so a figure cannot be pasted into a model without
+ * the caveats that qualify it. It contains only private companies, because
+ * only private companies exist in the sourcing universe.
  */
 
 function esc(value: string | number | null | undefined): string {
@@ -21,36 +18,33 @@ function esc(value: string | number | null | undefined): string {
 
 const HEADERS = [
   "Company",
-  "Record type",
-  "Market",
-  "Ticker",
+  "Website",
   "Sector",
   "Subsector",
-  "Stage",
-  "HQ",
+  "Financing stage",
+  "Headquarters",
   "Region",
   "Founded",
+  "Founders",
+  "Latest disclosed financing",
+  "Financing announced",
+  "Total disclosed funding",
+  "Named investors",
   "Mandate",
   "Score (of 100)",
   "Score band",
-  "Capital intensity",
-  "Commercial readiness",
-  "Market maturity",
+  "Data confidence",
+  "Sourcing signal",
+  "Date sourced",
+  "Why sourced",
   "Pipeline status",
   "Priority",
-  "Owner",
-  "Next step",
-  "Next step date",
-  "Key risk",
-  "Capital raised",
-  "Capital raised provenance",
-  "Market cap",
-  "Revenue growth",
-  "Gross margin",
-  "Traction signal",
-  "Traction provenance",
-  "Last reviewed",
+  "Key unanswered question",
+  "Next diligence step",
+  "Next-step date",
   "Notes",
+  "Sources",
+  "Date last reviewed",
 ];
 
 export function recordsToCsv(
@@ -62,45 +56,43 @@ export function recordsToCsv(
     const score = r.scores[mandateId];
     return [
       r.name,
-      r.isDemonstration ? "Demonstration data" : "Real company",
-      r.marketType,
-      r.ticker ?? "",
+      r.website,
       r.sector,
       r.subsector,
       r.stage,
-      r.hq,
+      r.headquarters,
       r.region,
       r.foundedYear,
+      r.founders,
+      r.latestRound,
+      r.latestRoundDate,
+      r.totalDisclosedFunding,
+      r.namedInvestors,
       mandateName,
       score,
       scoreBand(score).label,
-      r.capitalIntensity,
-      r.commercialReadiness,
-      r.marketMaturity,
+      r.dataConfidence,
+      r.sourcingSignal,
+      r.dateSourced,
+      r.whyEntered,
       r.status,
       r.priority,
-      r.owner,
+      r.keyUnansweredQuestion,
       r.nextStep,
       r.nextStepDate,
-      r.keyRisk,
-      r.capitalRaised,
-      r.marketType === "Private" ? r.capitalRaisedProvenance : "not-applicable",
-      r.marketCap,
-      r.revenueGrowth,
-      r.grossMargin,
-      r.tractionSignal,
-      r.tractionProvenance,
-      r.lastReviewed,
       r.notes,
+      r.sourceCount,
+      r.lastReviewed,
     ]
       .map(esc)
       .join(",");
   });
 
   const preamble = [
-    `# Venture Investment Research Engine export. Mandate: ${mandateName}. Generated ${new Date().toISOString().slice(0, 10)}.`,
-    "# Scores reflect an illustrative research framework and are not investment advice.",
-    "# Rows marked Demonstration data describe fictional companies. Rows marked Real company carry dated estimates requiring verification against primary filings.",
+    `# Venture Sourcing Engine export. Mandate: ${mandateName}. Generated ${new Date().toISOString().slice(0, 10)}.`,
+    "# All companies are real and were verified as independently private on 30 July 2026. No public companies and no fictional companies are included.",
+    "# Scores combine verified evidence with clearly identified analyst judgment and are not investment advice.",
+    "# Pipeline status, priority, and notes are demonstration workflow data. Company facts are sourced and dated.",
   ].join("\n");
 
   return [preamble, HEADERS.join(","), ...rows].join("\n");

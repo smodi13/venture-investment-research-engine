@@ -8,9 +8,10 @@ import {
   type IntelligenceEntry,
 } from "@/lib/intelligence";
 import { MANDATES, type MandateId } from "@/lib/mandates";
-import { ProvenanceBadge } from "./Provenance";
+import { SourceLink } from "./Provenance";
 import { formatDate } from "@/lib/format";
-import { SECTORS, MARKET_TYPES } from "@/lib/types";
+import { SECTORS } from "@/lib/types";
+import { COMPANY_BY_ID } from "@/lib/companies";
 
 const ANY = "Any";
 
@@ -20,7 +21,6 @@ const CONFIDENCE_TONE: Record<string, string> = {
   Low: "border-line bg-canvas text-ink-muted",
 };
 
-/** Sectors each mandate emphasises, used by the mandate filter. */
 function mandateSectors(id: MandateId): string[] {
   return MANDATES.find((m) => m.id === id)?.emphasisedSectors ?? [];
 }
@@ -28,7 +28,6 @@ function mandateSectors(id: MandateId): string[] {
 export function IntelligenceFeed() {
   const [sector, setSector] = useState(ANY);
   const [category, setCategory] = useState(ANY);
-  const [marketType, setMarketType] = useState(ANY);
   const [mandate, setMandate] = useState(ANY);
   const [since, setSince] = useState("");
 
@@ -36,7 +35,6 @@ export function IntelligenceFeed() {
     return INTELLIGENCE.filter((e: IntelligenceEntry) => {
       if (sector !== ANY && e.sector !== sector) return false;
       if (category !== ANY && e.category !== category) return false;
-      if (marketType !== ANY && e.marketType !== marketType) return false;
       if (since && e.date < since) return false;
       if (mandate !== ANY) {
         const sectors = mandateSectors(mandate as MandateId);
@@ -44,11 +42,11 @@ export function IntelligenceFeed() {
       }
       return true;
     }).sort((a, b) => b.date.localeCompare(a.date));
-  }, [sector, category, marketType, mandate, since]);
+  }, [sector, category, mandate, since]);
 
   return (
     <div className="space-y-6">
-      <div className="card grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="card grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
         <label className="block">
           <span className="label">Sector</span>
           <select
@@ -75,21 +73,6 @@ export function IntelligenceFeed() {
             {EVENT_CATEGORIES.map((c) => (
               <option key={c} value={c}>
                 {c}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          <span className="label">Public or private</span>
-          <select
-            value={marketType}
-            onChange={(e) => setMarketType(e.target.value)}
-            className="input"
-          >
-            <option value={ANY}>Both</option>
-            {MARKET_TYPES.map((m) => (
-              <option key={m} value={m}>
-                {m}
               </option>
             ))}
           </select>
@@ -137,8 +120,6 @@ export function IntelligenceFeed() {
               </time>
               <span className="chip">{e.category}</span>
               <span className="chip">{e.sector}</span>
-              <span className="chip">{e.marketType}</span>
-              <ProvenanceBadge provenance={e.provenance} />
               <span
                 className={`inline-flex rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${CONFIDENCE_TONE[e.confidence]}`}
               >
@@ -146,16 +127,7 @@ export function IntelligenceFeed() {
               </span>
             </div>
             <h3 className="mt-2.5 text-sm font-semibold text-ink">
-              {e.companyId ? (
-                <Link
-                  href={`/universe/${e.companyId}`}
-                  className="hover:text-accent hover:underline"
-                >
-                  {e.subject}
-                </Link>
-              ) : (
-                e.subject
-              )}
+              {e.subject}
             </h3>
             <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
               {e.summary}
@@ -174,9 +146,29 @@ export function IntelligenceFeed() {
                 </p>
               </div>
             </div>
-            <p className="mt-3 border-t border-line pt-2.5 text-xs leading-relaxed text-ink-muted">
+            {e.relatedPrivateIds.length > 0 && (
+              <div className="mt-3">
+                <p className="label">Related private companies</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {e.relatedPrivateIds.map((id) => {
+                    const company = COMPANY_BY_ID[id];
+                    if (!company) return null;
+                    return (
+                      <Link
+                        key={id}
+                        href={`/universe/${id}`}
+                        className="chip hover:border-accent hover:text-accent"
+                      >
+                        {company.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            <p className="mt-3 border-t border-line pt-2.5 text-xs text-ink-muted">
               <span className="font-medium">Source. </span>
-              {e.sourceNote}
+              <SourceLink sourceId={e.sourceId} />
             </p>
           </li>
         ))}

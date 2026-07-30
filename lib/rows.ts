@@ -1,73 +1,63 @@
 import { COMPANIES } from "./companies";
 import { MANDATES, type MandateId } from "./mandates";
 import { companyScore, mandateRelevance, type RelevanceTierId } from "./scoring";
-import { factText } from "./format";
 import type {
   CapitalIntensity,
   CommercialReadiness,
-  Company,
-  MarketMaturity,
-  MarketType,
-  Provenance,
+  DataConfidence,
+  PrivateCompany,
   Region,
   Sector,
+  SourcingSignal,
   Stage,
 } from "./types";
 
 /**
- * A compact projection of a company, carrying only what the table, filters,
- * sorting, and comparison views need.
+ * A compact projection of a private company, carrying only what the table,
+ * filters, sorting, and homepage cards need.
  *
- * The reason this exists is page weight. The full universe carries a large
- * amount of research prose that the browser has no use for while someone is
- * filtering a table, so the server sends this instead. Scores are precomputed
- * for every mandate, which is what lets the mandate selector re-rank the whole
- * universe instantly without a round trip.
+ * Scores and relevance tiers are precomputed for every mandate, which is what
+ * lets the mandate selector re-rank the universe instantly without a round
+ * trip and without shipping the full research corpus to the browser.
  */
 export interface UniverseRow {
   id: string;
   name: string;
-  isDemonstration: boolean;
-  marketType: MarketType;
-  ticker: string | null;
+  website: string;
   sector: Sector;
   subsector: string;
   stage: Stage;
   region: Region;
-  hq: string;
-  foundedYear: number;
+  headquarters: string;
+  foundedYear: string;
+  founders: string;
+  description: string;
   capitalIntensity: CapitalIntensity;
   commercialReadiness: CommercialReadiness;
-  marketMaturity: MarketMaturity;
+  dataConfidence: DataConfidence;
   lastReviewed: string;
-  description: string;
-  businessModel: string;
-  primaryCustomer: string;
-  technicalDifferentiation: string;
-  investmentRisk: string;
-  keyCatalyst: string;
+  /** Latest disclosed financing, already resolved to a display string. */
+  latestRound: string;
+  latestRoundDate: string;
+  totalDisclosedFunding: string;
+  namedInvestors: string;
+  sourcingSignal: SourcingSignal;
+  dateSourced: string;
+  whyEntered: string;
+  whyTimely: string;
+  whyOverlooked: string;
+  wellRecognised: boolean;
   recommendedNextStep: string;
-  /** Display strings, already resolved through their provenance. */
-  capitalRaised: string;
-  capitalRaisedValue: number | null;
-  capitalRaisedProvenance: Provenance;
-  marketCap: string;
-  revenueGrowth: string;
-  grossMargin: string;
-  cashPosition: string;
-  valuationMultiple: string;
-  tractionSignal: string;
-  tractionProvenance: Provenance;
-  /** Score under each mandate, so switching is instant and offline. */
+  keyUnansweredQuestion: string;
+  mainTechnicalRisk: string;
+  sourceCount: number;
   scores: Record<MandateId, number>;
-  /** Relevance tier under each mandate, shown beside the score. */
   tiers: Record<MandateId, RelevanceTierId>;
   /** Lowercased haystack for free-text search. */
   search: string;
 }
 
-function toRow(c: Company): UniverseRow {
-  const isPublic = c.financials.kind === "public";
+function toRow(c: PrivateCompany): UniverseRow {
   const scores = Object.fromEntries(
     MANDATES.map((m) => [m.id, companyScore(c, m.id)]),
   ) as Record<MandateId, number>;
@@ -78,57 +68,43 @@ function toRow(c: Company): UniverseRow {
   return {
     id: c.id,
     name: c.name,
-    isDemonstration: c.isDemonstration,
-    marketType: c.marketType,
-    ticker: c.financials.kind === "public" ? c.financials.ticker : null,
+    website: c.website,
     sector: c.sector,
     subsector: c.subsector,
-    stage: c.stage,
+    stage: c.financing.stage,
     region: c.region,
-    hq: c.hq,
-    foundedYear: c.foundedYear,
-    capitalIntensity: c.capitalIntensity,
-    commercialReadiness: c.commercialReadiness,
-    marketMaturity: c.market.maturity,
-    lastReviewed: c.lastReviewed,
+    headquarters: c.headquarters,
+    foundedYear: String(c.foundedYear),
+    founders: c.founders.length > 0 ? c.founders.join(", ") : "Not publicly disclosed",
     description: c.description,
-    businessModel: c.businessModel,
-    primaryCustomer: c.primaryCustomer,
-    technicalDifferentiation: c.technicalDifferentiation,
-    investmentRisk: c.investmentRisk,
-    keyCatalyst: c.keyCatalyst,
+    capitalIntensity: c.financing.capitalIntensity,
+    commercialReadiness:
+      c.factors.commercialReadiness.rating >= 4
+        ? "Scaling"
+        : c.factors.commercialReadiness.rating >= 3
+          ? "Early Deployment"
+          : c.factors.commercialReadiness.rating >= 2
+            ? "Prototype"
+            : "Research",
+    dataConfidence: c.dataConfidence,
+    lastReviewed: c.lastReviewed,
+    latestRound: c.financing.latestRound,
+    latestRoundDate: c.financing.latestRoundDate,
+    totalDisclosedFunding: String(c.financing.totalDisclosedFunding),
+    namedInvestors:
+      c.financing.namedInvestors.length > 0
+        ? c.financing.namedInvestors.join(", ")
+        : "Not publicly disclosed",
+    sourcingSignal: c.sourcing.signal,
+    dateSourced: c.sourcing.dateSourced,
+    whyEntered: c.sourcing.whyEntered,
+    whyTimely: c.sourcing.whyTimely,
+    whyOverlooked: c.sourcing.whyOverlooked,
+    wellRecognised: c.sourcing.wellRecognised,
     recommendedNextStep: c.investment.recommendedNextStep,
-    capitalRaised:
-      c.financials.kind === "private"
-        ? factText(c.financials.capitalRaised)
-        : "Publicly listed",
-    capitalRaisedValue:
-      c.financials.kind === "private" ? c.financials.capitalRaised.value : null,
-    capitalRaisedProvenance:
-      c.financials.kind === "private"
-        ? c.financials.capitalRaised.provenance
-        : "not-disclosed",
-    marketCap: isPublic && c.financials.kind === "public"
-      ? factText(c.financials.marketCap)
-      : "Private company",
-    revenueGrowth:
-      c.financials.kind === "public"
-        ? factText(c.financials.revenueGrowth)
-        : "Not disclosed for private companies",
-    grossMargin:
-      c.financials.kind === "public"
-        ? factText(c.financials.grossMargin)
-        : "Not disclosed for private companies",
-    cashPosition:
-      c.financials.kind === "public"
-        ? factText(c.financials.cashPosition)
-        : c.financials.futureFinancingNeed,
-    valuationMultiple:
-      c.financials.kind === "public"
-        ? factText(c.financials.valuationMultiple)
-        : "Not applicable",
-    tractionSignal: factText(c.tractionSignal),
-    tractionProvenance: c.tractionSignal.provenance,
+    keyUnansweredQuestion: c.investment.invalidators[0] ?? c.mainTechnicalRisk,
+    mainTechnicalRisk: c.mainTechnicalRisk,
+    sourceCount: c.sourceIds.length,
     scores,
     tiers,
     search: [
@@ -137,12 +113,12 @@ function toRow(c: Company): UniverseRow {
       c.subsector,
       c.description,
       c.technicalDifferentiation,
-      c.businessModel,
-      c.primaryCustomer,
-      c.hq,
-      c.financials.kind === "public" ? c.financials.ticker : "",
+      c.founders.join(" "),
+      c.headquarters,
+      c.sourcing.signal,
+      c.sourcing.whyEntered,
+      c.targetCustomer,
       c.technology.howItWorks,
-      c.technology.coreAdvantage,
     ]
       .join(" ")
       .toLowerCase(),
@@ -156,7 +132,6 @@ export function rowsForIds(ids: readonly string[]): UniverseRow[] {
   return ids.map((id) => byId.get(id)).filter((r): r is UniverseRow => !!r);
 }
 
-/** Top ranked rows under a mandate, used on the overview page. */
 export function topRanked(mandateId: MandateId, count: number): UniverseRow[] {
   return [...UNIVERSE_ROWS]
     .sort((a, b) => b.scores[mandateId] - a.scores[mandateId])

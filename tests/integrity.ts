@@ -1,0 +1,505 @@
+/**
+ * Data-integrity and investment-logic checks.
+ *
+ * These assert the promises the platform makes about its own data: that every
+ * sourcing candidate is real and private, that no public company can reach a
+ * ranking, that every claim has a source, and that missing information is
+ * shown rather than invented.
+ *
+ * Run with:  npm run test:integrity
+ */
+import { COMPANIES, UNIVERSE_STATS } from "../lib/companies";
+import { MARKET_SIGNALS } from "../lib/data/market-signals";
+import { MANDATES, type MandateId } from "../lib/mandates";
+import { UNIVERSE_ROWS, topRanked } from "../lib/rows";
+import { scoreBand, scoreCompany, weightTotal, FACTORS } from "../lib/scoring";
+import { SOURCES, SOURCE_BY_ID } from "../lib/sources";
+import { INTELLIGENCE } from "../lib/intelligence";
+import { baseFields } from "../lib/storage";
+import { THESIS } from "../lib/thesis";
+import { SITE, NAV_LINKS } from "../lib/site";
+import { NOT_DISCLOSED, type Sector } from "../lib/types";
+import { readFileSync, readdirSync, statSync } from "fs";
+import { join } from "path";
+
+let failures = 0;
+function check(name: string, pass: boolean, detail = "") {
+  if (!pass) failures++;
+  console.log(
+    `${pass ? "PASS" : "FAIL"}  ${name}${detail ? "  :: " + detail : ""}`,
+  );
+}
+
+/** Every source file that could contain visible copy. */
+function sourceFiles(dir: string, acc: string[] = []): string[] {
+  for (const entry of readdirSync(dir)) {
+    if (["node_modules", ".next", ".git", ".vercel"].includes(entry)) continue;
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) sourceFiles(full, acc);
+    else if (/\.(ts|tsx|md|json|css|mjs)$/.test(entry)) acc.push(full);
+  }
+  return acc;
+}
+const FILES = sourceFiles(process.cwd());
+
+console.log("=== 1 to 3: the universe is real, private, and free of public companies ===");
+check(
+  `all ${COMPANIES.length} companies are flagged currently private`,
+  COMPANIES.every((c) => c.currentlyPrivate === true),
+);
+check(
+  "every company records how private status was verified",
+  COMPANIES.every((c) => c.privateStatusNote.length > 30),
+);
+check(
+  "no company carries a ticker, exchange, or public marker",
+  COMPANIES.every(
+    (c) => !("ticker" in c) && !("exchange" in c) && !("marketType" in c),
+  ),
+);
+check(
+  "no financing stage is public",
+  COMPANIES.every((c) => (c.financing.stage as string) !== "Public"),
+);
+{
+  const publicNames = MARKET_SIGNALS.map((s) => s.name.toLowerCase());
+  const collisions = COMPANIES.filter((c) =>
+    publicNames.includes(c.name.toLowerCase()),
+  );
+  check(
+    "no market-signal company appears in the sourcing universe",
+    collisions.length === 0,
+    collisions.map((c) => c.name).join(", "),
+  );
+}
+
+console.log("\n=== 2: no fictional or demonstration company in production data ===");
+{
+  // Names of every fictional company from the previous build.
+  const FICTIONAL = [
+    "Tidewater Autonomy", "Anvil Grid", "Larkspur Systems", "Meridian Fabric",
+    "Coldbrook Thermal", "Halden Compute", "Wrenfield Robotics",
+    "Palisade Quantum", "Kestrel Bio", "Ferrule Photonics", "Ravelin Data",
+    "Sable Health", "Halyard Systems", "Corvid Security", "Alder Clinical",
+  ];
+  const hits: string[] = [];
+  for (const file of FILES) {
+    if (file.includes("tests/")) continue;
+    const text = readFileSync(file, "utf8");
+    for (const name of FICTIONAL) {
+      if (text.includes(name)) hits.push(`${name} in ${file}`);
+    }
+  }
+  check("no fictional company name appears anywhere", hits.length === 0, hits.slice(0, 4).join("; "));
+
+  const demoWords: string[] = [];
+  for (const file of FILES) {
+    if (file.includes("tests/") || file.includes("storage.ts")) continue;
+    const text = readFileSync(file, "utf8");
+    if (/isDemonstration\s*[:?]|<DemonstrationBadge|DemonstrationBadge\s*}/.test(text)) {
+      demoWords.push(file);
+    }
+  }
+  check(
+    "no demonstration badge or flag remains in company data or components",
+    demoWords.length === 0,
+    demoWords.join(", "),
+  );
+}
+
+console.log("\n=== 4 and 5: public companies never rank or enter the pipeline ===");
+for (const m of MANDATES) {
+  const ranked = topRanked(m.id, UNIVERSE_ROWS.length);
+  const publicIds = new Set(MARKET_SIGNALS.map((s) => s.id));
+  check(
+    `${m.name}: ranking contains no market-signal company`,
+    ranked.every((r) => !publicIds.has(r.id)),
+  );
+}
+{
+  const universeIds = new Set(COMPANIES.map((c) => c.id));
+  const pipelineIds = UNIVERSE_ROWS.map((r) => r.id);
+  check(
+    "every pipeline company exists in the verified private universe",
+    pipelineIds.every((id) => universeIds.has(id)),
+  );
+  check(
+    "market signals carry no score, tier, or pipeline status",
+    MARKET_SIGNALS.every(
+      (s) => !("scores" in s) && !("tiers" in s) && !("status" in s),
+    ),
+  );
+}
+
+console.log("\n=== 6 to 10: every company is sourced ===");
+check(
+  "every company has a working official website recorded",
+  COMPANIES.every((c) => /^https:\/\/[a-z0-9.-]+/i.test(c.website)),
+);
+check(
+  "every company has at least one primary source",
+  COMPANIES.every((c) =>
+    c.sourceIds.some((id) => SOURCE_BY_ID[id]?.primary === true),
+  ),
+  COMPANIES.filter(
+    (c) => !c.sourceIds.some((id) => SOURCE_BY_ID[id]?.primary === true),
+  )
+    .map((c) => c.name)
+    .join(", "),
+);
+{
+  // A corroborating source is a second registered source on the record.
+  const thin = COMPANIES.filter((c) => c.sourceIds.length < 2);
+  check(
+    "every company has at least one corroborating source",
+    thin.length === 0,
+    thin.map((c) => `${c.name} (${c.sourceIds.length})`).join(", "),
+  );
+}
+check(
+  "every registered source id on a company resolves",
+  COMPANIES.every((c) => c.sourceIds.every((id) => Boolean(SOURCE_BY_ID[id]))),
+);
+check(
+  "every company has a last-reviewed date",
+  COMPANIES.every((c) => /^\d{4}-\d{2}-\d{2}$/.test(c.lastReviewed)),
+);
+check(
+  "every financing claim has a supporting source that resolves",
+  COMPANIES.every((c) => Boolean(SOURCE_BY_ID[c.financing.latestRoundSourceId])),
+);
+check(
+  "every financing claim has an announcement date",
+  COMPANIES.every((c) => /^\d{4}-\d{2}-\d{2}$/.test(c.financing.latestRoundDate)),
+);
+
+console.log("\n=== 11 and 12: sourcing rationale and confidence ===");
+check(
+  "every company has a specific sourcing rationale",
+  COMPANIES.every(
+    (c) =>
+      c.sourcing.whyEntered.length > 80 &&
+      c.sourcing.whyTimely.length > 40 &&
+      c.sourcing.whyOverlooked.length > 40,
+  ),
+);
+check(
+  "every company records a sourcing signal, channel, and date",
+  COMPANIES.every(
+    (c) =>
+      c.sourcing.signal.length > 0 &&
+      c.sourcing.channel.length > 0 &&
+      /^\d{4}-\d{2}-\d{2}$/.test(c.sourcing.dateSourced),
+  ),
+);
+check(
+  "every company has a data-confidence rating and an explanation",
+  COMPANIES.every(
+    (c) =>
+      ["High", "Medium", "Low"].includes(c.dataConfidence) &&
+      c.dataConfidenceNote.length > 60,
+  ),
+);
+check(
+  "every factor carries evidence, explanation, basis, and confidence",
+  COMPANIES.every((c) =>
+    FACTORS.every((f) => {
+      const a = c.factors[f.key];
+      return (
+        a &&
+        a.evidence.length > 10 &&
+        a.explanation.length > 10 &&
+        ["verified", "judgment"].includes(a.basis) &&
+        ["High", "Medium", "Low"].includes(a.confidence)
+      );
+    }),
+  ),
+);
+{
+  const wellKnown = COMPANIES.filter((c) => c.sourcing.wellRecognised);
+  check(
+    "companies marked well recognised score low on sourcing originality",
+    wellKnown.every((c) => c.factors.sourcingOriginality.rating <= 2),
+    wellKnown
+      .map((c) => `${c.name}:${c.factors.sourcingOriginality.rating}`)
+      .join(", "),
+  );
+}
+
+console.log("\n=== 13: homepage top cards are private companies ===");
+for (const m of MANDATES) {
+  const top6 = topRanked(m.id, 6);
+  const universeIds = new Set(COMPANIES.map((c) => c.id));
+  check(
+    `${m.name}: all six homepage cards are verified private companies`,
+    top6.length === 6 && top6.every((r) => universeIds.has(r.id)),
+  );
+}
+
+console.log("\n=== 15: missing fields display the not-disclosed sentinel ===");
+{
+  // Nothing may be an empty string where a fact belongs.
+  const blanks = COMPANIES.filter(
+    (c) =>
+      c.businessModel.trim() === "" ||
+      String(c.financing.totalDisclosedFunding).trim() === "" ||
+      String(c.technology.benchmarks).trim() === "",
+  );
+  check(
+    "no factual field is left blank instead of marked not disclosed",
+    blanks.length === 0,
+    blanks.map((c) => c.name).join(", "),
+  );
+  const undisclosedCount = COMPANIES.reduce((n, c) => {
+    const vals = [
+      c.businessModel,
+      c.tractionSignal,
+      String(c.foundedYear),
+      String(c.financing.totalDisclosedFunding),
+      String(c.technology.benchmarks),
+      String(c.technology.intellectualProperty),
+      String(c.commercial.pricingModel),
+      String(c.commercial.salesMotion),
+    ];
+    return n + vals.filter((v) => v === NOT_DISCLOSED).length;
+  }, 0);
+  check(
+    "the not-disclosed sentinel is actually used where facts are missing",
+    undisclosedCount > 0,
+    `${undisclosedCount} fields marked not publicly disclosed`,
+  );
+  check(
+    "every company lists what is missing from its financing record",
+    COMPANIES.every((c) => c.financing.missingInformation.length > 0),
+  );
+}
+
+console.log("\n=== 16: public companies appear only as market signals ===");
+{
+  const signalNames = MARKET_SIGNALS.map((s) => s.name);
+  const offenders: string[] = [];
+  for (const file of FILES) {
+    if (
+      file.includes("tests/") ||
+      file.includes("market-signals") ||
+      file.includes("thesis.ts") ||
+      file.includes("intelligence.ts") ||
+      file.includes("sources.ts") ||
+      file.includes("README") ||
+      file.includes("companies-")
+    )
+      continue;
+    const text = readFileSync(file, "utf8");
+    for (const n of signalNames) {
+      if (new RegExp(`["'\`]${n}["'\`]`).test(text)) offenders.push(`${n} in ${file}`);
+    }
+  }
+  check(
+    "public company names appear only in market signals, thesis context, sources, and competitor lists",
+    offenders.length === 0,
+    offenders.slice(0, 4).join("; "),
+  );
+}
+
+console.log("\n=== 17 and 18: no firm names, no em dashes ===");
+{
+  // Case-sensitive and word-bounded. "headline" and "matchstick" are ordinary
+  // English words; only the capitalised firm names are disqualifying. Lock
+  // files are skipped because their integrity hashes are not visible copy.
+  const FIRMS = [
+    "Headline", "LDV", "Remoti", "Matchstick", "Magid",
+    "Boston Millennia", "ldv-x-sourcing", "x-sourcing-engine",
+  ];
+  const hits: string[] = [];
+  for (const file of FILES) {
+    if (file.includes("tests/integrity") || file.endsWith("package-lock.json"))
+      continue;
+    const text = readFileSync(file, "utf8");
+    for (const firm of FIRMS) {
+      if (new RegExp(`\\b${firm}\\b`).test(text)) hits.push(`${firm} in ${file}`);
+    }
+  }
+  check("no firm-specific name appears anywhere", hits.length === 0, hits.slice(0, 5).join("; "));
+
+  const dashes: string[] = [];
+  for (const file of FILES) {
+    if (file.includes("tests/integrity")) continue;
+    const text = readFileSync(file, "utf8");
+    if (text.includes("—")) dashes.push(file);
+  }
+  check("no em dash appears in any source file", dashes.length === 0, dashes.join(", "));
+}
+
+console.log("\n=== 19: the GitHub link is present where required ===");
+{
+  const required = [
+    "app/page.tsx",
+    "components/Footer.tsx",
+    "app/methodology/page.tsx",
+  ];
+  for (const file of required) {
+    const text = readFileSync(join(process.cwd(), file), "utf8");
+    check(`${file} renders the GitHub link`, /GitHubLink/.test(text));
+  }
+  check(
+    "the repository URL points at the independent repository",
+    SITE.repository === "https://github.com/smodi13/venture-investment-research-engine",
+    SITE.repository,
+  );
+}
+
+console.log("\n=== 20 and 21: no environment variables, no secrets ===");
+{
+  const envUses: string[] = [];
+  const secretHits: string[] = [];
+  const SECRET = /(ghp_|github_pat_|nvapi-|sk-[A-Za-z0-9]{16,}|AKIA[0-9A-Z]{16})/;
+  for (const file of FILES) {
+    if (file.includes("tests/integrity")) continue;
+    const text = readFileSync(file, "utf8");
+    if (/process\.env\./.test(text)) envUses.push(file);
+    if (SECRET.test(text)) secretHits.push(file);
+  }
+  check("the application reads no environment variable", envUses.length === 0, envUses.join(", "));
+  check("no credential pattern appears in any source file", secretHits.length === 0, secretHits.join(", "));
+}
+
+console.log("\n=== Scoring and mandate integrity ===");
+for (const m of MANDATES) {
+  check(`${m.name}: quality weights sum to 100`, weightTotal(m) === 100, String(weightTotal(m)));
+  const breaches = COMPANIES.map((c) => scoreCompany(c, m.id)).filter(
+    (r) => r.total > r.relevance.tier.ceiling,
+  );
+  check(`${m.name}: no company exceeds its relevance ceiling`, breaches.length === 0);
+}
+{
+  const tops = new Set(
+    MANDATES.map((m) => topRanked(m.id, 6).map((r) => r.id).join(">")),
+  );
+  check("all four mandates produce distinct top-six lists", tops.size === 4, `${tops.size}/4`);
+}
+{
+  // On-thesis sectors per mandate, used to check economic reasonableness.
+  const ON: Record<MandateId, Sector[]> = {
+    "frontier-technology": [
+      "AI Infrastructure", "Semiconductors & Advanced Computing",
+      "Robotics & Autonomy", "Quantum Computing", "Energy Systems",
+      "Advanced Materials", "Space & Aerospace", "Biotechnology & Research Tools",
+    ],
+    "enterprise-software": [
+      "Enterprise Infrastructure Software", "AI Infrastructure",
+    ],
+    "healthcare-technology": [
+      "Healthcare Technology", "Biotechnology & Research Tools",
+    ],
+    "generalist-early-stage": [
+      "Enterprise Infrastructure Software", "AI Infrastructure",
+      "Healthcare Technology", "Robotics & Autonomy",
+      "Biotechnology & Research Tools", "Energy Systems",
+      "Advanced Materials", "Semiconductors & Advanced Computing",
+      "Space & Aerospace", "Quantum Computing",
+    ],
+  };
+  for (const m of MANDATES) {
+    const offThesisPriority = COMPANIES.map((c) => ({ c, r: scoreCompany(c, m.id) }))
+      .filter(
+        ({ c, r }) =>
+          scoreBand(r.total).label === "Priority research" &&
+          !ON[m.id].includes(c.sector),
+      );
+    check(
+      `${m.name}: no off-thesis company reaches priority research`,
+      offThesisPriority.length === 0,
+      offThesisPriority.map((x) => x.c.name).join(", "),
+    );
+    const top = topRanked(m.id, 1)[0];
+    const topCompany = COMPANIES.find((c) => c.id === top.id)!;
+    check(
+      `${m.name}: the top-ranked company is on-thesis`,
+      ON[m.id].includes(topCompany.sector),
+      `${topCompany.name} (${topCompany.sector})`,
+    );
+  }
+}
+
+console.log("\n=== Sources, navigation, and intelligence integrity ===");
+check(
+  "every registered source has a resolvable https URL and an access date",
+  SOURCES.every(
+    (s) => /^https:\/\//.test(s.url) && /^\d{4}-\d{2}-\d{2}$/.test(s.accessed),
+  ),
+);
+check(
+  "no registered source is a search-results page",
+  SOURCES.every((s) => !/[?&]q=|\/search\?|google\.com\/search/.test(s.url)),
+);
+check(
+  "every intelligence entry has a resolvable source",
+  INTELLIGENCE.every((e) => Boolean(SOURCE_BY_ID[e.sourceId])),
+);
+check(
+  "every intelligence entry links only to companies in the universe",
+  INTELLIGENCE.every((e) =>
+    e.relatedPrivateIds.every((id) => COMPANIES.some((c) => c.id === id)),
+  ),
+);
+check(
+  "the thesis names only private companies from the universe",
+  THESIS.valueChain.every((l) =>
+    l.privateIds.every((id) => COMPANIES.some((c) => c.id === id)),
+  ),
+);
+check(
+  "the Market Signals route is present in navigation",
+  NAV_LINKS.some((l) => l.href === "/market-signals"),
+);
+check(
+  "pipeline defaults resolve for every company",
+  UNIVERSE_ROWS.every((r) => Boolean(baseFields(r).status)),
+);
+
+console.log("\n=== Universe composition ===");
+console.log(`  Companies: ${UNIVERSE_STATS.total}`);
+console.log(`  Sectors: ${UNIVERSE_STATS.sectorCount}`);
+console.log(`  Headquarters locations: ${UNIVERSE_STATS.headquartersCount}`);
+console.log(`  Registered sources: ${SOURCES.length}`);
+{
+  const bySector = new Map<string, number>();
+  for (const c of COMPANIES) bySector.set(c.sector, (bySector.get(c.sector) ?? 0) + 1);
+  console.log(
+    "  Sector distribution: " +
+      [...bySector.entries()].map(([s, n]) => `${s} ${n}`).join(", "),
+  );
+  const byStage = new Map<string, number>();
+  for (const c of COMPANIES)
+    byStage.set(c.financing.stage, (byStage.get(c.financing.stage) ?? 0) + 1);
+  console.log(
+    "  Stage distribution: " +
+      [...byStage.entries()].map(([s, n]) => `${s} ${n}`).join(", "),
+  );
+  const byConf = new Map<string, number>();
+  for (const c of COMPANIES)
+    byConf.set(c.dataConfidence, (byConf.get(c.dataConfidence) ?? 0) + 1);
+  console.log(
+    "  Data confidence: " +
+      [...byConf.entries()].map(([s, n]) => `${s} ${n}`).join(", "),
+  );
+}
+
+console.log("\n=== Top six per mandate ===");
+for (const m of MANDATES) {
+  console.log(`\n${m.name}`);
+  for (const [i, r] of topRanked(m.id, 6).entries()) {
+    const c = COMPANIES.find((x) => x.id === r.id)!;
+    const res = scoreCompany(c, m.id);
+    console.log(
+      `  ${i + 1}. ${c.name.padEnd(24)} ${String(res.total).padStart(3)}  ` +
+        `(quality ${res.quality} x ${res.relevance.tier.multiplier.toFixed(2)})  ` +
+        `${c.sector}, ${c.financing.stage}, ${c.dataConfidence} confidence`,
+    );
+  }
+}
+
+console.log(
+  `\n${failures === 0 ? "ALL INTEGRITY CHECKS PASSED" : `${failures} CHECK(S) FAILED`}`,
+);
+process.exit(failures === 0 ? 0 : 1);

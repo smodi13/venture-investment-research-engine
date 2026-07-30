@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { THESIS } from "@/lib/thesis";
-import { rowsForIds } from "@/lib/rows";
-import { DemonstrationBadge } from "@/components/Provenance";
-import { BulletList, DisclosureNote, PageHeader, Section } from "@/components/ui";
+import { ValueChain } from "@/components/ValueChain";
+import { MARKET_SIGNAL_DISCLOSURE } from "@/lib/data/market-signals";
+import { getSource } from "@/lib/sources";
+import { COMPANIES } from "@/lib/companies";
+import {
+  BulletList,
+  DisclosureNote,
+  PageHeader,
+  Section,
+} from "@/components/ui";
 import { formatDate } from "@/lib/format";
 
 export const metadata: Metadata = {
@@ -12,10 +19,16 @@ export const metadata: Metadata = {
 };
 
 export default function ThesisPage() {
+  // Every private company named anywhere in the thesis value chain.
+  const namedIds = [...new Set(THESIS.valueChain.flatMap((l) => l.privateIds))];
+  const named = namedIds
+    .map((id) => COMPANIES.find((c) => c.id === id))
+    .filter((c): c is NonNullable<typeof c> => Boolean(c));
+
   return (
     <div>
       <PageHeader
-        eyebrow="Featured investment thesis"
+        eyebrow="Featured frontier technology thesis"
         title={THESIS.title}
         intro={THESIS.subtitle}
       >
@@ -26,9 +39,7 @@ export default function ThesisPage() {
           <span className="chip">
             Snapshot as of {formatDate(THESIS.snapshotDate)}
           </span>
-          <span className="chip">
-            Last reviewed {formatDate(THESIS.lastReviewed)}
-          </span>
+          <span className="chip">{named.length} private companies named</span>
         </div>
       </PageHeader>
 
@@ -49,86 +60,45 @@ export default function ThesisPage() {
         </div>
 
         <Section
-          title="Value chain and where the constraint sits"
-          description="Each layer carries the constraint that binds it and a plain statement of who captures the margin there."
+          title="Value chain map"
+          description="Where the constraint sits at each layer, who captures the margin, and which private companies are positioned there."
         >
-          <div className="space-y-3">
-            {THESIS.valueChain.map((layer) => {
-              const pub = rowsForIds(layer.publicIds);
-              const priv = rowsForIds(layer.privateIds);
-              return (
-                <div key={layer.layer} className="card p-5">
-                  <h3 className="text-sm font-semibold text-ink">
-                    {layer.layer}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                    <span className="font-medium text-ink">Constraint. </span>
-                    {layer.constraint}
-                  </p>
-                  <p className="mt-2 rounded-lg border border-accent-line bg-accent-soft px-3 py-2 text-xs leading-relaxed text-ink-soft">
-                    <span className="font-semibold text-ink">
-                      Margin capture.{" "}
-                    </span>
-                    {layer.whoCaptures}
-                  </p>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    <div>
-                      <p className="label">Public companies</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {pub.length > 0 ? (
-                          pub.map((c) => (
-                            <Link
-                              key={c.id}
-                              href={`/universe/${c.id}`}
-                              className="chip hover:border-accent hover:text-accent"
-                            >
-                              {c.name}
-                            </Link>
-                          ))
-                        ) : (
-                          <span className="text-xs text-ink-muted">
-                            None tracked at this layer
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="label">Private companies</p>
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        {priv.length > 0 ? (
-                          priv.map((c) => (
-                            <span
-                              key={c.id}
-                              className="inline-flex items-center gap-1"
-                            >
-                              <Link
-                                href={`/universe/${c.id}`}
-                                className="chip hover:border-accent hover:text-accent"
-                              >
-                                {c.name}
-                              </Link>
-                              <DemonstrationBadge />
-                            </span>
-                          ))
-                        ) : (
-                          <span className="text-xs text-ink-muted">
-                            None tracked at this layer
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-xs leading-relaxed text-amber-900">
+            {MARKET_SIGNAL_DISCLOSURE}
+          </p>
+          <ValueChain layers={THESIS.valueChain} />
         </Section>
 
-        <Section title="Key technical bottlenecks">
-          <div className="content-column">
-            <BulletList items={THESIS.bottlenecks} tone="risk" />
-          </div>
+        <Section
+          title="Investment opportunities"
+          description="The private companies in the verified sourcing universe positioned against this thesis. Public companies above are context only."
+        >
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {named.map((c) => (
+              <li key={c.id} className="card-hover p-4">
+                <Link href={`/universe/${c.id}`} className="block">
+                  <h3 className="text-sm font-semibold text-ink">{c.name}</h3>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    <span className="chip">{c.sector}</span>
+                    <span className="chip">{c.financing.stage}</span>
+                  </div>
+                  <p className="mt-2 text-xs leading-relaxed text-ink-soft">
+                    {c.technicalDifferentiation}
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </Section>
+
+        <div className="grid gap-8 lg:grid-cols-2">
+          <Section title="Technical bottlenecks">
+            <BulletList items={THESIS.technicalBottlenecks} tone="risk" />
+          </Section>
+          <Section title="Commercial bottlenecks">
+            <BulletList items={THESIS.commercialBottlenecks} tone="risk" />
+          </Section>
+        </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
@@ -173,7 +143,7 @@ export default function ThesisPage() {
 
         <Section
           title="Questions that could disprove this thesis"
-          description="A thesis is only useful if it can be wrong. These are the questions that would change the view, given the same weight as the argument itself."
+          description="A thesis is only useful if it can be wrong. These are given the same weight as the argument itself."
         >
           <div className="content-column">
             <ol className="space-y-3">
@@ -194,31 +164,41 @@ export default function ThesisPage() {
           </div>
         </Section>
 
-        <Section title="Sources and snapshot dates">
-          <div className="content-column space-y-3 text-sm leading-relaxed text-ink-soft">
-            <p>
-              This thesis rests on the public-company profiles in the research
-              universe, each of which links to the investor relations material
-              and SEC filings it draws on. The complete source registry is
-              published on the{" "}
-              <Link
-                href="/methodology"
-                className="font-medium text-accent hover:underline"
-              >
-                methodology page
-              </Link>
-              .
-            </p>
-            <p>
-              Financial figures referenced anywhere in this thesis are dated
-              analyst estimates expressed as ranges, taken as of{" "}
-              {formatDate(THESIS.snapshotDate)}. Private companies referenced
-              here are demonstration records and are fictional. No market-size
-              estimate is published, because a defensible one is not available
-              and an indefensible one would weaken the argument rather than
-              support it.
-            </p>
-          </div>
+        <Section
+          title="Sources"
+          description="Every private company named above carries its own dated sources on its record. The sources supporting this thesis are listed here."
+        >
+          <ul className="space-y-2">
+            {named.flatMap((c) =>
+              c.sourceIds.map((id) => {
+                const src = getSource(id);
+                if (!src) return null;
+                return (
+                  <li key={`${c.id}-${id}`} className="text-sm">
+                    <a
+                      href={src.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-accent hover:underline"
+                    >
+                      {src.title}
+                    </a>
+                    <span className="text-ink-muted">
+                      {" "}
+                      ({src.publisher}, published {formatDate(src.published)},
+                      accessed {formatDate(src.accessed)})
+                    </span>
+                  </li>
+                );
+              }),
+            )}
+          </ul>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-ink-soft">
+            No market-size figure appears anywhere in this thesis. Top-down
+            sizing for this category has been wrong in both directions
+            repeatedly, and a number would add false precision to an argument
+            that stands on structure instead.
+          </p>
         </Section>
 
         <DisclosureNote />

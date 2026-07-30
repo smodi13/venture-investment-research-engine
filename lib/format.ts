@@ -1,18 +1,4 @@
-import type { Fact } from "./types";
-
-export function formatUsd(usd: number | null): string {
-  if (usd === null) return "Not disclosed";
-  if (usd <= 0) return "None disclosed";
-  if (usd >= 1_000_000_000) {
-    const b = usd / 1_000_000_000;
-    return `$${b % 1 === 0 ? b.toFixed(0) : b.toFixed(1)}B`;
-  }
-  if (usd >= 1_000_000) {
-    const m = usd / 1_000_000;
-    return `$${m % 1 === 0 ? m.toFixed(0) : m.toFixed(1)}M`;
-  }
-  return `$${Math.round(usd / 1000)}K`;
-}
+import { NOT_DISCLOSED } from "./types";
 
 export function formatDate(iso: string): string {
   const d = new Date(`${iso}T00:00:00`);
@@ -29,7 +15,7 @@ export function formatDate(iso: string): string {
  * built on a static snapshot, so the interface states the age rather than
  * leaving the reader to compute it.
  */
-export function ageInDays(iso: string, today = "2026-07-29"): number {
+export function ageInDays(iso: string, today = "2026-07-30"): number {
   const then = new Date(`${iso}T00:00:00`).getTime();
   const now = new Date(`${today}T00:00:00`).getTime();
   if (Number.isNaN(then) || Number.isNaN(now)) return 0;
@@ -39,20 +25,18 @@ export function ageInDays(iso: string, today = "2026-07-29"): number {
 export function describeAge(iso: string): string {
   const days = ageInDays(iso);
   if (days === 0) return "today";
-  if (days === 1) return "1 day old";
-  if (days < 45) return `${days} days old`;
+  if (days === 1) return "1 day ago";
+  if (days < 45) return `${days} days ago`;
   const months = Math.round(days / 30);
-  return months === 1 ? "1 month old" : `${months} months old`;
+  if (months < 24) return `${months} months ago`;
+  return `${Math.round(months / 12)} years ago`;
 }
 
-/** Renders the value of a fact, or the reason it is absent. */
-export function factText(fact: Fact<string | number>): string {
-  if (fact.value === null) {
-    return fact.provenance === "unverified"
-      ? "Requires verification"
-      : "Not publicly disclosed";
-  }
-  return typeof fact.value === "number"
-    ? formatUsd(fact.value)
-    : String(fact.value);
+/** Renders a value that may be the not-disclosed sentinel. */
+export function display(value: string | number): string {
+  return value === NOT_DISCLOSED ? NOT_DISCLOSED : String(value);
+}
+
+export function isMissing(value: string | number): boolean {
+  return value === NOT_DISCLOSED;
 }

@@ -1,179 +1,192 @@
+import { getCompany } from "./companies";
+import { getSource } from "./sources";
+import { scoreBand, scoreCompany } from "./scoring";
+import type { MandateId } from "./mandates";
+import { isDisclosed, type PrivateCompany } from "./types";
+
 /**
- * The demonstration investment memo.
+ * The investment memo.
  *
- * Written on a fictional company so that every judgment in it can be stated
- * with the confidence a memo requires without asserting anything about a real
- * business. The structure, the ordering, and the willingness to name what
- * would change the recommendation are the parts worth reading.
+ * The memo is generated from a real company's sourced record rather than
+ * written separately, so nothing can appear in it that is not already
+ * supported by the research and its sources. If a fact is not disclosed in the
+ * record, it is not disclosed in the memo either.
  */
+
+/** The company the featured memo is written on. */
+export const MEMO_COMPANY_ID = "sublime-systems";
+export const MEMO_MANDATE: MandateId = "frontier-technology";
+export const MEMO_DATE = "2026-07-30";
 
 export interface MemoSection {
   heading: string;
-  /** Rendered as paragraphs. */
   body: string[];
-  /** Optional bullet list rendered under the body. */
   points?: string[];
 }
 
-export const MEMO = {
-  companyId: "coldbrook-thermal",
-  companyName: "Coldbrook Thermal",
-  author: "Sahil Modi",
-  date: "2026-07-24",
-  mandate: "Frontier Technology",
-  recommendation: "Proceed to partner review",
-  recommendationDetail:
-    "Recommend a Series B participation of six million dollars, conditional on receiving three-year coolant chemistry data from the two oldest installations before signing.",
-  scoreNote:
-    "Scores 74 of 100 under the Frontier Technology mandate, in the strong watchlist band. The score does not drive this recommendation; the repeat purchase behaviour does.",
+export function buildMemo(
+  company: PrivateCompany,
+  mandateId: MandateId,
+): { recommendation: string; scoreNote: string; sections: MemoSection[] } {
+  const result = scoreCompany(company, mandateId);
+  const band = scoreBand(result.total);
 
-  sections: [
+  const recommendation =
+    band.tone === "priority" || band.tone === "watchlist"
+      ? "Proceed to partner review"
+      : "Continue diligence before progressing";
+
+  const scoreNote = `Scores ${result.total} of 100 under the ${result.mandate.name} mandate, in the ${band.label.toLowerCase()} band, from a quality score of ${result.quality} adjusted by a ${result.relevance.tier.label.toLowerCase()} relevance multiplier of ${result.relevance.tier.multiplier.toFixed(2)}. Data confidence on this record is ${company.dataConfidence.toLowerCase()}.`;
+
+  const sections: MemoSection[] = [
     {
       heading: "Executive summary",
-      body: [
-        "Coldbrook Thermal sells direct-to-chip liquid cooling designed to be retrofitted into existing air-cooled data halls. The differentiation is not thermal performance, where several larger vendors are competitive, but tolerance for the water quality and rack dimensions found in buildings that were never designed for liquid cooling.",
-        "Nine facilities are deployed across four operators. Two of the four have repeated after their first installation, and service contract attach is high across the installed base. That repeat behaviour, from operators who took real risk installing coolant loops into live facilities, is the strongest evidence available at this stage and is the basis for this recommendation.",
-        "The case against is that retrofit may be a transitional market. If operators simply build new facilities designed for liquid cooling, the reason to retrofit disappears. This is a genuine risk and it is not fully answerable today.",
+      body: [company.description, company.investment.thesis],
+      points: [
+        `Stage: ${company.financing.stage}, headquartered in ${company.headquarters}`,
+        `Latest disclosed financing: ${company.financing.latestRound}`,
+        `Data confidence: ${company.dataConfidence}. ${company.dataConfidenceNote}`,
       ],
     },
     {
-      heading: "Company overview",
+      heading: "Why this company entered the pipeline",
       body: [
-        "Founded in 2020 in Delft, the company has raised fifty two million dollars across two institutional rounds, with a strategic investor from the data centre engineering contractor channel holding a board observer seat.",
-        "Products are sold through engineering contractors, which shortens the sales cycle and gives away some gross margin. Revenue is hardware at installation plus annual service contracts covering coolant chemistry and pump maintenance.",
+        company.sourcing.whyEntered,
+        `Why now. ${company.sourcing.whyTimely}`,
+        company.sourcing.wellRecognised
+          ? `On visibility. ${company.sourcing.whyOverlooked}`
+          : `Why it may be overlooked. ${company.sourcing.whyOverlooked}`,
+      ],
+      points: [
+        `Sourcing signal: ${company.sourcing.signal}`,
+        `Date sourced: ${company.sourcing.dateSourced}`,
+        `Sourcing channel: ${company.sourcing.channel}`,
       ],
     },
     {
       heading: "Technology assessment",
       body: [
-        "Cold plates mount directly to processors and accelerators, with coolant circulating through a manifold to a heat exchanger connected to the building's existing chilled water loop. The engineering choice that matters is designing for imperfect water quality rather than specifying it away, which is what makes retrofit practical instead of theoretical.",
-        "Six patents cover manifold design and coolant chemistry. The chemistry work is the harder of the two to reproduce and is the more defensible asset.",
+        company.technology.howItWorks,
+        company.technology.coreAdvantage,
       ],
       points: [
-        "No reported coolant leak incidents across nine deployed facilities to date",
-        "Heat removal per rack is measured per installation and depends heavily on the host building, so cross-site comparison is limited",
-        "Long-term coolant chemistry behaviour in real building loops is the primary unresolved technical question",
+        `Benchmarks: ${company.technology.benchmarks}`,
+        `Third-party dependency: ${company.technology.thirdPartyDependency}`,
+        `Milestone required for scale: ${company.technology.milestoneForScale}`,
+        ...company.technology.failurePoints.map((f) => `Failure point: ${f}`),
       ],
     },
     {
-      heading: "Market opportunity",
-      body: [
-        "Rack densities have risen past what air cooling removes, while existing facilities carry leases with years remaining and construction timelines for new liquid-cooled buildings run to years. That gap is the market.",
-        "This platform deliberately does not publish a market size figure here. Top-down sizing for this category would be guesswork, and the structural argument stands without it: the number of facilities carrying both unexpired leases and density requirements they cannot meet is large and currently growing.",
+      heading: "Market assessment",
+      body: [company.market.painPoint, company.market.structure],
+      points: [
+        `Current catalyst: ${company.market.currentCatalyst}`,
+        `Regulatory environment: ${company.market.regulatoryEnvironment}`,
+        `Competitors: ${company.market.competitors.join(", ")}`,
       ],
     },
     {
-      heading: "Business model and commercial evidence",
+      heading: "Commercial assessment",
+      body: [company.commercial.salesMotion, company.commercial.goToMarketRisk],
+      points: [
+        `Customer type: ${company.commercial.customerType}`,
+        `Pricing model: ${company.commercial.pricingModel}`,
+        `Implementation burden: ${company.commercial.implementationBurden}`,
+        ...company.commercial.adoptionEvidence.map((e) => `Evidence: ${e.claim}`),
+      ],
+    },
+    {
+      heading: "Financing assessment",
       body: [
-        "Hardware is priced per rack with annual service contracts on top. The service revenue is the more interesting half of the model, because it accrues on an installed base that only grows and carries better margins than the equipment.",
-        "Installation happens in live facilities, which binds the sales cycle to maintenance windows and cannot be accelerated by adding sales capacity.",
+        company.financing.futureCapitalRequirement,
+        company.financing.financingRisk,
       ],
       points: [
-        "Nine facilities across four operators",
-        "Two of four operators have repeated after a first installation",
-        "Service contract attach rate is high across deployed sites",
-        "Channel sales through engineering contractors who also carry competing products",
+        `Total disclosed funding: ${company.financing.totalDisclosedFunding}`,
+        `Named investors: ${company.financing.namedInvestors.join(", ") || "Not publicly disclosed"}`,
+        `Capital intensity: ${company.financing.capitalIntensity}`,
+        ...company.financing.missingInformation.map(
+          (m) => `Not publicly disclosed: ${m}`,
+        ),
       ],
     },
     {
-      heading: "Competitive landscape",
+      heading: "Investment view",
       body: [
-        "The large thermal management vendors are credible competitors with global service organisations and existing operator relationships. They serve new construction well. They serve messy retrofits into buildings with unpredictable water quality less well, which is the segment this company has chosen.",
-        "That choice is the whole strategy. It is also the reason the position is narrow: if the large vendors decide the retrofit segment is worth serving properly, the differentiation is not deep enough to hold them off indefinitely.",
-      ],
-    },
-    {
-      heading: "Team",
-      body: [
-        "Thermal engineering team from a research university background, technically strong and commercially less proven. Nobody on the team has taken a thermal product through hyperscale qualification, which matters for the expansion case rather than for the current business.",
-      ],
-    },
-    {
-      heading: "Financial and financing considerations",
-      body: [
-        "Fifty two million dollars raised to reach nine deployed facilities is reasonable for a hardware business. The next round is working capital for manufacturing scale rather than research funding, which is a materially better reason to raise and reduces financing risk relative to the rest of the private universe.",
-        "The strategic investor from the contractor channel helps distribution and narrows the eventual buyer list, since a sale to a competing thermal vendor becomes more complicated. That should be priced into any expectation of exit optionality.",
-      ],
-    },
-    {
-      heading: "Investment thesis",
-      body: [
-        "A practical answer to a constraint operators face today, differentiated by tolerance for real building conditions rather than by thermal performance, with a service annuity accumulating underneath the equipment revenue.",
-        "The service base is what makes this more than a construction-cycle exposure. If retrofit demand softens, an installed base under contract still generates revenue at better margins than the original sale.",
-      ],
-    },
-    {
-      heading: "Risks",
-      body: [
-        "Three risks matter, in this order.",
+        `Bull case. ${company.investment.bullCase}`,
+        `Base case. ${company.investment.baseCase}`,
+        `Bear case. ${company.investment.bearCase}`,
       ],
       points: [
-        "A leak incident at a reference customer would be commercially severe regardless of fault. Nine facilities is not enough operating history to have a meaningful base rate.",
-        "Retrofit may be transitional. If new construction designed for liquid cooling absorbs the demand, the differentiation loses its purpose.",
-        "Channel dependence on engineering contractors who carry competing products and control the customer relationship.",
-      ],
-    },
-    {
-      heading: "Diligence questions",
-      body: [
-        "The following remain open and should be closed before signing.",
-      ],
-      points: [
-        "What does coolant chemistry look like after three years in a real building loop rather than in test conditions?",
-        "Of the two repeating operators, what specifically drove the second purchase decision?",
-        "How does installation time compare between the first and the most recent deployment?",
-        "What is the margin split between hardware and service after channel commission?",
-        "Where has the company lost against the large thermal vendors, and on what basis?",
-      ],
-    },
-    {
-      heading: "Catalysts",
-      body: [
-        "Three events would materially change the assessment upward.",
-      ],
-      points: [
-        "A hyperscale operator deployment, which would move the company out of the retrofit niche",
-        "Multi-year coolant chemistry data confirming stability at the oldest sites",
-        "Service revenue reaching a meaningful share of total revenue",
+        ...company.investment.catalysts.map((c) => `Catalyst: ${c}`),
+        ...company.investment.risks.map((r) => `Risk: ${r}`),
       ],
     },
     {
       heading: "What would invalidate the thesis",
       body: [
-        "Two things would end this position rather than merely reduce it.",
+        "Two conditions would end this position rather than merely reduce it.",
       ],
-      points: [
-        "A coolant leak incident at a reference site, which would damage the reference base that the sales motion depends on",
-        "Repeat purchase rate falling as operators shift decisively to new construction, which would confirm retrofit as a transitional category",
-      ],
+      points: company.investment.invalidators,
     },
     {
       heading: "Recommendation",
       body: [
-        "Proceed to partner review with a proposed six million dollar participation in the Series B, conditional on receiving three-year coolant chemistry data from the two oldest installations.",
-        "The condition is not procedural. Long-term chemistry degradation is the risk that would surface years after an investment, and it is the one piece of evidence that cannot be reconstructed later. If that data is unavailable or unfavourable, the recommendation is to pass rather than to proceed at a lower amount.",
+        `${recommendation}. ${company.investment.recommendedNextStep}`,
+        `Confidence in this view is ${company.investment.confidence.toLowerCase()}, reflecting the quality of the public record rather than enthusiasm for the company.`,
       ],
     },
-  ] satisfies MemoSection[],
-} as const;
+    {
+      heading: "Sources",
+      body: [
+        "Every factual claim in this memo is drawn from the company record, which is sourced as follows.",
+      ],
+      points: company.sourceIds.map((id) => {
+        const src = getSource(id);
+        return src
+          ? `${src.title}, ${src.publisher}, published ${src.published}, accessed ${src.accessed}`
+          : id;
+      }),
+    },
+  ];
 
-/** Plain-text rendering, used for the copy and download actions. */
+  return { recommendation, scoreNote, sections };
+}
+
+export function memoCompany(): PrivateCompany {
+  const company = getCompany(MEMO_COMPANY_ID);
+  if (!company) throw new Error("Memo company not found in the universe");
+  return company;
+}
+
+function renderLines(
+  company: PrivateCompany,
+  mandateId: MandateId,
+): { recommendation: string; scoreNote: string; sections: MemoSection[] } {
+  return buildMemo(company, mandateId);
+}
+
 export function memoToText(): string {
+  const company = memoCompany();
+  const { recommendation, scoreNote, sections } = renderLines(
+    company,
+    MEMO_MANDATE,
+  );
   const lines: string[] = [
-    `INVESTMENT MEMO: ${MEMO.companyName}`,
-    `Author: ${MEMO.author}`,
-    `Date: ${MEMO.date}`,
-    `Mandate: ${MEMO.mandate}`,
+    `INVESTMENT MEMO: ${company.name}`,
+    `Author: Sahil Modi`,
+    `Date: ${MEMO_DATE}`,
+    `Website: ${company.website}`,
+    `Founders: ${company.founders.join(", ") || "Not publicly disclosed"}`,
+    `Founded: ${isDisclosed(company.foundedYear) ? company.foundedYear : "Not publicly disclosed"}`,
     "",
-    `RECOMMENDATION: ${MEMO.recommendation}`,
-    MEMO.recommendationDetail,
-    "",
-    MEMO.scoreNote,
+    `RECOMMENDATION: ${recommendation}`,
+    scoreNote,
     "",
     "---",
     "",
   ];
-  for (const section of MEMO.sections) {
+  for (const section of sections) {
     lines.push(section.heading.toUpperCase(), "");
     for (const p of section.body) lines.push(p, "");
     if (section.points) {
@@ -184,28 +197,31 @@ export function memoToText(): string {
   lines.push(
     "---",
     "",
-    "Coldbrook Thermal is a demonstration company. It is fictional and describes no real business.",
-    "This memo is an independent work sample by Sahil Modi. It is not affiliated with or endorsed by any investment firm, and is not investment advice.",
+    "This memo is generated from a sourced company record. Every factual claim is supported by the sources listed above.",
+    "This is an independent work sample by Sahil Modi. It is not affiliated with or endorsed by any investment firm, and is not investment advice.",
   );
   return lines.join("\n");
 }
 
-/** Markdown rendering, used for the download action. */
 export function memoToMarkdown(): string {
+  const company = memoCompany();
+  const { recommendation, scoreNote, sections } = renderLines(
+    company,
+    MEMO_MANDATE,
+  );
   const lines: string[] = [
-    `# Investment memo: ${MEMO.companyName}`,
+    `# Investment memo: ${company.name}`,
     "",
-    `**Author:** ${MEMO.author}  `,
-    `**Date:** ${MEMO.date}  `,
-    `**Mandate:** ${MEMO.mandate}`,
+    `**Author:** Sahil Modi  `,
+    `**Date:** ${MEMO_DATE}  `,
+    `**Website:** ${company.website}  `,
+    `**Founders:** ${company.founders.join(", ") || "Not publicly disclosed"}`,
     "",
-    `> **Recommendation: ${MEMO.recommendation}**  `,
-    `> ${MEMO.recommendationDetail}`,
-    "",
-    MEMO.scoreNote,
+    `> **Recommendation: ${recommendation}**  `,
+    `> ${scoreNote}`,
     "",
   ];
-  for (const section of MEMO.sections) {
+  for (const section of sections) {
     lines.push(`## ${section.heading}`, "");
     for (const p of section.body) lines.push(p, "");
     if (section.points) {
@@ -216,9 +232,9 @@ export function memoToMarkdown(): string {
   lines.push(
     "---",
     "",
-    "*Coldbrook Thermal is a demonstration company. It is fictional and describes no real business.*",
+    "*This memo is generated from a sourced company record. Every factual claim is supported by the sources listed above.*",
     "",
-    "*This memo is an independent work sample by Sahil Modi. It is not affiliated with or endorsed by any investment firm, and is not investment advice.*",
+    "*This is an independent work sample by Sahil Modi. It is not affiliated with or endorsed by any investment firm, and is not investment advice.*",
   );
   return lines.join("\n");
 }

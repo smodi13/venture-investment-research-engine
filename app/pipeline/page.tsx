@@ -6,7 +6,7 @@ import { DisclosureNote, PageHeader } from "@/components/ui";
 export const metadata: Metadata = {
   title: "Investment pipeline",
   description:
-    "Track companies through a ten stage investment pipeline, with notes, next steps, and CSV export. All workflow state is stored in the browser.",
+    "Track verified private companies through a ten stage investment pipeline, with notes, next steps, and CSV export. All workflow state is stored in the browser.",
 };
 
 export default function PipelinePage() {
@@ -15,7 +15,7 @@ export default function PipelinePage() {
       <PageHeader
         eyebrow="Workflow"
         title="Investment pipeline"
-        intro="Ten stages from new lead through to invested, with the two honest endings most pipelines omit: passed, and monitoring. Change status and priority, write notes, set next steps, and export the filtered set to CSV."
+        intro="Ten stages from new lead through to invested, including the two honest endings most pipelines omit: passed, and monitoring. Every company in the pipeline comes from the verified private-company universe."
       />
 
       <section className="container-page py-8">

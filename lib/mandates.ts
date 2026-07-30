@@ -4,11 +4,14 @@ import type { FactorKey, Sector, Stage } from "./types";
  * Investment mandates.
  *
  * A mandate is the configuration object the whole platform reads from. It
- * carries the factor weights, the sector and stage affinities that produce a
- * relevance tier, the sectors the interface should emphasise, and the
- * extra diligence a mandate demands. Changing the mandate changes the ranking,
- * the score composition, the rationale, and the diligence list, because all
- * four are derived from this file rather than hard coded per company.
+ * carries the quality weights, the sector and stage affinities that set a
+ * company's relevance tier, the sectors the interface emphasises, and the
+ * extra diligence the mandate demands.
+ *
+ * Note what is absent: there is no public-company stage. The Stage type has no
+ * "Public" member, so a public company cannot be scored by any mandate here.
+ * Public companies are excluded structurally rather than by a filter that
+ * could later be forgotten.
  */
 
 export type MandateId =
@@ -21,20 +24,16 @@ export interface Mandate {
   id: MandateId;
   name: string;
   summary: string;
-  /** The investment question this mandate is really asking. */
   centralQuestion: string;
   focusAreas: string[];
-  typicalStages: string;
-  /** Quality-factor weights, summing to 100. Relevance is separate. */
+  targetStages: string;
+  /** Quality-factor weights, summing to 100. Relevance is applied separately. */
   weights: Record<FactorKey, number>;
-  /** 0 to 5 affinity. Relevance takes the weaker of sector and stage. */
+  /** 0 to 5. Relevance takes the weaker of sector and stage affinity. */
   sectorAffinity: Record<Sector, number>;
   stageAffinity: Record<Stage, number>;
-  /** Sectors surfaced first in the interface under this mandate. */
   emphasisedSectors: Sector[];
-  /** Appended to every company diligence list while this mandate is active. */
   additionalDiligence: string[];
-  /** How this mandate reads a score, stated in the mandate's own terms. */
   scoringNote: string;
 }
 
@@ -43,59 +42,63 @@ export const MANDATES: Mandate[] = [
     id: "frontier-technology",
     name: "Frontier Technology",
     summary:
-      "Deep technology companies where the hard problem is genuinely hard, the capital requirement is real, and the defensibility comes from physics, process, or accumulated engineering rather than from a feature set.",
+      "Deep technology companies where the hard problem is genuinely hard, the capital requirement is real, and defensibility comes from physics, process, or accumulated engineering rather than from a feature set.",
     centralQuestion:
       "Is the technical advantage real, durable, and reachable with the capital this company can plausibly raise?",
     focusAreas: [
       "AI infrastructure",
-      "Robotics and autonomy",
       "Advanced computing",
+      "Semiconductors",
+      "Robotics",
       "Quantum technology",
-      "Biotechnology and research tools",
+      "Biotechnology tools",
       "Energy systems",
       "Advanced materials",
       "Space and aerospace technology",
     ],
-    typicalStages: "Seed through growth, plus select public-market opportunities",
+    targetStages:
+      "Pre-Seed through Series C, plus limited later-stage private opportunities",
     weights: {
-      differentiation: 16,
-      defensibility: 14,
-      marketPotential: 12,
-      commercialReadiness: 5,
+      technicalDifferentiation: 15,
+      technicalEvidence: 14,
+      defensibility: 12,
+      marketImportance: 10,
+      commercialReadiness: 4,
       customerEvidence: 6,
-      teamCredibility: 12,
-      capitalEfficiency: 8,
+      teamCredibility: 11,
+      capitalEfficiency: 7,
       competitiveIntensity: 5,
-      technicalRisk: 9,
+      financingRisk: 6,
       regulatoryRisk: 4,
-      financingRisk: 5,
-      overlooked: 4,
+      sourcingOriginality: 6,
     },
     sectorAffinity: {
       "AI Infrastructure": 5,
-      Semiconductors: 5,
+      "Semiconductors & Advanced Computing": 5,
       "Robotics & Autonomy": 5,
-      "Quantum Technology": 5,
+      "Quantum Computing": 5,
       "Biotechnology & Research Tools": 4,
-      "Energy & Advanced Materials": 5,
-      "Enterprise Software": 2,
+      "Energy Systems": 5,
+      "Advanced Materials": 5,
+      "Space & Aerospace": 5,
+      "Enterprise Infrastructure Software": 2,
       "Healthcare Technology": 2,
     },
     stageAffinity: {
-      "Pre-Seed": 3,
-      Seed: 4,
+      "Pre-Seed": 4,
+      Seed: 5,
       "Series A": 5,
       "Series B": 5,
-      "Series C": 4,
-      Growth: 4,
-      Public: 4,
+      "Series C": 5,
+      "Later stage": 3,
     },
     emphasisedSectors: [
       "AI Infrastructure",
-      "Semiconductors",
+      "Semiconductors & Advanced Computing",
       "Robotics & Autonomy",
-      "Quantum Technology",
-      "Energy & Advanced Materials",
+      "Quantum Computing",
+      "Energy Systems",
+      "Space & Aerospace",
     ],
     additionalDiligence: [
       "What is the specific physical or engineering constraint that competitors cannot design around, and how long does it hold?",
@@ -103,7 +106,7 @@ export const MANDATES: Mandate[] = [
       "Which parts of the stack depend on a supplier that could be acquired by a competitor or constrained by export control?",
     ],
     scoringNote:
-      "Differentiation, defensibility, and team credibility carry 42 of the 100 quality points, because in frontier technology those are the variables that decide whether anything else ever matters. Commercial readiness is weighted lightly on purpose: penalising a company for being early would defeat the mandate. Public companies are adjacent rather than core here, because the mandate targets select public opportunities alongside a private pipeline rather than treating them as equivalent.",
+      "Technical differentiation and technical evidence carry 29 of the 100 quality points between them, because in frontier technology a claim without published or independently observable evidence is the most common way to be wrong. Commercial readiness is weighted lightly on purpose: penalising a company for being early would defeat the mandate.",
   },
   {
     id: "enterprise-software",
@@ -113,36 +116,39 @@ export const MANDATES: Mandate[] = [
     centralQuestion:
       "Does the early customer evidence describe a repeatable sale, or a series of one-off relationships?",
     focusAreas: [
-      "Vertical software",
       "Data infrastructure",
-      "Security",
+      "Cybersecurity",
       "Developer tools",
-      "Financial technology",
+      "Vertical software",
       "Workflow software",
+      "Financial technology",
+      "Enterprise infrastructure",
     ],
-    typicalStages: "Seed through Series C",
+    targetStages: "Seed through Series C",
     weights: {
-      differentiation: 12,
+      technicalDifferentiation: 10,
+      technicalEvidence: 8,
       defensibility: 13,
-      marketPotential: 10,
+      marketImportance: 10,
       commercialReadiness: 12,
-      customerEvidence: 14,
+      customerEvidence: 15,
       teamCredibility: 10,
-      capitalEfficiency: 9,
-      competitiveIntensity: 9,
-      technicalRisk: 4,
-      regulatoryRisk: 3,
+      capitalEfficiency: 8,
+      competitiveIntensity: 8,
       financingRisk: 3,
-      overlooked: 1,
+      regulatoryRisk: 1,
+      sourcingOriginality: 2,
     },
     sectorAffinity: {
       "AI Infrastructure": 5,
-      Semiconductors: 1,
+      "Semiconductors & Advanced Computing": 1,
       "Robotics & Autonomy": 2,
-      "Quantum Technology": 1,
+      "Quantum Computing": 1,
       "Biotechnology & Research Tools": 2,
-      "Energy & Advanced Materials": 1,
-      "Enterprise Software": 5,
+      "Energy Systems": 1,
+      "Advanced Materials": 1,
+      "Space & Aerospace": 1,
+      "Enterprise Infrastructure Software": 5,
       "Healthcare Technology": 3,
     },
     stageAffinity: {
@@ -150,12 +156,11 @@ export const MANDATES: Mandate[] = [
       Seed: 5,
       "Series A": 5,
       "Series B": 5,
-      "Series C": 4,
-      Growth: 2,
-      Public: 2,
+      "Series C": 5,
+      "Later stage": 2,
     },
     emphasisedSectors: [
-      "Enterprise Software",
+      "Enterprise Infrastructure Software",
       "AI Infrastructure",
       "Healthcare Technology",
     ],
@@ -165,7 +170,7 @@ export const MANDATES: Mandate[] = [
       "What happens to gross margin once support and implementation are fully loaded into cost of revenue?",
     ],
     scoringNote:
-      "Customer evidence and commercial readiness carry 26 of the 100 quality points between them, more than any other mandate assigns. Technical risk is weighted lightly because in this category execution risk usually outweighs feasibility risk.",
+      "Customer evidence and commercial readiness carry 27 of the 100 quality points between them, more than any other mandate assigns. Technical evidence is weighted lower because in this category execution risk usually outweighs feasibility risk.",
   },
   {
     id: "healthcare-technology",
@@ -175,46 +180,48 @@ export const MANDATES: Mandate[] = [
     centralQuestion:
       "Is there a credible path through regulation and reimbursement, and does the team have direct evidence of having walked one?",
     focusAreas: [
-      "Healthcare software",
-      "Clinical research infrastructure",
-      "Life sciences tools",
-      "Drug discovery technology",
-      "Care delivery infrastructure",
+      "Clinical software",
+      "Healthcare infrastructure",
+      "Life-sciences tools",
+      "Drug-discovery technology",
+      "Research infrastructure",
+      "Care-delivery technology",
       "Healthcare data",
     ],
-    typicalStages: "Seed through growth",
+    targetStages: "Seed through growth",
     weights: {
-      differentiation: 10,
+      technicalDifferentiation: 9,
+      technicalEvidence: 11,
       defensibility: 10,
-      marketPotential: 10,
+      marketImportance: 10,
       commercialReadiness: 9,
       customerEvidence: 12,
-      teamCredibility: 12,
+      teamCredibility: 11,
       capitalEfficiency: 5,
       competitiveIntensity: 4,
-      technicalRisk: 5,
-      regulatoryRisk: 18,
       financingRisk: 4,
-      overlooked: 1,
+      regulatoryRisk: 13,
+      sourcingOriginality: 2,
     },
     sectorAffinity: {
       "AI Infrastructure": 2,
-      Semiconductors: 1,
+      "Semiconductors & Advanced Computing": 1,
       "Robotics & Autonomy": 2,
-      "Quantum Technology": 1,
+      "Quantum Computing": 1,
       "Biotechnology & Research Tools": 5,
-      "Energy & Advanced Materials": 1,
-      "Enterprise Software": 2,
+      "Energy Systems": 1,
+      "Advanced Materials": 1,
+      "Space & Aerospace": 1,
+      "Enterprise Infrastructure Software": 2,
       "Healthcare Technology": 5,
     },
     stageAffinity: {
-      "Pre-Seed": 2,
-      Seed: 4,
+      "Pre-Seed": 3,
+      Seed: 5,
       "Series A": 5,
       "Series B": 5,
-      "Series C": 4,
-      Growth: 4,
-      Public: 3,
+      "Series C": 5,
+      "Later stage": 4,
     },
     emphasisedSectors: [
       "Healthcare Technology",
@@ -226,7 +233,7 @@ export const MANDATES: Mandate[] = [
       "How is patient or research data governed, and what happens to the product if that governing rule changes?",
     ],
     scoringNote:
-      "Regulatory risk carries 18 of the 100 quality points, the highest weight this platform assigns to any risk factor. In this category a strong product with an unclear regulatory path is a worse investment than an adequate product with a cleared one.",
+      "Regulatory risk carries 13 of the 100 quality points, the highest weight this platform assigns to any risk factor. In this category a strong product with an unclear regulatory path is a worse investment than an adequate product with a cleared one.",
   },
   {
     id: "generalist-early-stage",
@@ -234,37 +241,40 @@ export const MANDATES: Mandate[] = [
     summary:
       "Broad early-stage technology investing where the company is young enough that founder quality and market choice are the only things reliably observable.",
     centralQuestion:
-      "Is this a person who will find a way through, in a market large enough to make that worth doing?",
+      "Is this a team that will find a way through, in a market important enough to make that worth doing?",
     focusAreas: [
-      "Broad software and technology",
+      "Broad technology",
       "Founder quality",
-      "Market potential",
       "Early customer evidence",
+      "Market importance",
       "Capital efficiency",
+      "Technical or product differentiation",
     ],
-    typicalStages: "Pre-seed through Series A",
+    targetStages: "Pre-Seed through Series A",
     weights: {
-      differentiation: 11,
-      defensibility: 10,
-      marketPotential: 14,
+      technicalDifferentiation: 10,
+      technicalEvidence: 8,
+      defensibility: 9,
+      marketImportance: 15,
       commercialReadiness: 6,
       customerEvidence: 12,
-      teamCredibility: 20,
-      capitalEfficiency: 11,
+      teamCredibility: 19,
+      capitalEfficiency: 10,
       competitiveIntensity: 5,
-      technicalRisk: 4,
-      regulatoryRisk: 2,
-      financingRisk: 4,
-      overlooked: 1,
+      financingRisk: 3,
+      regulatoryRisk: 1,
+      sourcingOriginality: 2,
     },
     sectorAffinity: {
       "AI Infrastructure": 4,
-      Semiconductors: 2,
-      "Robotics & Autonomy": 3,
-      "Quantum Technology": 2,
-      "Biotechnology & Research Tools": 3,
-      "Energy & Advanced Materials": 3,
-      "Enterprise Software": 5,
+      "Semiconductors & Advanced Computing": 3,
+      "Robotics & Autonomy": 4,
+      "Quantum Computing": 2,
+      "Biotechnology & Research Tools": 4,
+      "Energy Systems": 4,
+      "Advanced Materials": 3,
+      "Space & Aerospace": 3,
+      "Enterprise Infrastructure Software": 5,
       "Healthcare Technology": 4,
     },
     stageAffinity: {
@@ -273,17 +283,19 @@ export const MANDATES: Mandate[] = [
       "Series A": 5,
       "Series B": 2,
       "Series C": 1,
-      Growth: 1,
-      Public: 1,
+      "Later stage": 1,
     },
-    emphasisedSectors: ["Enterprise Software", "AI Infrastructure"],
+    emphasisedSectors: [
+      "Enterprise Infrastructure Software",
+      "AI Infrastructure",
+    ],
     additionalDiligence: [
-      "What has this founder built before, and what does the way they describe the failure tell you about how they think?",
+      "What has this team built before, and what does the way they describe the hard part tell you about how they think?",
       "If the current product is wrong, what does the team already know that would make the second attempt faster than the first?",
       "How many months of runway does the current plan assume, and what is the smallest result that would make the next round straightforward?",
     ],
     scoringNote:
-      "Team credibility carries 20 of the 100 quality points and market potential 14, the heaviest weights any profile assigns to either. At pre-seed and seed the product will change, so the model deliberately weights the people and the market over the current artefact. The sector affinities are broad by design, but the stage affinities are narrow: anything past Series A falls out of relevance quickly, which is what makes this an early-stage mandate rather than a general one.",
+      "Team credibility carries 19 of the 100 quality points and market importance 15, the heaviest weights any profile assigns to either. At pre-seed and seed the product will change, so the model deliberately weights the people and the market over the current artefact. The stage affinities are narrow: anything past Series A falls out of relevance quickly.",
   },
 ];
 

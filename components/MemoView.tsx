@@ -2,13 +2,27 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { MEMO, memoToMarkdown, memoToText } from "@/lib/memo";
+import {
+  buildMemo,
+  MEMO_DATE,
+  MEMO_MANDATE,
+  memoCompany,
+  memoToMarkdown,
+  memoToText,
+} from "@/lib/memo";
 import { downloadMarkdown, downloadText } from "@/lib/csv";
-import { DemonstrationBadge } from "./Provenance";
+import { ConfidenceBadge } from "./Provenance";
 import { formatDate } from "@/lib/format";
+import { SITE } from "@/lib/site";
+import { isDisclosed } from "@/lib/types";
 
 export function MemoView() {
   const [copied, setCopied] = useState(false);
+  const company = memoCompany();
+  const { recommendation, scoreNote, sections } = buildMemo(
+    company,
+    MEMO_MANDATE,
+  );
 
   async function copy() {
     try {
@@ -29,7 +43,7 @@ export function MemoView() {
         <button
           type="button"
           onClick={() =>
-            downloadMarkdown(`investment-memo-${MEMO.companyId}.md`, memoToMarkdown())
+            downloadMarkdown(`investment-memo-${company.id}.md`, memoToMarkdown())
           }
           className="btn-secondary"
         >
@@ -38,7 +52,7 @@ export function MemoView() {
         <button
           type="button"
           onClick={() =>
-            downloadText(`investment-memo-${MEMO.companyId}.txt`, memoToText())
+            downloadText(`investment-memo-${company.id}.txt`, memoToText())
           }
           className="btn-secondary"
         >
@@ -56,44 +70,56 @@ export function MemoView() {
       <header className="mt-8 border-b border-line pb-6">
         <div className="flex flex-wrap items-center gap-2">
           <span className="eyebrow">Investment memo</span>
-          <DemonstrationBadge />
+          <ConfidenceBadge confidence={company.dataConfidence} />
         </div>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">
-          {MEMO.companyName}
+          {company.name}
         </h1>
         <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-1 text-sm text-ink-muted">
           <div className="flex gap-1.5">
             <dt className="font-medium text-ink-soft">Author</dt>
-            <dd>{MEMO.author}</dd>
+            <dd>{SITE.author}</dd>
           </div>
           <div className="flex gap-1.5">
             <dt className="font-medium text-ink-soft">Date</dt>
-            <dd>{formatDate(MEMO.date)}</dd>
+            <dd>{formatDate(MEMO_DATE)}</dd>
           </div>
           <div className="flex gap-1.5">
-            <dt className="font-medium text-ink-soft">Mandate</dt>
-            <dd>{MEMO.mandate}</dd>
+            <dt className="font-medium text-ink-soft">Stage</dt>
+            <dd>{company.financing.stage}</dd>
           </div>
+          {isDisclosed(company.foundedYear) && (
+            <div className="flex gap-1.5">
+              <dt className="font-medium text-ink-soft">Founded</dt>
+              <dd>{company.foundedYear}</dd>
+            </div>
+          )}
         </dl>
+        <a
+          href={company.website}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-block text-sm font-medium text-accent hover:underline"
+        >
+          {company.website}
+        </a>
       </header>
 
       <div className="mt-6 rounded-xl border border-accent-line bg-accent-soft p-5">
         <p className="text-xs font-semibold uppercase tracking-wider text-accent">
           Recommendation
         </p>
-        <p className="mt-2 text-lg font-semibold text-ink">
-          {MEMO.recommendation}
-        </p>
+        <p className="mt-2 text-lg font-semibold text-ink">{recommendation}</p>
         <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-          {MEMO.recommendationDetail}
+          {company.investment.recommendedNextStep}
         </p>
         <p className="mt-3 text-xs leading-relaxed text-ink-muted">
-          {MEMO.scoreNote}
+          {scoreNote}
         </p>
       </div>
 
       <div className="mt-8 space-y-8">
-        {MEMO.sections.map((section) => (
+        {sections.map((section) => (
           <section key={section.heading}>
             <h2 className="h-section">{section.heading}</h2>
             <div className="mt-3 space-y-3">
@@ -125,15 +151,14 @@ export function MemoView() {
 
       <footer className="mt-10 space-y-3 border-t border-line pt-6 text-xs leading-relaxed text-ink-muted">
         <p>
-          {MEMO.companyName} is a demonstration company. It is fictional and
-          describes no real business. The memo is written on a fictional company
-          precisely so that every judgment in it can be stated with the
-          confidence a memo requires without asserting anything about a real
-          one.
+          This memo is generated directly from {company.name}&apos;s sourced
+          research record rather than written separately, so nothing can appear
+          in it that is not already supported by the sources listed above. Where
+          a fact is not disclosed in the record, it is not disclosed here.
         </p>
         <p className="print:hidden">
           <Link
-            href={`/universe/${MEMO.companyId}`}
+            href={`/universe/${company.id}`}
             className="font-medium text-accent hover:underline"
           >
             See the full research record behind this memo

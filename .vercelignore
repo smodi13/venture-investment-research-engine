@@ -3,43 +3,48 @@
 .env.*
 .git
 .github
+.vercel
+*.pem
+*.key
+*.p12
+*.crt
+secrets
+credentials
+tokens
 
-# Dependencies and build output are produced on the build machine.
+# Private or scraped research data
+private-data
+raw-data
+scraped-data
+/data
+/research
+/private
+*.db
+*.sqlite
+
+# Dependencies and build output are produced on the build machine
 node_modules
 .next
 
-# Local databases and any scraped or private research data.
-# Anchored to the project root so lib/data/, which is source code, is uploaded.
-*.db
-*.sqlite
-*.sqlite3
-/data/
-/research/
-/private/
+# Test artifacts and suites, not needed by the web application
+playwright-report
+test-results
+coverage
+tests
 
-# Screenshots, browser automation artifacts, and test output.
+# Screenshots and browser automation artifacts
 *.png
 *.jpg
 *.jpeg
 *.gif
-.playwright-mcp/
-playwright-report/
-test-results/
-coverage/
+.playwright-mcp
 
-# Python tooling, in case any is ever reintroduced.
-.venv/
-venv/
-__pycache__/
-.pytest_cache/
-.mypy_cache/
-
-# Editor, OS, and agent local files.
+# Editor, OS, and agent local files
 .DS_Store
-.vscode/
-.idea/
-.claude/
+.vscode
+.idea
+.claude
 
-# Documentation not required by the web application.
+# Documentation not required by the web application
 README.md
-docs/
+docs

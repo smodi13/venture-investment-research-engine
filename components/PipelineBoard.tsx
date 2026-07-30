@@ -5,27 +5,19 @@ import { Fragment, useMemo, useState } from "react";
 import { useMandate } from "./MandateProvider";
 import { MandateSelector } from "./MandateSelector";
 import { ScoreBadge } from "./Score";
-import { DemonstrationBadge } from "./Provenance";
+import { ConfidenceBadge } from "./Provenance";
 import type { UniverseRow } from "@/lib/rows";
 import {
   mergeRows,
   resetWorkflow,
   updateRecord,
   useOverrides,
-  type WorkflowRow,
+  WORKFLOW_DISCLAIMER,
 } from "@/lib/storage";
 import { downloadCsv, recordsToCsv } from "@/lib/csv";
 import { formatDate } from "@/lib/format";
 import { PIPELINE_STAGES, PRIORITIES } from "@/lib/types";
 import type { PipelineStage, Priority } from "@/lib/types";
-
-const STAGE_TONE: Record<string, string> = {
-  Passed: "border-line bg-canvas text-ink-muted",
-  Invested: "border-emerald-200 bg-emerald-50 text-emerald-800",
-  Monitoring: "border-line bg-canvas text-ink-soft",
-  "Partner review": "border-accent-line bg-accent-soft text-accent",
-  "Investment memo": "border-accent-line bg-accent-soft text-accent",
-};
 
 const PRIORITY_TONE: Record<Priority, string> = {
   High: "border-amber-200 bg-amber-50 text-amber-800",
@@ -40,10 +32,7 @@ export function PipelineBoard({ rows }: { rows: UniverseRow[] }) {
   const [priorityFilter, setPriorityFilter] = useState("Any");
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  const records = useMemo(
-    () => mergeRows(rows, overrides),
-    [rows, overrides],
-  );
+  const records = useMemo(() => mergeRows(rows, overrides), [rows, overrides]);
 
   const filtered = useMemo(
     () =>
@@ -60,15 +49,6 @@ export function PipelineBoard({ rows }: { rows: UniverseRow[] }) {
     return map;
   }, [records]);
 
-  function patch(id: string, next: Partial<WorkflowRow>) {
-    updateRecord(id, next);
-  }
-
-  function onReset() {
-    resetWorkflow();
-    setExpanded(null);
-  }
-
   function exportCsv() {
     const csv = recordsToCsv(filtered, mandateId, mandate.name);
     downloadCsv(
@@ -79,6 +59,10 @@ export function PipelineBoard({ rows }: { rows: UniverseRow[] }) {
 
   return (
     <div className="space-y-6">
+      <p className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
+        {WORKFLOW_DISCLAIMER}
+      </p>
+
       <div className="card p-4 sm:p-5">
         <MandateSelector variant="compact" />
       </div>
@@ -143,22 +127,32 @@ export function PipelineBoard({ rows }: { rows: UniverseRow[] }) {
           <button type="button" onClick={exportCsv} className="btn-secondary">
             Export {filtered.length} to CSV
           </button>
-          <button type="button" onClick={onReset} className="btn-ghost">
-            Reset demonstration data
+          <button
+            type="button"
+            onClick={() => {
+              resetWorkflow();
+              setExpanded(null);
+            }}
+            className="btn-ghost"
+          >
+            Reset demonstration workflow data
           </button>
         </div>
       </div>
 
       <div className="card overflow-x-auto">
-        <table className="w-full min-w-[64rem] border-collapse text-sm">
+        <table className="w-full min-w-[70rem] border-collapse text-sm">
           <thead>
             <tr className="border-b border-line text-left">
               <th className="py-3 pl-4 pr-3 font-semibold text-ink">Company</th>
               <th className="py-3 px-3 font-semibold text-ink">Status</th>
               <th className="py-3 px-3 font-semibold text-ink">Priority</th>
-              <th className="py-3 px-3 font-semibold text-ink">Next step</th>
-              <th className="py-3 px-3 font-semibold text-ink">Owner</th>
-              <th className="py-3 px-3 font-semibold text-ink">Activity</th>
+              <th className="py-3 px-3 font-semibold text-ink">
+                Key unanswered question
+              </th>
+              <th className="py-3 px-3 font-semibold text-ink">
+                Next diligence step
+              </th>
               <th className="py-3 pl-3 pr-4 font-semibold text-ink">Score</th>
             </tr>
           </thead>
@@ -175,10 +169,16 @@ export function PipelineBoard({ rows }: { rows: UniverseRow[] }) {
                     </Link>
                     <div className="mt-1 flex flex-wrap items-center gap-1.5">
                       <span className="chip">{r.sector}</span>
-                      {r.isDemonstration && <DemonstrationBadge />}
+                      <span className="chip">{r.stage}</span>
                     </div>
                     <div className="mt-1 text-xs text-ink-muted">
-                      Sourced via {r.source}, {formatDate(r.dateSourced)}
+                      {r.headquarters}
+                    </div>
+                    <div className="mt-1 text-xs text-ink-muted">
+                      {r.sourcingSignal}, sourced {formatDate(r.dateSourced)}
+                    </div>
+                    <div className="mt-1.5">
+                      <ConfidenceBadge confidence={r.dataConfidence} />
                     </div>
                     <button
                       type="button"
@@ -195,15 +195,12 @@ export function PipelineBoard({ rows }: { rows: UniverseRow[] }) {
                     <select
                       value={r.status}
                       onChange={(e) =>
-                        patch(r.id, {
+                        updateRecord(r.id, {
                           status: e.target.value as PipelineStage,
                         })
                       }
                       aria-label={`Pipeline status for ${r.name}`}
-                      className={`rounded-lg border px-2 py-1 text-xs font-medium ${
-                        STAGE_TONE[r.status] ??
-                        "border-line bg-surface text-ink-soft"
-                      }`}
+                      className="rounded-lg border border-line bg-surface px-2 py-1 text-xs font-medium text-ink-soft"
                     >
                       {PIPELINE_STAGES.map((s) => (
                         <option key={s} value={s}>
@@ -216,7 +213,9 @@ export function PipelineBoard({ rows }: { rows: UniverseRow[] }) {
                     <select
                       value={r.priority}
                       onChange={(e) =>
-                        patch(r.id, { priority: e.target.value as Priority })
+                        updateRecord(r.id, {
+                          priority: e.target.value as Priority,
+                        })
                       }
                       aria-label={`Priority for ${r.name}`}
                       className={`rounded-lg border px-2 py-1 text-xs font-medium ${PRIORITY_TONE[r.priority]}`}
@@ -229,16 +228,13 @@ export function PipelineBoard({ rows }: { rows: UniverseRow[] }) {
                     </select>
                   </td>
                   <td className="max-w-xs py-3 px-3 text-xs leading-relaxed text-ink-soft">
+                    {r.keyUnansweredQuestion}
+                  </td>
+                  <td className="max-w-xs py-3 px-3 text-xs leading-relaxed text-ink-soft">
                     {r.nextStep}
                     <div className="mt-1 text-ink-muted">
                       Due {formatDate(r.nextStepDate)}
                     </div>
-                  </td>
-                  <td className="py-3 px-3 whitespace-nowrap text-ink-soft">
-                    {r.owner}
-                  </td>
-                  <td className="py-3 px-3 whitespace-nowrap text-ink-muted">
-                    {formatDate(r.lastActivity)}
                   </td>
                   <td className="py-3 pl-3 pr-4">
                     <ScoreBadge score={r.scores[mandateId]} showBand={false} />
@@ -246,14 +242,14 @@ export function PipelineBoard({ rows }: { rows: UniverseRow[] }) {
                 </tr>
                 {expanded === r.id && (
                   <tr className="border-b border-line bg-canvas">
-                    <td colSpan={7} className="px-4 py-4">
+                    <td colSpan={6} className="px-4 py-4">
                       <div className="grid gap-4 lg:grid-cols-2">
                         <label className="block">
                           <span className="label">Notes</span>
                           <textarea
                             value={r.notes}
                             onChange={(e) =>
-                              patch(r.id, { notes: e.target.value })
+                              updateRecord(r.id, { notes: e.target.value })
                             }
                             rows={4}
                             placeholder="What do you actually think, and what would change your mind?"
@@ -262,33 +258,42 @@ export function PipelineBoard({ rows }: { rows: UniverseRow[] }) {
                         </label>
                         <div className="space-y-3">
                           <label className="block">
-                            <span className="label">Next step</span>
+                            <span className="label">Next diligence step</span>
                             <input
                               type="text"
                               value={r.nextStep}
                               onChange={(e) =>
-                                patch(r.id, { nextStep: e.target.value })
+                                updateRecord(r.id, { nextStep: e.target.value })
                               }
                               className="input"
                             />
                           </label>
                           <label className="block">
-                            <span className="label">Next step date</span>
+                            <span className="label">Next-step date</span>
                             <input
                               type="date"
                               value={r.nextStepDate}
                               onChange={(e) =>
-                                patch(r.id, { nextStepDate: e.target.value })
+                                updateRecord(r.id, {
+                                  nextStepDate: e.target.value,
+                                })
                               }
                               className="input"
                             />
                           </label>
-                          <div>
-                            <span className="label">Key risk</span>
-                            <p className="text-xs leading-relaxed text-ink-soft">
-                              {r.keyRisk}
-                            </p>
-                          </div>
+                          <label className="block">
+                            <span className="label">Key unanswered question</span>
+                            <input
+                              type="text"
+                              value={r.keyUnansweredQuestion}
+                              onChange={(e) =>
+                                updateRecord(r.id, {
+                                  keyUnansweredQuestion: e.target.value,
+                                })
+                              }
+                              className="input"
+                            />
+                          </label>
                         </div>
                       </div>
                     </td>
@@ -298,10 +303,7 @@ export function PipelineBoard({ rows }: { rows: UniverseRow[] }) {
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td
-                  colSpan={7}
-                  className="p-8 text-center text-sm text-ink-muted"
-                >
+                <td colSpan={6} className="p-8 text-center text-sm text-ink-muted">
                   No companies at this status. Clear the filters to see the full
                   pipeline.
                 </td>
@@ -314,7 +316,8 @@ export function PipelineBoard({ rows }: { rows: UniverseRow[] }) {
       <p className="text-xs leading-relaxed text-ink-muted">
         Status, priority, notes, and next steps are stored in this browser only,
         using local storage. Nothing is sent to a server, and resetting returns
-        every record to its starting state.
+        every record to its starting state. Company facts are sourced and are
+        not editable.
       </p>
     </div>
   );
