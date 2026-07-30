@@ -201,6 +201,24 @@ npm run lint
 npx tsc --noEmit
 ```
 
+## Testing
+
+An end-to-end suite runs in an isolated headless Chromium profile and covers
+42 checks: navigation across every route, mandate switching and score
+recalculation, search, filters, sorting, four-way comparison, company detail
+views, pipeline edits, local storage persistence across a refresh, CSV export
+contents, memo copy and download, mobile layout and navigation, external link
+safety, the custom 404, and browser console output.
+
+```bash
+npx playwright install chromium   # once
+npm run build && npm start        # in one terminal
+npm run test:e2e                  # in another
+
+# Or point it at any deployment:
+BASE=https://venture-investment-research-engine.vercel.app npm run test:e2e
+```
+
 ## Deployment
 
 Deploys to Vercel as a static site with no configuration:

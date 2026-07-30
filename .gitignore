@@ -60,3 +60,6 @@ tmp/
 Thumbs.db
 .vscode/
 .idea/
+
+# End-to-end test artifacts
+tests/.tmp-downloads/
