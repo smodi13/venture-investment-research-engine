@@ -331,8 +331,16 @@ export interface DiligenceSet {
 /* Scoring                                                                    */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * The twelve quality factors.
+ *
+ * Mandate fit is deliberately absent. It is not a quality factor and is not
+ * scored additively, because a weighted factor can always be outvoted by the
+ * other eleven: a superb company outside a mandate would still rank near the
+ * top, which is not how a mandate works. Relevance is handled as a separate
+ * stage in lib/scoring.ts.
+ */
 export type FactorKey =
-  | "mandateFit"
   | "differentiation"
   | "defensibility"
   | "marketPotential"
@@ -345,13 +353,6 @@ export type FactorKey =
   | "regulatoryRisk"
   | "financingRisk"
   | "overlooked";
-
-/**
- * Mandate fit is the one factor that is never stored on a company. It is
- * derived at read time from the active mandate, which is what makes every
- * score in the platform move when the mandate changes.
- */
-export type StoredFactorKey = Exclude<FactorKey, "mandateFit">;
 
 /**
  * A per-factor assessment. `rating` is 0 to 5 and is deliberately coarse: the
@@ -370,7 +371,7 @@ export interface FactorAssessment {
   basis: "verified" | "judgment";
 }
 
-export type FactorSet = Record<StoredFactorKey, FactorAssessment>;
+export type FactorSet = Record<FactorKey, FactorAssessment>;
 
 /** Terse constructor for factor assessments, used throughout the dataset. */
 export const fa = (

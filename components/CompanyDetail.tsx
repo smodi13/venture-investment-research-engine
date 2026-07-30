@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useMandate } from "./MandateProvider";
 import { MandateSelector } from "./MandateSelector";
-import { ScoreBadge, ScoreBar, ScoreBreakdown } from "./Score";
+import { RelevanceBadge, ScoreBadge, ScoreBar, ScoreBreakdown } from "./Score";
 import {
   DemonstrationBadge,
   EvidenceLine,
@@ -82,6 +82,9 @@ export function CompanyDetail({ company }: { company: Company }) {
             <ScoreBadge score={result.total} />
             <div className="mt-2 w-40">
               <ScoreBar score={result.total} />
+            </div>
+            <div className="mt-2 flex justify-end">
+              <RelevanceBadge relevance={result.relevance} />
             </div>
             <p className="mt-1.5 text-xs text-ink-muted">
               Under the {mandate.name} mandate
@@ -387,10 +390,19 @@ export function CompanyDetail({ company }: { company: Company }) {
       {/* Scoring */}
       <Section
         title="Scoring breakdown"
-        description={`Thirteen factors weighted by the active mandate. ${mix.verifiedShare} percent of the ratings on this company rest on verified information, and the rest are analyst judgment, labelled per factor.`}
+        description={`Twelve quality factors weighted by the active mandate, then scaled by mandate relevance. ${mix.verifiedShare} percent of the ratings on this company rest on verified information, and the rest are analyst judgment, labelled per factor.`}
       >
-        <div className="mb-4 flex flex-wrap items-center gap-3 rounded-lg border border-line bg-canvas p-4">
-          <ScoreBadge score={result.total} />
+        <div className="mb-4 space-y-3 rounded-lg border border-line bg-canvas p-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <ScoreBadge score={result.total} />
+            <RelevanceBadge relevance={result.relevance} />
+          </div>
+          <p className="text-sm leading-relaxed text-ink-soft">
+            Quality {result.quality} of 100, multiplied by{" "}
+            {result.relevance.tier.multiplier.toFixed(2)} for mandate relevance,
+            gives {result.total}. This tier is capped at{" "}
+            {result.relevance.tier.ceiling}.
+          </p>
           <p className="text-sm leading-relaxed text-ink-soft">{band.meaning}</p>
         </div>
         <ScoreBreakdown result={result} />

@@ -304,7 +304,7 @@ export const PRIVATE_COMPANIES: Company[] = [
     hq: "Austin, Texas",
     region: "North America",
     foundedYear: 2021,
-    sector: "AI Infrastructure",
+    sector: "Semiconductors",
     subsector: "Optical interconnect for rack-scale systems",
     stage: "Series B",
     description:
@@ -3278,6 +3278,826 @@ export const PRIVATE_COMPANIES: Company[] = [
         "judgment",
         "Revenue cycle software is covered, though denial prevention receives less attention than denial recovery.",
         "Somewhat under-examined within a covered category.",
+      ),
+    },
+  },
+
+  /* ------------------------------------------------------- Halyard Systems */
+  {
+    id: "halyard-systems",
+    name: "Halyard Systems",
+    isDemonstration: true,
+    marketType: "Private",
+    hq: "Chicago, Illinois",
+    region: "North America",
+    foundedYear: 2019,
+    sector: "Enterprise Software",
+    subsector: "Compliance automation for regulated industries",
+    stage: "Series B",
+    description:
+      "Continuous control monitoring for regulated financial and healthcare organisations, replacing the annual evidence-gathering scramble before an audit with a system that collects and tests controls as they run.",
+    businessModel:
+      "Annual subscription priced on the number of controls monitored and the frameworks in scope, sold to compliance and internal audit functions.",
+    primaryCustomer:
+      "Compliance, internal audit, and risk teams at regulated mid-market and enterprise organisations.",
+    technicalDifferentiation:
+      "Control tests run against the customer's own systems and produce audit-ready evidence in the format examiners already accept, which is the part competitors treat as a reporting afterthought.",
+    tractionSignal: demo(
+      "One hundred and forty paying customers with gross revenue retention above ninety five percent, and four of the six largest customers now in their third contract year.",
+      D,
+      "Illustrative traction on a fictional company.",
+    ),
+    keyCatalyst:
+      "Whether examiners at a major regulator begin accepting continuously collected evidence as a matter of course rather than case by case.",
+    investmentRisk:
+      "The buyer is a cost centre, so budgets are defended rather than grown, and a downturn in regulated industries compresses spending directly.",
+    technicalRisk:
+      "Control tests must be maintained against systems the customer keeps changing, which is ongoing engineering rather than a one-time build.",
+    competitiveThreat:
+      "Established governance and risk platforms with existing enterprise agreements, and the audit firms themselves moving upstream into software.",
+    capitalIntensity: "Low",
+    commercialReadiness: "Scaling",
+    lastReviewed: "2026-07-28",
+    sourceIds: [],
+    financials: {
+      kind: "private",
+      stage: "Series B",
+      capitalRaised: demo(74_000_000, D, "Illustrative total raised."),
+      latestRound: demo("Series B, closed in late 2025", D),
+      capitalIntensity: "Low",
+      futureFinancingNeed:
+        "None required on the current plan. The company reached cash-flow break-even before the Series B and raised to accelerate rather than to survive.",
+      ownershipConsiderations:
+        "Two institutional rounds with standard terms and no structured preference beyond a one times non-participating stack.",
+      financingRisk:
+        "Low. Break-even with contracted recurring revenue means the next round is optional, which is the strongest financing position in this universe.",
+    },
+    technology: {
+      howItWorks:
+        "Read-only connectors pull configuration and access state from the customer's cloud, identity, and core systems. Each control is expressed as a test against that state, run continuously, with failures routed to an owner and every result retained as timestamped evidence.",
+      coreAdvantage:
+        "The evidence format. Producing output that an examiner accepts without translation is unglamorous work that took years to get right, and it is the reason customers stop running parallel manual processes.",
+      supportingEvidence: [
+        {
+          claim:
+            "Gross revenue retention above ninety five percent across the customer base.",
+          provenance: "demonstration",
+          asOf: D,
+        },
+        {
+          claim:
+            "Four of the six largest customers are in a third contract year.",
+          provenance: "demonstration",
+          asOf: D,
+        },
+        {
+          claim:
+            "Customers report retiring their parallel manual evidence process after the first full audit cycle.",
+          provenance: "demonstration",
+          asOf: D,
+        },
+      ],
+      benchmarks:
+        "The operative measure is the proportion of audit evidence requests satisfied without manual work. Results vary by framework and by examiner, so figures are quoted per customer rather than as a product claim.",
+      intellectualProperty:
+        "No patents. The defensible assets are the control test library and the accumulated mapping between frameworks, both of which took years of customer work to build.",
+      thirdPartyDependency:
+        "Read-only API access to customer cloud, identity, and core banking or clinical systems, which those vendors control.",
+      milestoneForScale:
+        "A framework mapping that covers a new regulatory regime without bespoke engineering, which is the test of whether international expansion is a product exercise or a services one.",
+      failurePoints: [
+        "Control tests decaying as customer systems change faster than the library is maintained",
+        "A major platform restricting the read-only access the connectors depend on",
+        "Audit firms bundling comparable monitoring into engagements customers already pay for",
+      ],
+    },
+    market: {
+      painPoint:
+        "Compliance evidence is gathered manually in the weeks before an audit, which is expensive, error prone, and tells the organisation nothing during the eleven months in between.",
+      structure:
+        "Well-defined budgets inside regulated organisations, with procurement led by compliance functions and security review by the technology organisation.",
+      adoptionDrivers: [
+        "Regulatory examination frequency and scope increasing in financial services and healthcare",
+        "Compliance headcount that has not grown in proportion to the control surface",
+        "Cloud adoption making the control surface change continuously rather than annually",
+      ],
+      whyNow:
+        "The control surface now changes daily while the audit cycle remains annual. That gap is what makes continuous monitoring a product rather than a preference.",
+      competitors: [
+        "Established governance, risk, and compliance platforms",
+        "Audit firms offering monitoring alongside engagements",
+        "Internal tooling built by large compliance teams",
+      ],
+      substitutes: [
+        "Manual evidence collection with spreadsheets and screenshots",
+        "Point solutions covering a single framework",
+      ],
+      regulatoryEnvironment:
+        "The product is not itself regulated, but its value depends entirely on what examiners accept, which varies by regulator and changes over time.",
+      maturity: "Developing",
+    },
+    commercial: {
+      pricingModel:
+        "Annual subscription scaled by controls monitored and frameworks in scope, with multi-year terms standard above a threshold.",
+      salesMotion:
+        "Enterprise sales into compliance functions, with a security review stage that lengthens the cycle but raises switching costs once passed.",
+      customerType:
+        "Compliance, internal audit, and risk leadership at regulated organisations.",
+      adoptionEvidence: [
+        {
+          claim:
+            "One hundred and forty paying customers with gross retention above ninety five percent.",
+          provenance: "demonstration",
+          asOf: D,
+        },
+        {
+          claim:
+            "Expansion into additional frameworks at more than half the customer base.",
+          provenance: "demonstration",
+          asOf: D,
+        },
+      ],
+      implementationBurden:
+        "Six to ten weeks, dominated by connector access approvals rather than by configuration.",
+      expansionOpportunity:
+        "Additional frameworks within existing customers, and adjacent vendor risk monitoring using connectors that are already in place.",
+      goToMarketRisk:
+        "Selling to a cost centre means the buyer defends a budget rather than growing one, so expansion depends on displacing manual spend rather than on new money.",
+    },
+    investment: {
+      thesis:
+        "A repeatable enterprise sale into a defended budget line, with retention and multi-year renewals that demonstrate the product survives the only test that matters in compliance software, which is a completed audit cycle.",
+      bullCase:
+        "Continuous evidence becomes the examiner default, framework coverage expands internationally without bespoke work, and the company compounds inside a category with high switching costs.",
+      baseCase:
+        "Steady growth in the domestic regulated mid-market with excellent retention, reaching a strong but not category-defining outcome.",
+      bearCase:
+        "Audit firms bundle comparable monitoring into engagements customers already buy, and a cost-centre budget proves unable to support two vendors.",
+      catalysts: [
+        "A regulator accepting continuously collected evidence as standard practice",
+        "International framework coverage shipped without bespoke engineering",
+        "Net expansion improving as vendor risk monitoring attaches",
+      ],
+      risks: [
+        "Cost-centre budget compression in a downturn",
+        "Audit firms moving upstream into software",
+        "Connector access restricted by platform vendors",
+      ],
+      invalidators: [
+        "Gross retention falling below ninety percent, which would mean the product does not survive an audit cycle",
+        "A major audit firm bundling equivalent monitoring at no incremental cost",
+      ],
+      recommendedNextStep:
+        "Interview a compliance officer at a third-year customer about what they stopped doing manually, since retirement of the parallel process is the only durable evidence in this category.",
+    },
+    diligence: {
+      technology: [
+        "How much engineering per quarter goes into maintaining control tests against changing customer systems?",
+      ],
+      product: [
+        "What proportion of audit evidence requests are satisfied without any manual work, measured at the customer rather than claimed?",
+      ],
+      customers: [
+        "Of the third-year customers, how many have retired their parallel manual process entirely?",
+      ],
+      competition: [
+        "Where has the company lost to an audit firm bundling monitoring, and what was the price difference?",
+      ],
+      unitEconomics: [
+        "What is gross margin after fully loading connector maintenance and customer support?",
+      ],
+      capitalRequirements: [
+        "Given break-even, what is the Series B actually funding, and what happens if that spending is cut?",
+      ],
+      regulation: [
+        "Which regulators have accepted continuously collected evidence, and in what form?",
+      ],
+      team: [
+        "Who on the team has sat on the examiner side of an audit?",
+      ],
+      financing: [
+        "What does the plan look like if no further capital is raised at all?",
+      ],
+      commercialization: [
+        "How long is the security review stage, and has it shortened as reference customers accumulated?",
+      ],
+    },
+    outreach:
+      "Hi, the write-up on producing evidence in the format examiners already accept, rather than producing a dashboard and translating afterwards, is the most useful thing I have read about this category. It is also the least glamorous possible thing to have spent three years on. I focus on early-stage enterprise infrastructure. I would like to understand how many third-year customers have actually retired their parallel manual process. Would you be open to a call?",
+    factors: {
+      differentiation: fa(
+        4,
+        "judgment",
+        "Control tests producing examiner-ready evidence without translation, built on a framework mapping accumulated over years.",
+        "The differentiation is in unglamorous format and coverage work rather than in novel technology, which makes it slower to copy than it looks.",
+      ),
+      defensibility: fa(
+        5,
+        "judgment",
+        "Embedded in audit workflow, with switching costs measured in a full audit cycle plus the control library rebuild.",
+        "Among the most defensible positions in the private set, because leaving mid-cycle is not a realistic option for the buyer.",
+      ),
+      marketPotential: fa(
+        4,
+        "judgment",
+        "Every regulated organisation has this problem and a defined budget line for it.",
+        "Large and well defined, though a cost centre rather than a growth budget.",
+      ),
+      commercialReadiness: fa(
+        5,
+        "judgment",
+        "One hundred and forty customers on a repeatable enterprise motion with a standard implementation path.",
+        "Fully repeatable, which is what this mandate is looking for.",
+      ),
+      customerEvidence: fa(
+        5,
+        "judgment",
+        "Gross retention above ninety five percent with four of six largest customers in a third contract year.",
+        "Multi-year renewal through completed audit cycles is the strongest customer evidence available in this category.",
+      ),
+      teamCredibility: fa(
+        5,
+        "judgment",
+        "Founders built and sold a compliance product previously, and one came from the examiner side.",
+        "Direct prior experience with both the buyer and the regulator.",
+      ),
+      capitalEfficiency: fa(
+        4,
+        "judgment",
+        "Reached cash-flow break-even before the Series B on seventy four million dollars raised.",
+        "Strong, though the Series B raises the bar it must now clear.",
+      ),
+      competitiveIntensity: fa(
+        3,
+        "judgment",
+        "Established governance platforms and audit firms both credible, none dominant in continuous monitoring specifically.",
+        "Competitive but not crowded at the specific position.",
+      ),
+      technicalRisk: fa(
+        5,
+        "judgment",
+        "The product works in production across one hundred and forty customers.",
+        "Effectively no feasibility risk.",
+      ),
+      regulatoryRisk: fa(
+        4,
+        "judgment",
+        "Not itself regulated, though value depends on what examiners accept.",
+        "Low direct exposure, with indirect dependence on examiner practice.",
+      ),
+      financingRisk: fa(
+        4,
+        "judgment",
+        "Break-even with contracted recurring revenue, so the next round is optional.",
+        "The strongest financing position in the private set.",
+      ),
+      overlooked: fa(
+        2,
+        "judgment",
+        "Compliance automation is a well-covered venture category.",
+        "Not overlooked, which the score reflects honestly.",
+      ),
+    },
+  },
+
+  /* -------------------------------------------------------- Corvid Security */
+  {
+    id: "corvid-security",
+    name: "Corvid Security",
+    isDemonstration: true,
+    marketType: "Private",
+    hq: "Waterloo, Ontario",
+    region: "North America",
+    foundedYear: 2024,
+    sector: "Enterprise Software",
+    subsector: "Identity and permissioning for autonomous agents",
+    stage: "Seed",
+    description:
+      "Identity, scoping, and audit for software agents acting on behalf of employees, addressing the gap where an agent inherits a person's full credentials because nothing exists to give it narrower ones.",
+    businessModel:
+      "Annual subscription priced per agent identity under management, sold to platform and security engineering teams.",
+    primaryCustomer:
+      "Security and platform engineering teams at companies deploying agents against internal systems.",
+    technicalDifferentiation:
+      "Scoped, expiring credentials issued per agent task rather than per agent, so the blast radius of a compromised or misbehaving agent is bounded by what it was asked to do.",
+    tractionSignal: demo(
+      "Nine paid design partners, none yet past a twelve-month renewal, and no security incident data on which to judge the product.",
+      D,
+      "Illustrative traction on a fictional company. The absence of renewal history is the honest state of a company this young.",
+    ),
+    keyCatalyst:
+      "Whether identity providers treat agent identity as their own roadmap item or as a partner category.",
+    investmentRisk:
+      "The category may be absorbed by incumbent identity providers before it is established, which is the usual outcome for a security primitive.",
+    technicalRisk:
+      "Scoping is only as good as the task description, and task descriptions come from the customer.",
+    competitiveThreat:
+      "Established identity providers, for whom this is an adjacent feature rather than a new product.",
+    capitalIntensity: "Low",
+    commercialReadiness: "Early Deployment",
+    lastReviewed: "2026-07-27",
+    sourceIds: [],
+    financials: {
+      kind: "private",
+      stage: "Seed",
+      capitalRaised: demo(6_500_000, D, "Illustrative total raised."),
+      latestRound: demo("Seed, closed in the first quarter of 2026", D),
+      capitalIntensity: "Low",
+      futureFinancingNeed:
+        "A Series A within eighteen months, which will be judged on renewal evidence the company does not yet have.",
+      ownershipConsiderations:
+        "Single institutional lead, clean terms, founders hold a large majority.",
+      financingRisk:
+        "Moderate. Burn is low, but the next round requires renewal data that only time can produce.",
+    },
+    technology: {
+      howItWorks:
+        "An agent requests a credential scoped to a described task. The service issues a short-lived credential limited to the systems and operations that task requires, and records every use against the originating request.",
+      coreAdvantage:
+        "Scoping per task rather than per agent. It is a small conceptual difference that changes what a compromised agent can reach from everything the user can touch to only what the task needed.",
+      supportingEvidence: [
+        {
+          claim: "Nine paid design partners deploying against internal systems.",
+          provenance: "demonstration",
+          asOf: D,
+        },
+        {
+          claim:
+            "No customer has yet reached a twelve-month renewal, so retention is unproven.",
+          provenance: "demonstration",
+          asOf: D,
+        },
+      ],
+      benchmarks:
+        "The meaningful measure is reduction in credential scope per agent action, which the company reports per deployment. There is no industry benchmark for this and no incident data yet to validate against.",
+      intellectualProperty:
+        "One provisional filing on the scoping mechanism. Defensibility at this stage rests on nothing durable.",
+      thirdPartyDependency:
+        "Integration with customer identity providers, which are also the most likely competitors.",
+      milestoneForScale:
+        "A full renewal cycle across the design partner base, which is the first evidence that the product is bought rather than trialled.",
+      failurePoints: [
+        "Identity providers shipping agent scoping as a standard feature",
+        "Task descriptions proving too coarse for scoping to bound anything meaningful",
+        "The agent deployment wave slowing before the category establishes",
+      ],
+    },
+    market: {
+      painPoint:
+        "Agents acting for employees currently inherit those employees' full permissions, because no narrower credential exists to give them. Every organisation deploying agents has this problem and most are managing it with policy rather than with technology.",
+      structure:
+        "Early and undefined. Buyers are security teams reacting to agent deployments their organisation has already started.",
+      adoptionDrivers: [
+        "Agent deployments moving from experiment into systems that hold real data",
+        "Security teams being asked to approve agent access they cannot currently scope",
+        "Audit requirements arriving before the tooling to satisfy them",
+      ],
+      whyNow:
+        "Agents began acting against production systems faster than the identity layer beneath them was designed for. That gap is the market, and it did not exist two years ago.",
+      competitors: [
+        "Established identity and access management providers",
+        "Cloud provider native credential scoping",
+        "Internal tooling built by platform teams",
+      ],
+      substitutes: [
+        "Policy and review processes instead of technical scoping",
+        "Restricting agents to read-only access",
+      ],
+      regulatoryEnvironment:
+        "No direct product regulation. Customers in regulated industries impose audit requirements that shape the logging design.",
+      maturity: "Emerging",
+    },
+    commercial: {
+      pricingModel:
+        "Annual subscription per agent identity under management, with a low entry point suited to design-partner economics.",
+      salesMotion:
+        "Founder-led technical sales into security and platform teams, mostly inbound from technical writing.",
+      customerType:
+        "Security and platform engineering leadership.",
+      adoptionEvidence: [
+        {
+          claim: "Nine paid design partners.",
+          provenance: "demonstration",
+          asOf: D,
+        },
+        {
+          claim:
+            "No renewal history and no incident data to validate the security claim.",
+          provenance: "demonstration",
+          asOf: D,
+        },
+      ],
+      implementationBurden:
+        "Two to three weeks, most of it spent mapping which internal systems an agent legitimately needs.",
+      expansionOpportunity:
+        "Agent count growth within existing customers, plus audit and logging products built on the same request record.",
+      goToMarketRisk:
+        "Selling a security primitive that the customer's existing identity vendor could plausibly ship as a feature.",
+    },
+    investment: {
+      thesis:
+        "A correctly identified gap in the agent deployment stack, addressed by a credible team at the earliest possible point, with essentially no evidence yet that it will be bought rather than absorbed.",
+      bullCase:
+        "Agent identity becomes its own category, the design partners renew and expand, and the company establishes the primitive before incumbents treat it seriously.",
+      baseCase:
+        "Useful product, modest growth, and an acquisition by an identity provider that wants the team and the mechanism.",
+      bearCase:
+        "An identity provider ships agent scoping as a checkbox feature and the category never separates from the incumbent stack.",
+      catalysts: [
+        "A full renewal cycle across the design partner base",
+        "An identity provider partnering rather than competing",
+        "Any published incident where scoping demonstrably bounded the damage",
+      ],
+      risks: [
+        "Absorption by incumbent identity providers",
+        "No renewal evidence yet",
+        "Dependence on the pace of agent deployment generally",
+      ],
+      invalidators: [
+        "A major identity provider shipping equivalent scoping as a standard feature",
+        "Design partners declining to renew at the first cycle",
+      ],
+      recommendedNextStep:
+        "Wait for the first renewal cohort rather than pricing this now. There is no substitute for that evidence and it arrives within nine months.",
+    },
+    diligence: {
+      technology: [
+        "How coarse are the task descriptions in practice, and how much scope reduction do they actually achieve?",
+      ],
+      product: [
+        "What happens when an agent needs access the task description did not anticipate?",
+      ],
+      customers: [
+        "Of the nine design partners, how many have expanded agent counts since deployment?",
+      ],
+      competition: [
+        "What have the major identity providers said publicly about agent identity on their roadmaps?",
+      ],
+      unitEconomics: [
+        "What does a design partner pay relative to the engineering support they consume?",
+      ],
+      capitalRequirements: [
+        "What does the plan fund, and does it reach the first renewal cycle with margin?",
+      ],
+      regulation: [
+        "What audit and logging requirements do regulated design partners impose?",
+      ],
+      team: [
+        "Who on the team has shipped an identity primitive at scale before?",
+      ],
+      financing: [
+        "What evidence does the Series A require, and is it obtainable within the runway?",
+      ],
+      commercialization: [
+        "What proportion of design partners came inbound, and from what?",
+      ],
+    },
+    outreach:
+      "Hi, the post arguing that agents inherit full user credentials because nothing narrower exists to give them is the clearest statement of that problem I have read, and you were direct that scoping is only as good as the task description. I look at early-stage security and infrastructure companies. I am aware the renewal evidence does not exist yet, and I would still like to understand what the design partners have expanded. Would you be open to a short call?",
+    factors: {
+      differentiation: fa(
+        4,
+        "judgment",
+        "Per-task rather than per-agent credential scoping, a small conceptual shift with a large effect on blast radius.",
+        "Genuinely the right primitive, though not a difficult one to reproduce once named.",
+      ),
+      defensibility: fa(
+        2,
+        "judgment",
+        "One provisional filing and no accumulated data asset. The incumbent identity providers own the integration point.",
+        "Weak, and the team says so directly.",
+      ),
+      marketPotential: fa(
+        5,
+        "judgment",
+        "Every organisation deploying agents against production systems needs this or something like it.",
+        "Very large if the category separates from the identity stack at all.",
+      ),
+      commercialReadiness: fa(
+        2,
+        "judgment",
+        "Nine paid design partners, no renewal cycle completed.",
+        "Deployed but unproven as a purchase.",
+      ),
+      customerEvidence: fa(
+        2,
+        "judgment",
+        "Paid design partners with no retention history.",
+        "Interest rather than demand, which is the honest reading at seed.",
+      ),
+      teamCredibility: fa(
+        4,
+        "judgment",
+        "Founders came from identity infrastructure engineering at scale.",
+        "Well matched to the problem, without a prior company outcome.",
+      ),
+      capitalEfficiency: fa(
+        4,
+        "judgment",
+        "Nine deployments on six and a half million dollars with a small team.",
+        "Efficient for the stage.",
+      ),
+      competitiveIntensity: fa(
+        2,
+        "judgment",
+        "Competing against identity providers for whom this is an adjacent feature.",
+        "The classic security primitive problem: the incumbent does not need to be better, only present.",
+      ),
+      technicalRisk: fa(
+        4,
+        "judgment",
+        "The mechanism works in production deployments.",
+        "Low feasibility risk; the open question is commercial.",
+      ),
+      regulatoryRisk: fa(
+        4,
+        "judgment",
+        "No direct product regulation.",
+        "Low.",
+      ),
+      financingRisk: fa(
+        3,
+        "judgment",
+        "Low burn, but the Series A depends on renewal evidence that does not yet exist.",
+        "Moderate, and dependent on time rather than on execution.",
+      ),
+      overlooked: fa(
+        4,
+        "judgment",
+        "Agent infrastructure attracts attention; the identity layer beneath it attracts much less.",
+        "Genuinely under-examined relative to how often the problem is described.",
+      ),
+    },
+  },
+
+  /* --------------------------------------------------------- Alder Clinical */
+  {
+    id: "alder-clinical",
+    name: "Alder Clinical",
+    isDemonstration: true,
+    marketType: "Private",
+    hq: "Raleigh, North Carolina",
+    region: "North America",
+    foundedYear: 2021,
+    sector: "Healthcare Technology",
+    subsector: "Clinical trial site operations",
+    stage: "Series A",
+    description:
+      "Operations software for clinical trial sites, targeting the coordinator workload that determines whether a site can run a second trial at all, rather than the sponsor-side systems that already have vendors.",
+    businessModel:
+      "Annual subscription per site with a per-study component, sold to site networks and academic research organisations rather than to sponsors.",
+    primaryCustomer:
+      "Research coordinators and site directors at community and academic trial sites.",
+    technicalDifferentiation:
+      "Built around the coordinator's actual sequence of work across multiple concurrent studies, rather than around a single sponsor's protocol, which is how every incumbent system is organised.",
+    tractionSignal: demo(
+      "Sixty one sites under subscription across nine networks, with coordinator time per enrolled patient measured before and after at twelve of them.",
+      D,
+      "Illustrative traction on a fictional company.",
+    ),
+    keyCatalyst:
+      "Whether sponsors begin funding site-side software directly, which would move the buyer from a constrained budget to a well-funded one.",
+    investmentRisk:
+      "Sites have small budgets and the party that benefits most from faster enrolment is the sponsor, who does not currently pay.",
+    technicalRisk:
+      "Integration with electronic data capture systems is controlled by vendors who have no incentive to make it easy.",
+    competitiveThreat:
+      "Electronic data capture vendors extending into site operations, and clinical trial management systems moving down market.",
+    capitalIntensity: "Moderate",
+    commercialReadiness: "Scaling",
+    lastReviewed: "2026-07-27",
+    sourceIds: [],
+    financials: {
+      kind: "private",
+      stage: "Series A",
+      capitalRaised: demo(23_000_000, D, "Illustrative total raised."),
+      latestRound: demo("Series A, closed in mid 2025", D),
+      capitalIntensity: "Moderate",
+      futureFinancingNeed:
+        "One further round to fund the sponsor-side commercial motion, which is a different sale from the current one.",
+      ownershipConsiderations:
+        "A site network participates as a strategic investor, which secures reference sites and may complicate selling to competing networks.",
+      financingRisk:
+        "Moderate. Recurring revenue with good retention, offset by a small average contract value that makes growth headcount-intensive.",
+    },
+    technology: {
+      howItWorks:
+        "Study protocols are decomposed into the coordinator tasks they generate, then scheduled across all concurrent studies at a site so that visit windows, monitoring, and source verification are planned against one calendar rather than several.",
+      coreAdvantage:
+        "Modelling the site rather than the study. Every incumbent system is organised around one sponsor's protocol, which is precisely why coordinators end up reconciling four systems by hand.",
+      supportingEvidence: [
+        {
+          claim:
+            "Coordinator time per enrolled patient measured before and after deployment at twelve sites.",
+          provenance: "demonstration",
+          asOf: D,
+        },
+        {
+          claim:
+            "Sixty one sites under subscription across nine networks.",
+          provenance: "demonstration",
+          asOf: D,
+        },
+      ],
+      benchmarks:
+        "Coordinator hours per enrolled patient is the operative measure. It is measured per site against that site's own baseline, so cross-site comparison is limited by differences in study mix.",
+      intellectualProperty:
+        "No patents. The defensible asset is the protocol decomposition library built across studies.",
+      thirdPartyDependency:
+        "Integration with electronic data capture systems controlled by vendors who compete at the edges of this category.",
+      milestoneForScale:
+        "A sponsor funding site licences directly, which would change the unit economics of the entire business.",
+      failurePoints: [
+        "Electronic data capture vendors restricting integration access",
+        "Site budgets proving too small to support the price the sales motion requires",
+        "Protocol decomposition needing bespoke work for each new therapeutic area",
+      ],
+    },
+    market: {
+      painPoint:
+        "Trial sites lose money on coordinator time and turn down studies they could otherwise run. The bottleneck in clinical research is frequently site capacity rather than patient willingness.",
+      structure:
+        "Highly fragmented sites with small budgets, alongside sponsors and contract research organisations with large ones and no current habit of paying for site tooling.",
+      adoptionDrivers: [
+        "Coordinator turnover making institutional knowledge fragile",
+        "Decentralised trial designs increasing coordination load per study",
+        "Sponsors competing for site capacity in crowded therapeutic areas",
+      ],
+      whyNow:
+        "Site capacity has become the binding constraint on trial timelines, which is what makes coordinator efficiency a sponsor problem rather than only a site problem.",
+      competitors: [
+        "Clinical trial management system vendors",
+        "Electronic data capture vendors extending into operations",
+        "Spreadsheets and coordinator institutional memory",
+      ],
+      substitutes: [
+        "Hiring more coordinators",
+        "Declining studies the site cannot staff",
+      ],
+      regulatoryEnvironment:
+        "Good clinical practice requirements, patient data privacy rules, and electronic records validation requirements all apply directly to the system.",
+      maturity: "Developing",
+    },
+    commercial: {
+      pricingModel:
+        "Annual subscription per site plus a per-study component, priced against coordinator hours saved.",
+      salesMotion:
+        "Sold to site networks rather than to individual sites, which is what makes the small contract values workable.",
+      customerType:
+        "Site directors and research operations leadership at networks.",
+      adoptionEvidence: [
+        {
+          claim:
+            "Nine networks under contract, with expansion to additional sites at six of them.",
+          provenance: "demonstration",
+          asOf: D,
+        },
+        {
+          claim:
+            "Measured reduction in coordinator hours per enrolled patient at twelve sites.",
+          provenance: "demonstration",
+          asOf: D,
+        },
+      ],
+      implementationBurden:
+        "Four to six weeks per network, dominated by protocol decomposition for the studies already running.",
+      expansionOpportunity:
+        "Sponsor-funded licences, and expansion into site financial management using the same study and visit data.",
+      goToMarketRisk:
+        "The party that benefits most from faster enrolment is the sponsor, and the sponsor is not currently the buyer.",
+    },
+    investment: {
+      thesis:
+        "A measured operational improvement for a constrained buyer, in a category where the eventual prize is convincing the well-funded party to pay for it, and where the measurement work has already been done.",
+      bullCase:
+        "Sponsors begin funding site tooling directly, contract values step up materially, and the protocol library becomes the asset that makes each new therapeutic area cheap.",
+      baseCase:
+        "Steady network-by-network growth with good retention, producing a solid business constrained by site budgets.",
+      bearCase:
+        "Electronic data capture vendors restrict integration, site budgets cap pricing, and growth stays headcount-bound.",
+      catalysts: [
+        "A sponsor funding site licences directly",
+        "Coordinator hours data published across a full network",
+        "Expansion into a new therapeutic area without bespoke decomposition",
+      ],
+      risks: [
+        "Small site budgets",
+        "Integration access controlled by competitors",
+        "Buyer and beneficiary being different parties",
+      ],
+      invalidators: [
+        "No sponsor-funded pilot within eighteen months",
+        "An electronic data capture vendor restricting integration access",
+      ],
+      recommendedNextStep:
+        "Ask a sponsor, not a site, whether they would fund site licences to secure capacity. That answer determines the ceiling of this business.",
+    },
+    diligence: {
+      technology: [
+        "How much bespoke work does protocol decomposition require for a therapeutic area the library has not seen?",
+      ],
+      product: [
+        "What is the measured change in coordinator hours per enrolled patient, and how consistent is it across the twelve measured sites?",
+      ],
+      customers: [
+        "Of the nine networks, how many expanded to additional sites, and what triggered it?",
+      ],
+      competition: [
+        "What integration access do the electronic data capture vendors currently grant, and on what terms?",
+      ],
+      unitEconomics: [
+        "What is the average contract value against the cost to implement and support a network?",
+      ],
+      capitalRequirements: [
+        "What does building a sponsor-side commercial motion cost, and how long does it take?",
+      ],
+      regulation: [
+        "How is the system validated against electronic records requirements, and who signed off?",
+      ],
+      team: [
+        "Who on the team has worked as a research coordinator?",
+      ],
+      financing: [
+        "What is the runway, and does it reach a sponsor-funded pilot?",
+      ],
+      commercialization: [
+        "What is the sales cycle for a network, and has it shortened with references?",
+      ],
+    },
+    outreach:
+      "Hi, the decision to model the site rather than the study, and the point that coordinators end up reconciling four systems by hand because every incumbent is organised around one sponsor's protocol, is the clearest description of that problem I have come across. I focus on early-stage healthcare infrastructure. I would like to understand what the coordinator hours data looks like across the twelve measured sites, and whether any sponsor has discussed funding licences directly. Would twenty minutes work?",
+    factors: {
+      differentiation: fa(
+        3,
+        "judgment",
+        "Site-centric rather than study-centric modelling, supported by a protocol decomposition library.",
+        "A genuine design insight rather than a technical moat.",
+      ),
+      defensibility: fa(
+        4,
+        "judgment",
+        "The protocol library compounds across studies and therapeutic areas, and network switching costs are high mid-study.",
+        "Reasonably strong, resting on accumulated work rather than on protection.",
+      ),
+      marketPotential: fa(
+        4,
+        "judgment",
+        "Site capacity is a binding constraint on clinical trial timelines industry-wide.",
+        "Large if the buyer moves to the sponsor, moderate if it does not.",
+      ),
+      commercialReadiness: fa(
+        4,
+        "judgment",
+        "Sixty one sites across nine networks with a repeatable network sales motion.",
+        "Genuinely commercial and scaling.",
+      ),
+      customerEvidence: fa(
+        4,
+        "judgment",
+        "Network expansion at six of nine, with before-and-after measurement at twelve sites.",
+        "Strong, and unusually well measured for this stage.",
+      ),
+      teamCredibility: fa(
+        5,
+        "judgment",
+        "Founders include a former research coordinator and a site network operations director.",
+        "Exactly the background this problem requires, which is rare in this category.",
+      ),
+      capitalEfficiency: fa(
+        4,
+        "judgment",
+        "Sixty one sites on twenty three million dollars raised.",
+        "Efficient given the enterprise healthcare sales cycle.",
+      ),
+      competitiveIntensity: fa(
+        3,
+        "judgment",
+        "Trial management and data capture vendors are adjacent, none focused on coordinator workload.",
+        "Moderate, with the specific position currently uncontested.",
+      ),
+      technicalRisk: fa(
+        4,
+        "judgment",
+        "The product works in production across sixty one sites.",
+        "Low.",
+      ),
+      regulatoryRisk: fa(
+        4,
+        "judgment",
+        "Good clinical practice and electronic records requirements apply, and the system is validated against them.",
+        "Real but well understood and already satisfied, which is unusual in this sector.",
+      ),
+      financingRisk: fa(
+        4,
+        "judgment",
+        "Recurring revenue with good retention and moderate burn.",
+        "Comparatively low.",
+      ),
+      overlooked: fa(
+        3,
+        "judgment",
+        "Clinical trial software attracts attention on the sponsor side; the site side attracts much less.",
+        "Under-examined relative to where the actual constraint sits.",
       ),
     },
   },

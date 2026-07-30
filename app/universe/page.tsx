@@ -7,7 +7,7 @@ import { DisclosureNote, PageHeader } from "@/components/ui";
 export const metadata: Metadata = {
   title: "Company universe",
   description:
-    "Twenty four companies across private and public markets, ranked by a transparent thirteen factor scoring framework that re-weights with the active mandate.",
+    "Twenty seven companies across private and public markets, ranked by a transparent two-stage framework: mandate relevance first, then twelve weighted quality factors.",
 };
 
 export default function UniversePage() {

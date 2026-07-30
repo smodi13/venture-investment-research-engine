@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useMandate } from "./MandateProvider";
 import { MandateSelector } from "./MandateSelector";
 import { ScoreBadge, ScoreBar } from "./Score";
+import { RELEVANCE_TIERS, RELEVANCE_ORDER } from "@/lib/scoring";
 import { DemonstrationBadge } from "./Provenance";
 import { CompareTable } from "./CompareTable";
 import type { UniverseRow } from "@/lib/rows";
@@ -89,6 +90,7 @@ export function UniverseExplorer({
   const [capital, setCapital] = useState(ANY);
   const [readiness, setReadiness] = useState(ANY);
   const [minScore, setMinScore] = useState(0);
+  const [relevance, setRelevance] = useState(ANY);
   const [sort, setSort] = useState<SortKey>("score");
   const [compare, setCompare] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
@@ -104,6 +106,8 @@ export function UniverseExplorer({
       if (region !== ANY && r.region !== region) return false;
       if (capital !== ANY && r.capitalIntensity !== capital) return false;
       if (readiness !== ANY && r.commercialReadiness !== readiness) return false;
+      if (relevance !== ANY && RELEVANCE_TIERS[r.tiers[mandateId]].label !== relevance)
+        return false;
       if (r.scores[mandateId] < minScore) return false;
       return true;
     });
@@ -138,6 +142,7 @@ export function UniverseExplorer({
     region,
     capital,
     readiness,
+    relevance,
     minScore,
     sort,
     mandateId,
@@ -167,6 +172,7 @@ export function UniverseExplorer({
     setRegion(ANY);
     setCapital(ANY);
     setReadiness(ANY);
+    setRelevance(ANY);
     setMinScore(0);
   }
 
@@ -270,6 +276,12 @@ export function UniverseExplorer({
             value={readiness}
             options={COMMERCIAL_READINESS}
             onChange={setReadiness}
+          />
+          <Select
+            label="Mandate relevance"
+            value={relevance}
+            options={RELEVANCE_ORDER.map((t) => RELEVANCE_TIERS[t].label)}
+            onChange={setRelevance}
           />
           <label className="block">
             <span className="label">Minimum score: {minScore}</span>
@@ -384,6 +396,12 @@ export function UniverseExplorer({
                     <ScoreBadge score={score} />
                     <div className="mt-2 w-24">
                       <ScoreBar score={score} />
+                    </div>
+                    <div
+                      className="mt-1.5 text-[11px] leading-tight text-ink-muted"
+                      title={RELEVANCE_TIERS[r.tiers[mandateId]].meaning}
+                    >
+                      {RELEVANCE_TIERS[r.tiers[mandateId]].label}
                     </div>
                   </td>
                 </tr>

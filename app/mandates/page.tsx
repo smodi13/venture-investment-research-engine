@@ -3,7 +3,12 @@ import { MANDATES } from "@/lib/mandates";
 import { FACTORS, weightTotal } from "@/lib/scoring";
 import { UNIVERSE_ROWS } from "@/lib/rows";
 import { MandatePreview } from "@/components/OverviewPanels";
-import { BulletList, DisclosureNote, PageHeader } from "@/components/ui";
+import {
+  BulletList,
+  CrossLink,
+  DisclosureNote,
+  PageHeader,
+} from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Investment mandates",
@@ -17,20 +22,34 @@ export default function MandatesPage() {
       <PageHeader
         eyebrow="Configuration"
         title="Investment mandates"
-        intro="A mandate is the configuration object the entire platform reads from. It carries the factor weights, the sector and stage affinities that produce a mandate-fit rating, the sectors emphasised in the interface, and the additional diligence every company must answer. Changing it changes the ranking, the score composition, the stated rationale, and the diligence list."
+        intro="A mandate is the configuration object the entire platform reads from. It carries the quality weights, the sector and stage affinities that set each company's relevance tier and score ceiling, the sectors emphasised in the interface, and the additional diligence every company must answer. Changing it changes the ranking, the score composition, the stated rationale, and the diligence list."
       />
 
       <section className="container-page py-10">
         <MandatePreview rows={UNIVERSE_ROWS} />
+        <p className="mt-6 rounded-lg border border-line bg-canvas p-4 text-sm leading-relaxed text-ink-soft">
+          <span className="font-medium text-ink">
+            Relevance is applied before quality.{" "}
+          </span>
+          A company is rated on how well it matches the sectors and stages of
+          the mandate, taking the weaker of the two. That rating sets a multiplier
+          and a hard score ceiling, so a company outside the mandate cannot
+          reach the top of the ranking on company quality alone. Only companies
+          core to the active mandate can reach priority research.{" "}
+          <CrossLink href="/methodology">See the full adjustment</CrossLink>.
+        </p>
       </section>
 
       <section className="border-t border-line bg-canvas">
         <div className="container-page py-10">
-          <h2 className="h-section">Weights by mandate</h2>
+          <h2 className="h-section">Quality weights by mandate</h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">
-            Each column sums to 100. The differences between the columns are the
-            argument each mandate is making about what matters, and they are
-            published rather than hidden inside the scoring code.
+            These are the twelve quality weights, and each column sums to 100.
+            They decide how good a company looks, not whether it is in scope.
+            Relevance is settled first, as a separate stage that caps the final
+            score, and is explained on the methodology page. The differences
+            between the columns are the argument each mandate makes about what
+            matters, published rather than hidden inside the scoring code.
           </p>
           <div className="mt-5 card overflow-x-auto">
             <table className="w-full min-w-[46rem] border-collapse text-sm">

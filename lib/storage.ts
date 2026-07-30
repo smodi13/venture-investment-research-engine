@@ -51,6 +51,9 @@ const DEFAULT_STATUS: Record<string, PipelineStage> = {
   "ferrule-photonics": "Founder outreach",
   "ravelin-data": "First meeting",
   "sable-health": "Initial research",
+  "halyard-systems": "Partner review",
+  "corvid-security": "Founder outreach",
+  "alder-clinical": "First meeting",
 };
 
 const DEFAULT_PRIORITY: Record<string, Priority> = {
@@ -70,6 +73,8 @@ const DEFAULT_PRIORITY: Record<string, Priority> = {
   be: "Low",
   "halden-compute": "Low",
   "palisade-quantum": "Low",
+  "halyard-systems": "High",
+  "alder-clinical": "High",
 };
 
 /** Notes written on the records where the analyst has an actual view. */
@@ -85,6 +90,12 @@ const DEFAULT_NOTES: Record<string, string> = {
   "ferrule-photonics":
     "Genuinely overlooked. Everyone funds photonic chips and nobody funds the alignment step that sets their cost. Timing risk on co-packaged optics is a reason to be careful, not a reason to pass.",
   be: "Passed on capital efficiency and history rather than on current demand. Two decades of losses and repeated financing is a pattern, and the demand driver is a grid constraint utilities are actively working to remove.",
+  "halyard-systems":
+    "The clearest case in the pipeline. Break-even before the Series B, gross retention above ninety five percent, and four of six largest customers in a third contract year. The only real question is whether audit firms bundle this before the category sets.",
+  "corvid-security":
+    "Right primitive, no evidence. Do not price this until the first renewal cohort lands, which is roughly nine months out. Nothing else will tell us whether it is bought or merely trialled.",
+  "alder-clinical":
+    "The measurement work is already done, which is rare this early. The question is not whether it works but whether a sponsor will ever pay for it. Ask a sponsor, not a site.",
   "ravelin-data":
     "Best retention in the private set on the least capital. The single question that matters is retention among customers whose warehouse vendor has already shipped native lineage.",
 };

@@ -5,7 +5,7 @@ import type { FactorKey, Sector, Stage } from "./types";
  *
  * A mandate is the configuration object the whole platform reads from. It
  * carries the factor weights, the sector and stage affinities that produce a
- * mandate-fit rating, the sectors the interface should emphasise, and the
+ * relevance tier, the sectors the interface should emphasise, and the
  * extra diligence a mandate demands. Changing the mandate changes the ranking,
  * the score composition, the rationale, and the diligence list, because all
  * four are derived from this file rather than hard coded per company.
@@ -25,9 +25,9 @@ export interface Mandate {
   centralQuestion: string;
   focusAreas: string[];
   typicalStages: string;
-  /** Weights per factor, summing to 100. */
+  /** Quality-factor weights, summing to 100. Relevance is separate. */
   weights: Record<FactorKey, number>;
-  /** 0 to 5 affinity used to derive the mandate-fit rating. */
+  /** 0 to 5 affinity. Relevance takes the weaker of sector and stage. */
   sectorAffinity: Record<Sector, number>;
   stageAffinity: Record<Stage, number>;
   /** Sectors surfaced first in the interface under this mandate. */
@@ -58,19 +58,18 @@ export const MANDATES: Mandate[] = [
     ],
     typicalStages: "Seed through growth, plus select public-market opportunities",
     weights: {
-      mandateFit: 22,
-      differentiation: 13,
-      defensibility: 11,
-      marketPotential: 9,
-      commercialReadiness: 4,
-      customerEvidence: 5,
-      teamCredibility: 9,
-      capitalEfficiency: 6,
-      competitiveIntensity: 4,
-      technicalRisk: 7,
-      regulatoryRisk: 3,
-      financingRisk: 4,
-      overlooked: 3,
+      differentiation: 16,
+      defensibility: 14,
+      marketPotential: 12,
+      commercialReadiness: 5,
+      customerEvidence: 6,
+      teamCredibility: 12,
+      capitalEfficiency: 8,
+      competitiveIntensity: 5,
+      technicalRisk: 9,
+      regulatoryRisk: 4,
+      financingRisk: 5,
+      overlooked: 4,
     },
     sectorAffinity: {
       "AI Infrastructure": 5,
@@ -104,7 +103,7 @@ export const MANDATES: Mandate[] = [
       "Which parts of the stack depend on a supplier that could be acquired by a competitor or constrained by export control?",
     ],
     scoringNote:
-      "Mandate fit carries 22 points, and differentiation, defensibility, and team credibility carry 33 more, because in frontier technology those are the variables that decide whether anything else ever matters. Commercial readiness is weighted lightly on purpose: penalising a company for being early would defeat the mandate.",
+      "Differentiation, defensibility, and team credibility carry 42 of the 100 quality points, because in frontier technology those are the variables that decide whether anything else ever matters. Commercial readiness is weighted lightly on purpose: penalising a company for being early would defeat the mandate. Public companies are adjacent rather than core here, because the mandate targets select public opportunities alongside a private pipeline rather than treating them as equivalent.",
   },
   {
     id: "enterprise-software",
@@ -123,22 +122,21 @@ export const MANDATES: Mandate[] = [
     ],
     typicalStages: "Seed through Series C",
     weights: {
-      mandateFit: 22,
-      differentiation: 9,
-      defensibility: 10,
-      marketPotential: 8,
-      commercialReadiness: 9,
-      customerEvidence: 12,
-      teamCredibility: 8,
-      capitalEfficiency: 7,
-      competitiveIntensity: 7,
-      technicalRisk: 3,
-      regulatoryRisk: 2,
-      financingRisk: 2,
+      differentiation: 12,
+      defensibility: 13,
+      marketPotential: 10,
+      commercialReadiness: 12,
+      customerEvidence: 14,
+      teamCredibility: 10,
+      capitalEfficiency: 9,
+      competitiveIntensity: 9,
+      technicalRisk: 4,
+      regulatoryRisk: 3,
+      financingRisk: 3,
       overlooked: 1,
     },
     sectorAffinity: {
-      "AI Infrastructure": 4,
+      "AI Infrastructure": 5,
       Semiconductors: 1,
       "Robotics & Autonomy": 2,
       "Quantum Technology": 1,
@@ -167,7 +165,7 @@ export const MANDATES: Mandate[] = [
       "What happens to gross margin once support and implementation are fully loaded into cost of revenue?",
     ],
     scoringNote:
-      "Customer evidence and commercial readiness carry 21 points between them, more than any other mandate assigns. Technical risk is weighted lightly because in this category execution risk usually outweighs feasibility risk.",
+      "Customer evidence and commercial readiness carry 26 of the 100 quality points between them, more than any other mandate assigns. Technical risk is weighted lightly because in this category execution risk usually outweighs feasibility risk.",
   },
   {
     id: "healthcare-technology",
@@ -186,18 +184,17 @@ export const MANDATES: Mandate[] = [
     ],
     typicalStages: "Seed through growth",
     weights: {
-      mandateFit: 22,
-      differentiation: 8,
-      defensibility: 8,
-      marketPotential: 8,
-      commercialReadiness: 7,
-      customerEvidence: 9,
-      teamCredibility: 9,
-      capitalEfficiency: 4,
-      competitiveIntensity: 3,
-      technicalRisk: 4,
-      regulatoryRisk: 14,
-      financingRisk: 3,
+      differentiation: 10,
+      defensibility: 10,
+      marketPotential: 10,
+      commercialReadiness: 9,
+      customerEvidence: 12,
+      teamCredibility: 12,
+      capitalEfficiency: 5,
+      competitiveIntensity: 4,
+      technicalRisk: 5,
+      regulatoryRisk: 18,
+      financingRisk: 4,
       overlooked: 1,
     },
     sectorAffinity: {
@@ -229,7 +226,7 @@ export const MANDATES: Mandate[] = [
       "How is patient or research data governed, and what happens to the product if that governing rule changes?",
     ],
     scoringNote:
-      "Regulatory risk carries 14 points, the highest weight this platform assigns to any risk factor. In this category a strong product with an unclear regulatory path is a worse investment than an adequate product with a cleared one.",
+      "Regulatory risk carries 18 of the 100 quality points, the highest weight this platform assigns to any risk factor. In this category a strong product with an unclear regulatory path is a worse investment than an adequate product with a cleared one.",
   },
   {
     id: "generalist-early-stage",
@@ -247,18 +244,17 @@ export const MANDATES: Mandate[] = [
     ],
     typicalStages: "Pre-seed through Series A",
     weights: {
-      mandateFit: 18,
-      differentiation: 9,
-      defensibility: 8,
-      marketPotential: 12,
-      commercialReadiness: 5,
-      customerEvidence: 10,
-      teamCredibility: 16,
-      capitalEfficiency: 9,
-      competitiveIntensity: 4,
-      technicalRisk: 3,
+      differentiation: 11,
+      defensibility: 10,
+      marketPotential: 14,
+      commercialReadiness: 6,
+      customerEvidence: 12,
+      teamCredibility: 20,
+      capitalEfficiency: 11,
+      competitiveIntensity: 5,
+      technicalRisk: 4,
       regulatoryRisk: 2,
-      financingRisk: 3,
+      financingRisk: 4,
       overlooked: 1,
     },
     sectorAffinity: {
@@ -274,7 +270,7 @@ export const MANDATES: Mandate[] = [
     stageAffinity: {
       "Pre-Seed": 5,
       Seed: 5,
-      "Series A": 4,
+      "Series A": 5,
       "Series B": 2,
       "Series C": 1,
       Growth: 1,
@@ -287,7 +283,7 @@ export const MANDATES: Mandate[] = [
       "How many months of runway does the current plan assume, and what is the smallest result that would make the next round straightforward?",
     ],
     scoringNote:
-      "Team credibility carries 16 points and market potential 12, the heaviest non-mandate weights any profile assigns. At pre-seed and seed the product will change, so the model deliberately weights the people and the market over the current artefact. Mandate fit is 18 rather than 22 here, because a generalist mandate is meant to be broad.",
+      "Team credibility carries 20 of the 100 quality points and market potential 14, the heaviest weights any profile assigns to either. At pre-seed and seed the product will change, so the model deliberately weights the people and the market over the current artefact. The sector affinities are broad by design, but the stage affinities are narrow: anything past Series A falls out of relevance quickly, which is what makes this an early-stage mandate rather than a general one.",
   },
 ];
 

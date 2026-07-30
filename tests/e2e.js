@@ -88,6 +88,53 @@ const ROUTES = [
   record("mandate switch re-ranks the universe", uniqueTops.size === 4,
     `${uniqueTops.size} distinct top-6 orderings across 4 mandates`);
 
+  /* Requirement 7: off-thesis companies cannot be priority research ------ */
+  // Read the rendered table rather than the model, so this asserts what a user
+  // actually sees. Each entry is a company that is materially outside the
+  // mandate on sector, stage, or both.
+  const OFF_THESIS = {
+    "Healthcare Technology": ["Broadcom", "NVIDIA", "Arm Holdings", "Micron Technology"],
+    "Enterprise Software": ["Broadcom", "Micron Technology", "Bloom Energy", "IonQ"],
+    "Frontier Technology": ["Ravelin Data", "Sable Health", "Halyard Systems"],
+    "Generalist Early Stage": ["Broadcom", "NVIDIA", "Arm Holdings", "Vertiv"],
+  };
+
+  for (const [mandateName, offThesis] of Object.entries(OFF_THESIS)) {
+    await page.getByRole("button", { name: mandateName }).first().click();
+    await page.waitForTimeout(400);
+
+    const rendered = await page.locator("table tbody tr").evaluateAll((rows) =>
+      rows.map((row) => ({
+        name: row.querySelector("td:nth-child(2) a")?.textContent?.trim(),
+        cell: row.querySelector("td:last-child")?.textContent ?? "",
+      })),
+    );
+
+    const violations = rendered.filter(
+      (r) => offThesis.includes(r.name) && /Priority research/.test(r.cell),
+    );
+    record(
+      `${mandateName}: off-thesis companies never show priority research`,
+      violations.length === 0,
+      violations.map((v) => v.name).join(", "),
+    );
+
+    // And the top of the ranking is not an off-thesis company.
+    record(
+      `${mandateName}: top-ranked company is not off-thesis`,
+      !offThesis.includes(rendered[0]?.name),
+      `top = ${rendered[0]?.name}`,
+    );
+
+    // Every row states its relevance tier, so a low score is explainable.
+    const tiered = rendered.filter((r) => /to mandate|Outside mandate/.test(r.cell));
+    record(
+      `${mandateName}: every row shows a relevance tier`,
+      tiered.length === rendered.length,
+      `${tiered.length}/${rendered.length}`,
+    );
+  }
+
   await page.getByRole("button", { name: "Healthcare Technology" }).first().click();
   await page.waitForTimeout(400);
   const afterName = (await firstRowName()).trim();
@@ -167,8 +214,10 @@ const ROUTES = [
     const csv = fs.readFileSync(file, "utf8");
     const lines = csv.trim().split("\n");
     record("CSV export downloads", fs.existsSync(file), dl.suggestedFilename());
-    record("CSV has preamble, header and 24 data rows",
-      lines.length === 3 + 1 + 24, `${lines.length} lines`);
+    // Derived from the rendered table rather than hardcoded, so the check
+    // survives the universe growing.
+    record("CSV has preamble, header and one row per company",
+      lines.length === 3 + 1 + allRows, `${lines.length} lines for ${allRows} companies`);
     record("CSV carries provenance columns",
       /provenance/i.test(csv) && /Demonstration data/.test(csv));
     record("CSV states scores are not advice", /not investment advice/i.test(csv));
@@ -184,7 +233,14 @@ const ROUTES = [
   record("public detail: provenance labels shown",
     nvdaText.includes("Analyst estimate") && nvdaText.includes("Requires verification"));
   const factorRows = await page.locator("table tbody tr").count();
-  record("scoring breakdown shows 13 factors", factorRows === 13, `${factorRows} rows`);
+  record("scoring breakdown shows 12 quality factors", factorRows === 12, `${factorRows} rows`);
+  record("detail page shows the relevance adjustment arithmetic",
+    /Mandate relevance adjustment/.test(nvdaText) &&
+      /Company quality under/.test(nvdaText) &&
+      /Final score under/.test(nvdaText));
+  record("detail page states the relevance tier and its ceiling",
+    /(Core|Adjacent|Peripheral|Marginal|Outside) to mandate|Outside mandate/.test(nvdaText) &&
+      /ceiling \d+/.test(nvdaText));
 
   await page.goto(BASE + "/universe/coldbrook-thermal", { waitUntil: "networkidle" });
   const demoText = await page.textContent("body");

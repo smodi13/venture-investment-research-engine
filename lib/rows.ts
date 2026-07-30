@@ -1,6 +1,6 @@
 import { COMPANIES } from "./companies";
 import { MANDATES, type MandateId } from "./mandates";
-import { companyScore } from "./scoring";
+import { companyScore, mandateRelevance, type RelevanceTierId } from "./scoring";
 import { factText } from "./format";
 import type {
   CapitalIntensity,
@@ -60,6 +60,8 @@ export interface UniverseRow {
   tractionProvenance: Provenance;
   /** Score under each mandate, so switching is instant and offline. */
   scores: Record<MandateId, number>;
+  /** Relevance tier under each mandate, shown beside the score. */
+  tiers: Record<MandateId, RelevanceTierId>;
   /** Lowercased haystack for free-text search. */
   search: string;
 }
@@ -69,6 +71,9 @@ function toRow(c: Company): UniverseRow {
   const scores = Object.fromEntries(
     MANDATES.map((m) => [m.id, companyScore(c, m.id)]),
   ) as Record<MandateId, number>;
+  const tiers = Object.fromEntries(
+    MANDATES.map((m) => [m.id, mandateRelevance(c, m).tier.id]),
+  ) as Record<MandateId, RelevanceTierId>;
 
   return {
     id: c.id,
@@ -125,6 +130,7 @@ function toRow(c: Company): UniverseRow {
     tractionSignal: factText(c.tractionSignal),
     tractionProvenance: c.tractionSignal.provenance,
     scores,
+    tiers,
     search: [
       c.name,
       c.sector,

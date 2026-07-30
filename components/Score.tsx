@@ -1,4 +1,36 @@
-import { scoreBand, type ScoreResult, type ScoreTone } from "@/lib/scoring";
+import {
+  scoreBand,
+  type Relevance,
+  type RelevanceTierId,
+  type ScoreResult,
+  type ScoreTone,
+} from "@/lib/scoring";
+
+const RELEVANCE_TONE: Record<RelevanceTierId, string> = {
+  core: "border-emerald-200 bg-emerald-50 text-emerald-800",
+  adjacent: "border-accent-line bg-accent-soft text-accent",
+  peripheral: "border-amber-200 bg-amber-50 text-amber-800",
+  marginal: "border-orange-200 bg-orange-50 text-orange-800",
+  outside: "border-line bg-canvas text-ink-muted",
+};
+
+/** The relevance tier, shown wherever a score is shown. */
+export function RelevanceBadge({
+  relevance,
+  className = "",
+}: {
+  relevance: Relevance;
+  className?: string;
+}) {
+  return (
+    <span
+      title={`${relevance.tier.meaning} Score ceiling ${relevance.tier.ceiling}.`}
+      className={`inline-flex items-center whitespace-nowrap rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${RELEVANCE_TONE[relevance.tier.id]} ${className}`}
+    >
+      {relevance.tier.label}
+    </span>
+  );
+}
 
 const TONE: Record<ScoreTone, { chip: string; bar: string }> = {
   priority: {
@@ -68,8 +100,13 @@ export function ScoreBar({ score }: { score: number }) {
  * verified information or on analyst judgment. Showing the deduction rather
  * than only the points is deliberate: the interesting question about a score
  * is usually what it lost, not what it kept.
+ *
+ * The table ends with the relevance adjustment, so the arithmetic from quality
+ * through to the final score is visible in one place rather than explained
+ * elsewhere.
  */
 export function ScoreBreakdown({ result }: { result: ScoreResult }) {
+  const { relevance } = result;
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[46rem] border-collapse text-sm">
@@ -140,18 +177,60 @@ export function ScoreBreakdown({ result }: { result: ScoreResult }) {
         <tfoot>
           <tr className="border-t-2 border-line-strong">
             <td className="py-3 pr-3 font-semibold text-ink">
-              Total under the {result.mandate.name} mandate
+              Company quality under the {result.mandate.name} weighting
             </td>
             <td className="py-3 px-3" />
             <td className="py-3 px-3 text-right font-mono font-semibold tabular-nums text-ink">
               100
             </td>
             <td className="py-3 px-3 text-right font-mono font-semibold tabular-nums text-ink">
+              {result.quality}
+            </td>
+            <td className="py-3 px-3 text-right font-mono tabular-nums text-ink-muted">
+              -{100 - result.quality}
+            </td>
+            <td className="py-3 pl-3" />
+          </tr>
+          <tr className="border-t border-line">
+            <td className="py-3 pr-3 align-top">
+              <div className="font-semibold text-ink">
+                Mandate relevance adjustment
+              </div>
+              <p className="mt-1 max-w-md text-xs leading-relaxed text-ink-muted">
+                {relevance.explanation}
+              </p>
+              <div className="mt-1.5">
+                <RelevanceBadge relevance={relevance} />
+              </div>
+            </td>
+            <td className="py-3 px-3 text-right font-mono tabular-nums text-ink">
+              {relevance.rating} / 5
+            </td>
+            <td className="py-3 px-3 text-right font-mono tabular-nums text-ink-soft">
+              &times;{relevance.tier.multiplier.toFixed(2)}
+            </td>
+            <td className="py-3 px-3 text-right font-mono tabular-nums text-ink">
               {result.total}
             </td>
             <td className="py-3 px-3 text-right font-mono tabular-nums text-ink-muted">
-              -{100 - result.total}
+              {result.quality - result.total > 0
+                ? `-${result.quality - result.total}`
+                : "0"}
             </td>
+            <td className="py-3 pl-3 text-right text-xs text-ink-muted">
+              ceiling {relevance.tier.ceiling}
+            </td>
+          </tr>
+          <tr className="border-t-2 border-line-strong">
+            <td className="py-3 pr-3 font-semibold text-ink">
+              Final score under the {result.mandate.name} mandate
+            </td>
+            <td className="py-3 px-3" />
+            <td className="py-3 px-3" />
+            <td className="py-3 px-3 text-right font-mono text-base font-semibold tabular-nums text-ink">
+              {result.total}
+            </td>
+            <td className="py-3 px-3" />
             <td className="py-3 pl-3" />
           </tr>
         </tfoot>

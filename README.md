@@ -32,10 +32,11 @@ technology analyst:
 
 1. **Define a mandate.** Four mandate profiles, each with its own factor
    weights, sector and stage affinities, and required diligence.
-2. **Review the universe.** Twenty four companies across eight sectors,
-   filterable and sortable on ten dimensions.
-3. **Rank opportunities.** Thirteen weighted factors produce a score out of
-   100, recalculated whenever the mandate changes.
+2. **Review the universe.** Twenty seven companies across eight sectors,
+   filterable and sortable on eleven dimensions including mandate relevance.
+3. **Rank opportunities.** Relevance is settled first, then twelve weighted
+   quality factors produce a score out of 100, recalculated whenever the
+   mandate changes.
 4. **Research in depth.** Technology, market, commercial, and financial
    assessments per company, with provenance on every claim.
 5. **Develop a sector view.** Five sector research pages built around value
@@ -51,8 +52,8 @@ technology analyst:
 ## Features
 
 - Four configurable investment mandates that re-weight the entire scoring model
-- Transparent thirteen factor scoring framework, weights published, totals
-  verified in the interface
+- Transparent two-stage scoring: a mandate relevance gate with published
+  multipliers and score ceilings, then twelve weighted quality factors
 - Provenance labelling on every figure: reported, analyst estimate,
   requires verification, demonstration data, or not publicly disclosed
 - Full company research records covering technology, market, commercial, and
@@ -72,27 +73,44 @@ Mandates live in `lib/mandates.ts`. A mandate carries:
 
 | Field | Purpose |
 | --- | --- |
-| `weights` | Points assigned to each of the thirteen factors, summing to 100 |
-| `sectorAffinity` | 0 to 5 affinity per sector, used to derive mandate fit |
+| `weights` | Points assigned to each of the twelve quality factors, summing to 100 |
+| `sectorAffinity` | 0 to 5 affinity per sector, used to derive relevance |
 | `stageAffinity` | 0 to 5 affinity per financing stage |
 | `emphasisedSectors` | Sectors the interface surfaces first |
 | `additionalDiligence` | Questions appended to every company under the mandate |
 
-Mandate fit is the one factor never stored on a company. It is derived at read
-time from sector and stage affinity, weighted two to one toward sector, which
-is what makes every score in the platform move when the mandate changes.
+Relevance is never stored on a company. It is derived at read time as the
+weaker of sector affinity and stage affinity, which is what makes every score
+in the platform move when the mandate changes.
 
 The four mandates are Frontier Technology, Enterprise Software, Healthcare
 Technology, and Generalist Early Stage.
 
 ## Scoring methodology
 
-Thirteen factors, weighted per mandate, totalling 100.
+Scoring runs in two stages, and the order matters.
 
-Factors are rated 0 to 5, deliberately coarse, so the model cannot manufacture
-precision the evidence does not support. Ratings are oriented so that 5 is
-always the most favourable reading, which on the four risk factors means 5
-signals low risk. The weighted total is rounded to a whole number.
+**Stage one asks whether the company is in scope.** Relevance is the weaker of
+the mandate's sector affinity and its stage affinity, on a 0 to 5 scale. This
+is a conjunction, not a trade-off: a company has to be both in the right sector
+and at the right stage to be core to a mandate. Each relevance tier carries a
+multiplier and a hard score ceiling.
+
+| Relevance tier | Rating | Multiplier | Score ceiling |
+| --- | --- | --- | --- |
+| Core to mandate | 5 | 1.00 | 100 |
+| Adjacent to mandate | 4 | 0.84 | 84 |
+| Peripheral to mandate | 3 | 0.69 | 69 |
+| Marginal to mandate | 2 | 0.54 | 54 |
+| Outside mandate | 0 to 1 | 0.40 | 40 |
+
+**Stage two asks how good the company is.** Twelve quality factors, weighted
+per mandate, totalling 100. Factors are rated 0 to 5, deliberately coarse, so
+the model cannot manufacture precision the evidence does not support. Ratings
+are oriented so that 5 is always most favourable, which on the four risk
+factors means 5 signals low risk.
+
+The final score is the quality score multiplied by the relevance multiplier.
 
 | Band | Meaning |
 | --- | --- |
@@ -101,17 +119,33 @@ signals low risk. The weighted total is rounded to a whole number.
 | 55 to 69 | Further diligence required |
 | Below 55 | Low current priority |
 
+The ceilings are chosen so that each relevance tier stops at the top of a band.
+An adjacent company can reach the top of strong watchlist and no further. **Only
+a company core to the active mandate can reach priority research.**
+
+This is a correction to an earlier version of the model, which treated mandate
+fit as one weighted factor among thirteen. That produced an indefensible
+result: under the healthcare mandate the highest ranked company was a
+semiconductor business, because eleven strong quality factors will always
+outvote one weak fit factor. The company was excellent and the arithmetic was
+correct, and the answer was still wrong. Relevance is not a quality to be traded
+against other qualities. It is a precondition, and it is now modelled as one.
+
+Nothing is hardcoded per company. Sector and stage affinities live on the
+mandate, quality ratings live on the company, and neither knows about the other.
+
 The highest band is called priority research, not buy. It means the company has
 earned analyst time this week. No score in this platform is a recommendation.
 
 Every factor rating carries the evidence behind it and a label stating whether
 it rests on verified information or analyst judgment. Each company page reports
-the proportion, because a score of 74 built from verified inputs is a different
-object from a score of 74 built from judgment.
+the proportion, and shows the quality score before adjustment alongside the tier
+that reduced it, so a low score can be read as low relevance rather than as a
+poor business.
 
 ## Company data methodology
 
-The universe is 24 companies: 12 public and 12 private. They are researched
+The universe is 27 companies: 12 public and 15 private. They are researched
 differently, and the difference is stated everywhere they appear.
 
 **Public companies are real.** Their qualitative profiles are drawn from widely
@@ -123,7 +157,7 @@ the most misleading thing this platform could do. Where a figure exists in
 filings but was not verified in this build, the interface says so explicitly
 and links to the primary source rather than guessing.
 
-**Private companies are demonstration data.** All twelve are fictional and
+**Private companies are demonstration data.** All fifteen are fictional and
 labelled as such. This is an integrity decision, not a shortcut. Private
 companies do not file, so a research record on a real one would consist of
 funding-database figures and inference presented with unwarranted confidence.
@@ -203,12 +237,23 @@ npx tsc --noEmit
 
 ## Testing
 
+Two suites. An investment-logic suite asserts economic reasonableness of the
+rankings: that quality weights sum to 100, that relevance ceilings are enforced,
+that no off-thesis company can reach priority research under any mandate, that
+the top of every ranking is on-thesis, and that all four mandates produce
+distinct top-five lists.
+
+```bash
+npx tsx tests/rankings.ts
+```
+
 An end-to-end suite runs in an isolated headless Chromium profile and covers
-42 checks: navigation across every route, mandate switching and score
+56 checks: navigation across every route, mandate switching and score
 recalculation, search, filters, sorting, four-way comparison, company detail
 views, pipeline edits, local storage persistence across a refresh, CSV export
 contents, memo copy and download, mobile layout and navigation, external link
-safety, the custom 404, and browser console output.
+safety, the custom 404, browser console output, and per-mandate assertions that
+off-thesis companies never render as priority research.
 
 ```bash
 npx playwright install chromium   # once
@@ -289,7 +334,7 @@ components/            Mandate state, scoring views, provenance display, tables
 lib/
   types.ts             Domain types and the provenance model
   mandates.ts          The four mandates and their weights
-  scoring.ts           Thirteen factor scoring framework
+  scoring.ts           Relevance gate and twelve factor quality framework
   companies.ts         Universe aggregation
   data/                Public and private company records
   sectors.ts           Sector research

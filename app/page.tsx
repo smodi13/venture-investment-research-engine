@@ -19,13 +19,13 @@ const STEPS = [
   {
     n: "02",
     title: "Review the universe",
-    body: "Twenty four companies across private and public markets, filterable by sector, stage, geography, capital intensity, and commercial readiness.",
+    body: "Twenty seven companies across private and public markets, filterable by sector, stage, geography, capital intensity, commercial readiness, and mandate relevance.",
     href: "/universe",
   },
   {
     n: "03",
     title: "Rank and compare",
-    body: "Thirteen weighted factors produce a score out of 100, with the evidence and the basis shown for every rating. Compare up to four companies side by side.",
+    body: "Relevance is settled first, then twelve weighted quality factors produce a score out of 100, with the evidence shown for every rating. Compare up to four companies side by side.",
     href: "/universe",
   },
   {
@@ -103,9 +103,9 @@ export default function OverviewPage() {
               hint="AI infrastructure through healthcare technology"
             />
             <StatTile
-              value="13"
-              label="Scoring factors"
-              hint="Re-weighted by each of the four mandates"
+              value="12"
+              label="Quality factors"
+              hint="Re-weighted by each mandate, then scaled by relevance"
             />
             <StatTile
               value={String(UNIVERSE_STATS.demonstrationCount)}

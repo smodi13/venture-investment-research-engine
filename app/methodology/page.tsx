@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { FACTORS, SCORE_BANDS, weightTotal } from "@/lib/scoring";
+import {
+  FACTORS,
+  RELEVANCE_ORDER,
+  RELEVANCE_TIERS,
+  SCORE_BANDS,
+  weightTotal,
+} from "@/lib/scoring";
 import { MANDATES } from "@/lib/mandates";
 import { SOURCES } from "@/lib/sources";
 import { UNIVERSE_STATS } from "@/lib/companies";
@@ -99,18 +105,18 @@ export default function MethodologyPage() {
           <div className="content-column space-y-3 text-sm leading-relaxed text-ink-soft">
             <p>
               Selecting a mandate does four things. It replaces the weight
-              assigned to each of the thirteen factors. It supplies the sector
-              and stage affinities that produce the mandate-fit rating, which is
-              the one factor never stored on a company and always derived at
-              read time. It determines which sectors the interface emphasises.
-              And it appends additional diligence questions that every company
-              under that mandate must answer.
+              assigned to each of the twelve quality factors. It supplies the
+              sector and stage affinities that determine the relevance tier, and
+              therefore the multiplier and score ceiling applied to that
+              company. It determines which sectors the interface emphasises. And
+              it appends additional diligence questions that every company under
+              that mandate must answer.
             </p>
             <p>
-              The mandate-fit rating blends sector affinity and stage affinity,
-              weighted two to one toward sector. A company in the right sector
-              at the wrong stage is still partially relevant to a mandate; a
-              company in the wrong sector rarely is.
+              The relevance rating takes the weaker of sector affinity and
+              stage affinity, so a company must be both in the right sector and
+              at the right stage to be treated as core. The section below sets
+              out how that rating becomes a multiplier and a score ceiling.
             </p>
             <p>
               Companies outside the active mandate are deliberately retained in
@@ -122,8 +128,127 @@ export default function MethodologyPage() {
         </Section>
 
         <Section
+          title="How a score is produced: two stages, in this order"
+          description="Relevance is settled before quality is scored. This is the most important design decision in the platform and it exists because the first version got it wrong."
+        >
+          <div className="content-column space-y-3 text-sm leading-relaxed text-ink-soft">
+            <p>
+              An earlier version of this model treated mandate fit as one
+              weighted factor among thirteen. That produced an indefensible
+              result. Under the healthcare mandate, the highest ranked company
+              was a semiconductor business, because eleven strong quality
+              factors will always outvote one weak fit factor. The company was
+              excellent and the arithmetic was correct, and the answer was still
+              wrong.
+            </p>
+            <p>
+              The error was conceptual. Relevance is not a quality to be traded
+              against other qualities. It is a precondition. A fund with a
+              healthcare mandate cannot buy a semiconductor company however good
+              it is, so the model must not be able to rank one first.
+            </p>
+            <p>
+              Scoring therefore runs in two stages. Stage one asks whether the
+              company is in scope. Stage two asks how good it is. The final
+              score is the quality score multiplied by a relevance multiplier,
+              and each relevance tier is capped at the top of a scoring band.
+            </p>
+          </div>
+
+          <div className="mt-6 card overflow-x-auto">
+            <table className="w-full min-w-[44rem] border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-line-strong text-left">
+                  <th className="py-3 pl-4 pr-3 font-semibold text-ink">
+                    Relevance tier
+                  </th>
+                  <th className="py-3 px-3 text-right font-semibold text-ink">
+                    Rating
+                  </th>
+                  <th className="py-3 px-3 text-right font-semibold text-ink">
+                    Multiplier
+                  </th>
+                  <th className="py-3 px-3 text-right font-semibold text-ink">
+                    Score ceiling
+                  </th>
+                  <th className="py-3 pl-3 pr-4 font-semibold text-ink">
+                    Effect
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {RELEVANCE_ORDER.map((id, i) => {
+                  const t = RELEVANCE_TIERS[id];
+                  const rating = [5, 4, 3, 2, "0 to 1"][i];
+                  return (
+                    <tr key={id} className="border-b border-line align-top">
+                      <td className="py-3 pl-4 pr-3 font-medium text-ink">
+                        {t.label}
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono tabular-nums text-ink-soft">
+                        {rating}
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono tabular-nums text-ink">
+                        &times;{t.multiplier.toFixed(2)}
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono font-semibold tabular-nums text-ink">
+                        {t.ceiling}
+                      </td>
+                      <td className="max-w-lg py-3 pl-3 pr-4 text-xs leading-relaxed text-ink-soft">
+                        {t.meaning}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="content-column mt-6 space-y-3 text-sm leading-relaxed text-ink-soft">
+            <p>
+              <span className="font-medium text-ink">
+                The relevance rating is the weaker of sector affinity and stage
+                affinity, not their average.
+              </span>{" "}
+              This is a conjunction rather than a trade-off: a company has to be
+              both in the right sector and at the right stage to be core to a
+              mandate. Averaging would let an excellent sector match compensate
+              for a company being fifteen years and one public listing past the
+              stage the mandate invests at, which is not how any real mandate
+              works.
+            </p>
+            <p>
+              <span className="font-medium text-ink">
+                The ceilings are chosen so each tier stops at the top of a band.
+              </span>{" "}
+              An adjacent company can reach the top of strong watchlist and no
+              further. Only a company core to the active mandate can reach
+              priority research. That is the entire adjustment: one multiplier
+              per tier, published above, rather than a rule buried in code.
+            </p>
+            <p>
+              <span className="font-medium text-ink">
+                Nothing is hardcoded per company.
+              </span>{" "}
+              Sector and stage affinities live on the mandate, quality ratings
+              live on the company, and neither knows about the other. Every
+              ranking in the platform is the product of those two independent
+              inputs, which is why switching mandates reorders the universe
+              without any company record changing.
+            </p>
+            <p>
+              A consequence worth stating plainly: an off-thesis company can
+              still be an excellent company, and the interface says so. Each
+              company page shows the quality score before adjustment alongside
+              the tier that reduced it, so a reader can see that a score of 47
+              means low relevance rather than a poor business.
+            </p>
+          </div>
+        </Section>
+
+        <Section
           title="How scoring weights change"
-          description="Each column sums to 100. The differences are each mandate's argument about what matters."
+          description="Quality weights only. Each column sums to 100, and relevance is applied afterwards. The differences between columns are each mandate's argument about what matters."
         >
           <div className="card overflow-x-auto">
             <table className="w-full min-w-[42rem] border-collapse text-sm">
@@ -182,8 +307,9 @@ export default function MethodologyPage() {
             </table>
           </div>
           <p className="mt-4 max-w-3xl text-sm leading-relaxed text-ink-soft">
-            Factors are rated 0 to 5, deliberately coarse, so the model cannot
-            manufacture precision the underlying evidence does not support.
+            The twelve quality factors are rated 0 to 5, deliberately coarse,
+            so the model cannot manufacture precision the evidence does not
+            support.
             Ratings are oriented so that 5 is always the most favourable
             reading, which on the four risk factors means 5 signals low risk.
             The weighted total is rounded to a whole number.
