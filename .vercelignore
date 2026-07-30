@@ -1,21 +1,45 @@
-# Never upload secrets to the deployment
+# Never upload secrets or local state to the deployment.
 .env
 .env.*
+.git
+.github
 
-# Python sourcing engine and its data are not part of the web deployment
+# Dependencies and build output are produced on the build machine.
+node_modules
+.next
+
+# Local databases and any scraped or private research data.
+# Anchored to the project root so lib/data/, which is source code, is uploaded.
+*.db
+*.sqlite
+*.sqlite3
+/data/
+/research/
+/private/
+
+# Screenshots, browser automation artifacts, and test output.
+*.png
+*.jpg
+*.jpeg
+*.gif
+.playwright-mcp/
+playwright-report/
+test-results/
+coverage/
+
+# Python tooling, in case any is ever reintroduced.
 .venv/
 venv/
 __pycache__/
 .pytest_cache/
-src/
-tests/
-config/
-data/
-scratch_build/
-pyproject.toml
-requirements.txt
+.mypy_cache/
 
-# Local dev artifacts
-.playwright-mcp/
-*.png
+# Editor, OS, and agent local files.
+.DS_Store
+.vscode/
+.idea/
+.claude/
+
+# Documentation not required by the web application.
+README.md
 docs/

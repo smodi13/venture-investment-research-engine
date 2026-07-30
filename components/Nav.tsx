@@ -2,49 +2,83 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Logo } from "./Logo";
-
-const links = [
-  { href: "/", label: "Overview" },
-  { href: "/pipeline", label: "Pipeline" },
-  { href: "/engine", label: "Engine" },
-];
+import { NAV_LINKS, SITE } from "@/lib/site";
 
 export function Nav() {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
+
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-surface/90 backdrop-blur-md">
-      <div className="container-page flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur print:hidden">
+      <div className="container-page flex h-16 items-center justify-between gap-4">
         <Link
           href="/"
-          className="flex items-center gap-2.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+          className="flex shrink-0 items-center gap-2.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
         >
           <Logo className="h-7 w-7 shrink-0" />
-          <span className="text-sm font-semibold tracking-tight text-ink">
-            X Sourcing Engine
+          <span className="text-sm font-semibold leading-tight tracking-tight text-ink">
+            <span className="hidden sm:inline">{SITE.name}</span>
+            <span className="sm:hidden">{SITE.shortName}</span>
           </span>
         </Link>
-        <nav className="flex items-center gap-0.5 sm:gap-1">
-          {links.map((l) => {
-            const active =
-              l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
-            return (
+
+        <nav className="hidden items-center gap-0.5 xl:flex">
+          {NAV_LINKS.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              aria-current={isActive(l.href) ? "page" : undefined}
+              className={`rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-colors ${
+                isActive(l.href)
+                  ? "bg-accent-soft text-accent"
+                  : "text-ink-soft hover:bg-canvas hover:text-ink"
+              }`}
+            >
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-controls="mobile-nav"
+          className="btn-secondary xl:hidden"
+        >
+          {open ? "Close" : "Menu"}
+        </button>
+      </div>
+
+      {open && (
+        <nav
+          id="mobile-nav"
+          className="border-t border-line bg-surface xl:hidden"
+        >
+          <div className="container-page grid gap-0.5 py-3 sm:grid-cols-2">
+            {NAV_LINKS.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
-                aria-current={active ? "page" : undefined}
-                className={`rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors sm:px-3 ${
-                  active
+                onClick={() => setOpen(false)}
+                aria-current={isActive(l.href) ? "page" : undefined}
+                className={`rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  isActive(l.href)
                     ? "bg-accent-soft text-accent"
                     : "text-ink-soft hover:bg-canvas hover:text-ink"
                 }`}
               >
                 {l.label}
               </Link>
-            );
-          })}
+            ))}
+          </div>
         </nav>
-      </div>
+      )}
     </header>
   );
 }

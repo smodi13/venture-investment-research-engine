@@ -1,111 +1,186 @@
-# X Sourcing Engine
+# Venture Investment Research Engine
 
-A venture sourcing workflow that finds **technical founders through X signals
-before they appear clearly in PitchBook, Crunchbase, or other mainstream startup
-databases**.
+A configurable sourcing, research, and diligence platform for evaluating
+emerging technology companies across private and public markets.
 
-Built by **Sahil Modi** as an independent demonstration project.
+Built by **Sahil Modi** as an independent work sample.
 
-> This project is an independent demonstration. It is not affiliated with,
-> endorsed by, or representing any investment firm or X Corp.
+> This is an independent work sample built by Sahil Modi. It is not affiliated
+> with or endorsed by any investment firm. Company information is drawn from
+> public sources or clearly labeled demonstration data. Investment scores and
+> conclusions reflect an illustrative research framework and are not investment
+> advice.
 
-## The premise
+This repository is independent from all prior firm-specific work samples and
+does not modify or connect to any other Sahil Modi repository or deployment.
 
-A database profile is a lagging indicator. It exists because something already
-happened: a round closed, a launch got covered, an accelerator published its
-cohort, and at that point every fund watching the category sees the company in
-the same week.
+## Purpose
 
-The months before that are not quiet. Technical founders spend them publishing:
-arguing with a benchmark, releasing a library, posting a demo that half works,
-complaining about a workflow they have run a hundred times. This engine treats
-that window as the sourcing surface, and turns those posts into structured
-sourcing cards an Investment Associate can act on.
+Most investment research tools present a number and hide the reasoning. This
+one is built the other way around. Every figure carries its provenance, every
+factor rating shows the evidence and whether it rests on verified information
+or analyst judgment, and the platform states what it does not know rather than
+filling the gap with something plausible.
 
-Coverage spans early technical markets rather than one narrow sector: AI drug
-discovery infrastructure, robotics and physical AI, enterprise AI workflow
-automation, biotech tooling, deep tech infrastructure, and technical software
-with strong founder-market fit.
+The result is a platform designed to make disagreement easy. A reader should be
+able to reject a specific factor rating, not the output as a whole.
 
-## What the site does
+## The workflow
 
-- **Overview:** the sourcing thesis, the signal taxonomy, the five-step
-  workflow, and the scoring weights.
-- **Pipeline:** leads surfaced from X signals, with filters for signal type,
-  database visibility, category, region, stage, status, capital raised, and
-  minimum score. Sortable by score, earliness, recency, or capital raised.
-- **Lead card:** the originating X post and its provenance, why it cleared the
-  noise filter, what corroborated it, evidence tagged by confidence, concerns,
-  diligence questions, a drafted outreach note, and the full scoring breakdown.
-- **Engine:** how queries are built and validated, how noise is filtered, how
-  claims are corroborated, the cost governance behind live X API runs, and the
-  limits and failure modes of sourcing this way.
-- **Workflow:** move a lead through the pipeline, add notes, export filtered
-  leads to CSV, copy the outreach draft, reset the demo. Status and notes are
-  stored in the browser only.
+The platform demonstrates the complete workflow of a venture or frontier
+technology analyst:
 
-## Signal taxonomy
+1. **Define a mandate.** Four mandate profiles, each with its own factor
+   weights, sector and stage affinities, and required diligence.
+2. **Review the universe.** Twenty four companies across eight sectors,
+   filterable and sortable on ten dimensions.
+3. **Rank opportunities.** Thirteen weighted factors produce a score out of
+   100, recalculated whenever the mandate changes.
+4. **Research in depth.** Technology, market, commercial, and financial
+   assessments per company, with provenance on every claim.
+5. **Develop a sector view.** Five sector research pages built around value
+   chains and margin position.
+6. **Compare across markets.** Up to four companies side by side, with public
+   and private figures explicitly distinguished.
+7. **Track the pipeline.** Ten stages, with notes, next steps, and priorities.
+8. **Write it up.** A complete investment memo, exportable as Markdown, text,
+   or print.
+9. **Export the research.** CSV export carrying provenance columns alongside
+   the values.
 
-Seven post shapes, ordered by how hard they are to fake:
+## Features
 
-| Signal type | What it looks like |
+- Four configurable investment mandates that re-weight the entire scoring model
+- Transparent thirteen factor scoring framework, weights published, totals
+  verified in the interface
+- Provenance labelling on every figure: reported, analyst estimate,
+  requires verification, demonstration data, or not publicly disclosed
+- Full company research records covering technology, market, commercial, and
+  financial assessment
+- Public and private market comparison, with the dimensions that do not compare
+  marked as such rather than left blank
+- Five sector research pages with value chain maps
+- A featured investment thesis on infrastructure for scaled AI inference
+- Dated market intelligence tracker with confidence levels
+- Ten stage investment pipeline with local workflow state
+- Complete demonstration investment memo with copy, download, and print
+- Source registry listing every external source and what it supports
+
+## Mandate configuration
+
+Mandates live in `lib/mandates.ts`. A mandate carries:
+
+| Field | Purpose |
 | --- | --- |
-| Product demo | Uncut video, failures left in |
-| Open-source release | Benchmarks with a published regression case |
-| Technical thread | Original data with a non-obvious conclusion |
-| Recurring problem discussion | The same problem, posted for months |
-| Customer pain point | A quantified complaint from inside the industry |
-| Hiring signal | A role that reveals the roadmap |
-| Build-in-public update | Shipping cadence with real numbers |
+| `weights` | Points assigned to each of the thirteen factors, summing to 100 |
+| `sectorAffinity` | 0 to 5 affinity per sector, used to derive mandate fit |
+| `stageAffinity` | 0 to 5 affinity per financing stage |
+| `emphasisedSectors` | Sectors the interface surfaces first |
+| `additionalDiligence` | Questions appended to every company under the mandate |
 
-## Scoring model
+Mandate fit is the one factor never stored on a company. It is derived at read
+time from sector and stage affinity, weighted two to one toward sector, which
+is what makes every score in the platform move when the mandate changes.
 
-Nine factors, fixed published weights, totalling 100. The weighting is the
-argument: founder depth, signal quality, and earliness carry 45 points between
-them, because when a company is still invisible those are the only things
-reliably observable. Traction and market sizing are scored but capped.
+The four mandates are Frontier Technology, Enterprise Software, Healthcare
+Technology, and Generalist Early Stage.
 
-| Factor | Points |
+## Scoring methodology
+
+Thirteen factors, weighted per mandate, totalling 100.
+
+Factors are rated 0 to 5, deliberately coarse, so the model cannot manufacture
+precision the evidence does not support. Ratings are oriented so that 5 is
+always the most favourable reading, which on the four risk factors means 5
+signals low risk. The weighted total is rounded to a whole number.
+
+| Band | Meaning |
 | --- | --- |
-| Founder-market fit & technical depth | 18 |
-| Signal strength & specificity | 14 |
-| Earliness vs. mainstream databases | 13 |
-| Thesis fit | 12 |
-| Evidence of early demand | 12 |
-| Technical differentiation | 11 |
-| Market size & durability | 9 |
-| Why now | 6 |
-| Stage fit | 5 |
+| 85 to 100 | Priority research |
+| 70 to 84 | Strong watchlist |
+| 55 to 69 | Further diligence required |
+| Below 55 | Low current priority |
 
-A company that already has a complete database profile scores near zero on
-earliness by design. One such lead is retained in the demo pipeline as a
-calibration example.
+The highest band is called priority research, not buy. It means the company has
+earned analyst time this week. No score in this platform is a recommendation.
 
-The score is a **sort order for a partner's attention**, never a decision. No
-lead advances on score alone.
+Every factor rating carries the evidence behind it and a label stating whether
+it rests on verified information or analyst judgment. Each company page reports
+the proportion, because a score of 74 built from verified inputs is a different
+object from a score of 74 built from judgment.
 
-## Demonstration data
+## Company data methodology
 
-The public deployment works immediately with **no API key required**. Every
-company shown is a **clearly labeled illustrative sample**. Company names,
-founder names, X handles, post text, engagement counts, funding figures, and
-lead times are invented to demonstrate the workflow, and no factual claim is
-made about any real business, account, or person. Sample links resolve to
-`example.com` on purpose.
+The universe is 24 companies: 12 public and 12 private. They are researched
+differently, and the difference is stated everywhere they appear.
 
-The dataset was built to exercise the interface honestly rather than
-flatteringly: it spans strong and weak leads, includes founder-reported claims
-that have not been verified, contains stealth records with almost no evidence,
-and keeps one lead the engine surfaced too late to be useful.
+**Public companies are real.** Their qualitative profiles are drawn from widely
+published information about what the company sells and how it competes.
+Financial figures are expressed as dated ranges labelled as analyst estimates,
+never as reported point values. A static file cannot hold a current market
+capitalisation or gross margin, and presenting one as though it could would be
+the most misleading thing this platform could do. Where a figure exists in
+filings but was not verified in this build, the interface says so explicitly
+and links to the primary source rather than guessing.
+
+**Private companies are demonstration data.** All twelve are fictional and
+labelled as such. This is an integrity decision, not a shortcut. Private
+companies do not file, so a research record on a real one would consist of
+funding-database figures and inference presented with unwarranted confidence.
+Writing invented revenue or invented customers onto a real private company
+would be indefensible. The companies here are modelled on real archetypes in
+each value chain, and the research structure applied to them is exactly the
+structure that would be applied to a real one. Only the facts are synthetic.
+
+## Public versus private market treatment
+
+Categorical dimensions such as capital intensity, commercial readiness, market
+maturity, and technical differentiation are analyst assessments applied on the
+same scale to both, so they compare directly. Scores compare directly for the
+same reason.
+
+Financial dimensions do not compare. A public company reports revenue growth
+and gross margin; a private company reports nothing. The comparison view states
+this in each affected row rather than leaving a blank cell, because an empty
+cell reads as a small number rather than as an absence.
+
+No private-company valuation is published anywhere. A funding-database
+valuation is a post-money figure from a single negotiated transaction, often
+stale and frequently reported by an interested party. Treating it as comparable
+to a market capitalisation would be a category error.
+
+## Featured thesis: infrastructure for scaled AI inference
+
+Training built the current AI infrastructure market. Inference will decide who
+keeps it.
+
+Training and inference are different workloads with different economics.
+Training rewards peak arithmetic throughput and tolerates proprietary software.
+Inference rewards memory bandwidth, low latency, and portability. As deployed
+compute shifts toward inference, the binding constraint moves from arithmetic
+toward memory, interconnect, power, and heat, which relocates margin down the
+stack into layers historically valued as industrial businesses.
+
+The thesis covers the value chain layer by layer, names who captures margin at
+each, and gives its disproving questions the same weight as its argument. It
+publishes no market-size figure, because a defensible one is not available and
+an indefensible one would weaken the argument rather than support it.
 
 ## Tech stack
 
 - Next.js 16 (App Router) and React 19 with TypeScript
 - Tailwind CSS
-- No database. The demo dataset is bundled; workflow state uses browser local
-  storage.
+- No database, no authentication, no API keys, no external services
+- All 41 routes are statically prerendered
+- Workflow state uses browser local storage, read through
+  `useSyncExternalStore`
 
-## Getting started
+The full research corpus stays on the server. Pages send a compact row
+projection to the browser with scores precomputed for all four mandates, which
+is what lets the mandate selector re-rank the universe instantly without a
+round trip and without shipping the research prose to the client.
+
+## Local setup
 
 ```bash
 npm install
@@ -119,63 +194,91 @@ npm run build
 npm start
 ```
 
+Lint and typecheck:
+
+```bash
+npm run lint
+npx tsc --noEmit
+```
+
+## Deployment
+
+Deploys to Vercel as a static site with no configuration:
+
+```bash
+npm run build
+vercel --prod
+```
+
+No environment variables are required. `.vercelignore` keeps local artifacts
+out of the upload.
+
+## Security
+
+- **No secrets exist in this project.** There are no API keys, no tokens, and
+  no credentials, because there are no external services to authenticate to.
+- **No server-side write path.** Nothing a user changes leaves their browser.
+  There is no database, no account system, and no analytics.
+- **No environment variables.** The application cannot leak configuration it
+  does not have. It renders identically with an empty environment.
+- **No user input reaches a server.** Search, filters, notes, and workflow
+  edits are all client-side state.
+- `.env` files are gitignored. `.env.example` documents that no variables are
+  required.
+- External links are limited to the source registry in `lib/sources.ts`, all
+  primary sources, all opened with `rel="noopener noreferrer"`.
+
+## Limitations
+
+Stated plainly, and expanded on the methodology page:
+
+- **Public information is incomplete and lagging.** Filings describe a quarter
+  that has ended, aggregated to a level the company chooses.
+- **Funding databases are not a source of truth**, which is why this platform
+  does not use them.
+- **Market-size estimates are the least reliable input available.** None is
+  published anywhere in this platform.
+- **Technical benchmarks are configuration dependent** and expire quickly.
+- **This is a static snapshot.** Public-market figures are dated 31 March 2026;
+  the intelligence tracker was assembled 28 July 2026. There is no live feed,
+  and the interface says so rather than implying freshness it does not have.
+
+## Source policy
+
+Only primary sources are registered: company investor relations material and
+the SEC EDGAR filing system. Secondary coverage and commercial funding
+databases are deliberately excluded.
+
+No source is invented. Demonstration companies carry no external links at all,
+because a fictional company cannot have a real filing behind it. Every
+registered source lists what it supports and when it was last checked, and the
+full registry is published on the methodology page.
+
 ## Project structure
 
 ```
-app/                   Next.js routes
-  page.tsx             Overview, the sourcing narrative
-  pipeline/            Sourcing dashboard
-  engine/              How the engine works, and its limits
-  api/source/          Server-side sourcing endpoint (demo-safe)
-components/            Nav, lead table, filters, analytics, signal card,
-                       lead detail panel, badges
-lib/                   Demo dataset, types, scoring model, CSV export, storage
-docs/ENGINE.md         Documentation for the underlying CLI sourcing engine
-src/, config/, tests/  The governed Python sourcing engine (see below)
+app/
+  page.tsx             Overview
+  mandates/            Mandate configuration and weight comparison
+  universe/            Company universe and per-company research records
+  sectors/             Sector research and value chain maps
+  thesis/              Featured investment thesis
+  intelligence/        Dated market intelligence tracker
+  memo/                Demonstration investment memo
+  pipeline/            Ten stage investment pipeline
+  methodology/         Methodology and source registry
+components/            Mandate state, scoring views, provenance display, tables
+lib/
+  types.ts             Domain types and the provenance model
+  mandates.ts          The four mandates and their weights
+  scoring.ts           Thirteen factor scoring framework
+  companies.ts         Universe aggregation
+  data/                Public and private company records
+  sectors.ts           Sector research
+  thesis.ts            Featured thesis
+  intelligence.ts      Market intelligence entries
+  memo.ts              Demonstration memo
+  sources.ts           Source registry
+  rows.ts              Compact client projection with precomputed scores
+  storage.ts           Local workflow state
 ```
-
-## Live sourcing and security
-
-The web app runs in demonstration mode and needs no secrets. The optional,
-**governed CLI sourcing engine** (Python, in `src/`, `config/`, and `tests/`)
-performs real X API sourcing behind a query validator, a counts-only preflight,
-explicit cost budgets, and human confirmation. Scoring there is fully
-deterministic Python; any LLM step only summarizes already-scored text and never
-assigns a number. See [`docs/ENGINE.md`](docs/ENGINE.md).
-
-Security practices:
-
-- API credentials are read only from `process.env` on the server and are never
-  sent to the browser. The `/api/source` route reports only whether a credential
-  is present, never its value.
-- Live, paid sourcing is deliberately **not** exposed as a one-click web action,
-  so a reviewer cannot accidentally spend money.
-- `.env` files are gitignored; `.env.example` documents variables without real
-  values.
-- The web app never depends on a secret to render, so it degrades gracefully if
-  external APIs fail, rate-limit, or are unconfigured.
-
-## Environment variables
-
-The **web app requires none**. The variables below only enable the optional CLI
-engine (see `.env.example`):
-
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `X_BEARER_TOKEN` | No (CLI only) | X API access for the governed CLI engine |
-| `ANTHROPIC_API_KEY` | No (CLI only) | Optional LLM summary step in the CLI |
-
-## Deployment (Vercel)
-
-This deploys as its own Vercel project, separate from any other project in the
-account. There is no linked `.vercel/` directory in the repo, so the first
-deploy will prompt for a new project name.
-
-```bash
-npm run build                                        # verify a clean build
-vercel link --yes --project venture-investment-research-engine
-vercel --prod                                        # promote to production
-```
-
-No environment variables are needed for the public demo. `.vercelignore` keeps
-the Python engine, its data, and all local artifacts out of the upload.

@@ -1,107 +1,51 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { PIPELINE_STATUSES } from "@/lib/types";
-import type { Confidence, LeadRecord, PipelineStatus } from "@/lib/types";
-import { companyTotal } from "@/lib/scoring";
-import { formatFunding, formatDate } from "@/lib/format";
-import { ScoreBars } from "./ScoreBars";
-import { ScoreBadge, ScoreTierLabel } from "./ScoreBadge";
-import { StatusBadge } from "./StatusBadge";
-import { SignalCard } from "./SignalCard";
+import Link from "next/link";
+import { useState } from "react";
+import { useMandate } from "./MandateProvider";
+import { MandateSelector } from "./MandateSelector";
+import { ScoreBadge, ScoreBar, ScoreBreakdown } from "./Score";
+import {
+  DemonstrationBadge,
+  EvidenceLine,
+  FactRow,
+  ProvenanceBadge,
+} from "./Provenance";
+import { BulletList, Field, Section } from "./ui";
+import {
+  evidenceMix,
+  investmentRationale,
+  scoreBand,
+  scoreCompany,
+} from "@/lib/scoring";
+import { getSource } from "@/lib/sources";
+import { formatDate, describeAge } from "@/lib/format";
+import type { Company } from "@/lib/types";
 
-const CONFIDENCE_STYLES: Record<Confidence, string> = {
-  Observed: "border-emerald-200 bg-emerald-50 text-emerald-800",
-  "Founder-reported": "border-amber-200 bg-amber-50 text-amber-800",
-  Inferred: "border-slate-200 bg-slate-100 text-slate-600",
-};
+const DILIGENCE_LABELS: { key: keyof Company["diligence"]; label: string }[] = [
+  { key: "technology", label: "Technology" },
+  { key: "product", label: "Product" },
+  { key: "customers", label: "Customers" },
+  { key: "competition", label: "Competition" },
+  { key: "unitEconomics", label: "Unit economics" },
+  { key: "capitalRequirements", label: "Capital requirements" },
+  { key: "regulation", label: "Regulation" },
+  { key: "team", label: "Team" },
+  { key: "financing", label: "Financing" },
+  { key: "commercialization", label: "Commercialisation" },
+];
 
-function ConfidenceTag({ confidence }: { confidence: Confidence }) {
-  return (
-    <span
-      className={`inline-flex shrink-0 items-center whitespace-nowrap rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${CONFIDENCE_STYLES[confidence]}`}
-    >
-      {confidence}
-    </span>
-  );
-}
-
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <div className="label">{label}</div>
-      <div className="text-sm text-ink-soft">{children}</div>
-    </div>
-  );
-}
-
-function Block({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="border-t border-line py-5">
-      <h4 className="text-sm font-semibold text-ink">{title}</h4>
-      {subtitle && <p className="mt-0.5 text-xs text-ink-muted">{subtitle}</p>}
-      <div className="mt-2.5">{children}</div>
-    </section>
-  );
-}
-
-function Prose({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-sm leading-relaxed text-ink-soft">{children}</p>
-  );
-}
-
-export function CompanyDetail({
-  lead,
-  onClose,
-  onStatusChange,
-  onNotesChange,
-}: {
-  lead: LeadRecord;
-  onClose: () => void;
-  onStatusChange: (id: string, status: PipelineStatus) => void;
-  onNotesChange: (id: string, notes: string) => void;
-}) {
-  const [notes, setNotes] = useState(lead.notes);
+export function CompanyDetail({ company }: { company: Company }) {
+  const { mandateId, mandate } = useMandate();
   const [copied, setCopied] = useState(false);
-  const total = companyTotal(lead);
-
-  useEffect(() => {
-    setNotes(lead.notes);
-    setCopied(false);
-  }, [lead.id, lead.notes]);
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", onKey);
-    // Stop the page behind the panel from scrolling.
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = previous;
-    };
-  }, [onClose]);
+  const result = scoreCompany(company, mandateId);
+  const band = scoreBand(result.total);
+  const mix = evidenceMix(result);
+  const f = company.financials;
 
   async function copyOutreach() {
     try {
-      await navigator.clipboard.writeText(lead.outreach);
+      await navigator.clipboard.writeText(company.outreach);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -110,235 +54,391 @@ export function CompanyDetail({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      <div
-        className="absolute inset-0 bg-ink/40 backdrop-blur-[2px]"
-        onClick={onClose}
-        aria-hidden
-      />
-      <aside
-        role="dialog"
-        aria-modal="true"
-        aria-label={`${lead.name} sourcing card`}
-        className="relative flex h-full w-full max-w-2xl animate-slide-in flex-col overflow-y-auto bg-surface shadow-panel"
+    <div className="space-y-10">
+      {/* Header */}
+      <div>
+        <Link
+          href="/universe"
+          className="text-sm font-medium text-accent hover:underline"
+        >
+          Back to company universe
+        </Link>
+        <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-3xl font-semibold tracking-tight text-ink">
+              {company.name}
+            </h1>
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <span className="chip">{company.marketType}</span>
+              {f.kind === "public" && <span className="chip">{f.ticker}</span>}
+              <span className="chip">{company.sector}</span>
+              <span className="chip">{company.stage}</span>
+              <span className="chip">{company.hq}</span>
+              <span className="chip">Founded {company.foundedYear}</span>
+              {company.isDemonstration && <DemonstrationBadge />}
+            </div>
+          </div>
+          <div className="shrink-0 text-right">
+            <ScoreBadge score={result.total} />
+            <div className="mt-2 w-40">
+              <ScoreBar score={result.total} />
+            </div>
+            <p className="mt-1.5 text-xs text-ink-muted">
+              Under the {mandate.name} mandate
+            </p>
+          </div>
+        </div>
+        <p className="mt-4 max-w-3xl text-base leading-relaxed text-ink-soft">
+          {company.description}
+        </p>
+        <p className="mt-3 text-xs text-ink-muted">
+          Last reviewed {formatDate(company.lastReviewed)},{" "}
+          {describeAge(company.lastReviewed)}.
+        </p>
+      </div>
+
+      {company.isDemonstration && (
+        <p className="rounded-lg border border-violet-200 bg-violet-50 p-4 text-sm leading-relaxed text-violet-900">
+          <strong className="font-semibold">Demonstration company.</strong>{" "}
+          {company.name} is fictional. Every figure and claim on this page is
+          illustrative, included to exercise the research workflow, and
+          describes no real business. Private companies in this platform are
+          modelled rather than researched, because inventing facts about a real
+          private company would be indefensible.
+        </p>
+      )}
+
+      <div className="card p-4 sm:p-5">
+        <MandateSelector variant="compact" />
+        <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+          {investmentRationale(company, result)}
+        </p>
+      </div>
+
+      {/* Overview */}
+      <Section
+        title="Overview"
+        description="What the company sells, who buys it, and where the record came from."
       >
-        {/* Header */}
-        <div className="sticky top-0 z-10 border-b border-line bg-surface/95 px-6 py-4 backdrop-blur">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-lg font-semibold tracking-tight text-ink">
-                  {lead.name}
-                </h2>
-                {lead.isDemo && (
-                  <span className="rounded border border-line px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-ink-muted">
-                    Sample record
-                  </span>
-                )}
+        <dl className="grid gap-5 sm:grid-cols-2">
+          <Field label="Business model">{company.businessModel}</Field>
+          <Field label="Primary customer">{company.primaryCustomer}</Field>
+          <Field label="Technical differentiation">
+            {company.technicalDifferentiation}
+          </Field>
+          <Field label="Key catalyst">{company.keyCatalyst}</Field>
+          <div>
+            <dt className="label">Traction signal</dt>
+            <dd className="text-sm leading-relaxed text-ink-soft">
+              {company.tractionSignal.value ?? "Not publicly disclosed"}
+            </dd>
+            <div className="mt-1.5 flex flex-wrap items-center gap-2">
+              <ProvenanceBadge provenance={company.tractionSignal.provenance} />
+              <span className="text-xs text-ink-muted">
+                As of {formatDate(company.tractionSignal.asOf)}
+              </span>
+            </div>
+          </div>
+          <Field label="Geography and stage">
+            {company.hq}, {company.region}. {company.stage},{" "}
+            {company.commercialReadiness.toLowerCase()} commercial readiness,{" "}
+            {company.capitalIntensity.toLowerCase()} capital intensity.
+          </Field>
+        </dl>
+
+        {company.sourceIds.length > 0 && (
+          <div className="mt-6">
+            <p className="label">Key public sources</p>
+            <ul className="space-y-1.5">
+              {company.sourceIds.map((id) => {
+                const s = getSource(id);
+                if (!s) return null;
+                return (
+                  <li key={id} className="text-sm">
+                    <a
+                      href={s.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-accent hover:underline"
+                    >
+                      {s.name}
+                    </a>
+                    <span className="text-ink-muted">
+                      {" "}
+                      ({s.type}, accessed {formatDate(s.accessDate)})
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+      </Section>
+
+      {/* Technology */}
+      <Section
+        title="Technology assessment"
+        description="What the technology does, what protects it, and where it could fail."
+      >
+        <dl className="grid gap-5 sm:grid-cols-2">
+          <Field label="How it works">{company.technology.howItWorks}</Field>
+          <Field label="Core technical advantage">
+            {company.technology.coreAdvantage}
+          </Field>
+          <Field label="Benchmarks">{company.technology.benchmarks}</Field>
+          <Field label="Intellectual property">
+            {company.technology.intellectualProperty}
+          </Field>
+          <Field label="Third-party dependency">
+            {company.technology.thirdPartyDependency}
+          </Field>
+          <Field label="Milestone required for scale">
+            {company.technology.milestoneForScale}
+          </Field>
+        </dl>
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <div>
+            <p className="label">Supporting evidence</p>
+            <ul>
+              {company.technology.supportingEvidence.map((e) => (
+                <EvidenceLine key={e.claim} {...e} />
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="label">Potential technical failure points</p>
+            <BulletList items={company.technology.failurePoints} tone="risk" />
+          </div>
+        </div>
+      </Section>
+
+      {/* Market */}
+      <Section
+        title="Market assessment"
+        description="The buying problem, the structure around it, and what is changing now."
+      >
+        <dl className="grid gap-5 sm:grid-cols-2">
+          <Field label="Customer pain point">{company.market.painPoint}</Field>
+          <Field label="Market structure">{company.market.structure}</Field>
+          <Field label="Why now">{company.market.whyNow}</Field>
+          <Field label="Regulatory environment">
+            {company.market.regulatoryEnvironment}
+          </Field>
+          <Field label="Market maturity">{company.market.maturity}</Field>
+        </dl>
+        <div className="mt-6 grid gap-6 md:grid-cols-3">
+          <div>
+            <p className="label">Adoption drivers</p>
+            <BulletList items={company.market.adoptionDrivers} />
+          </div>
+          <div>
+            <p className="label">Competitors</p>
+            <BulletList items={company.market.competitors} />
+          </div>
+          <div>
+            <p className="label">Substitute technologies</p>
+            <BulletList items={company.market.substitutes} />
+          </div>
+        </div>
+      </Section>
+
+      {/* Commercial */}
+      <Section
+        title="Commercial assessment"
+        description="How it is sold, what adoption looks like, and what could stop it."
+      >
+        <dl className="grid gap-5 sm:grid-cols-2">
+          <Field label="Pricing model">{company.commercial.pricingModel}</Field>
+          <Field label="Sales motion">{company.commercial.salesMotion}</Field>
+          <Field label="Customer type">{company.commercial.customerType}</Field>
+          <Field label="Implementation burden">
+            {company.commercial.implementationBurden}
+          </Field>
+          <Field label="Expansion opportunity">
+            {company.commercial.expansionOpportunity}
+          </Field>
+          <Field label="Go-to-market risk">
+            {company.commercial.goToMarketRisk}
+          </Field>
+        </dl>
+        <div className="mt-6">
+          <p className="label">Adoption evidence</p>
+          <ul className="max-w-2xl">
+            {company.commercial.adoptionEvidence.map((e) => (
+              <EvidenceLine key={e.claim} {...e} />
+            ))}
+          </ul>
+        </div>
+      </Section>
+
+      {/* Financials */}
+      <Section
+        title={
+          f.kind === "public"
+            ? "Financial assessment"
+            : "Financing assessment"
+        }
+        description={
+          f.kind === "public"
+            ? "Every figure below is a dated range carrying an explicit provenance label. None is a reported point value, and each should be reconciled against the primary filing before use."
+            : "Financing structure for a private company. All figures are demonstration data on a fictional company."
+        }
+      >
+        {f.kind === "public" ? (
+          <div className="grid gap-x-8 lg:grid-cols-2">
+            <dl>
+              <FactRow label="Market capitalisation" fact={f.marketCap} />
+              <FactRow label="Revenue growth" fact={f.revenueGrowth} />
+              <FactRow label="Gross margin" fact={f.grossMargin} />
+            </dl>
+            <dl>
+              <FactRow label="Operating margin" fact={f.operatingMargin} />
+              <FactRow label="Cash position" fact={f.cashPosition} />
+              <FactRow label="Valuation multiple" fact={f.valuationMultiple} />
+            </dl>
+            <div className="mt-4 space-y-5 lg:col-span-2">
+              <Field label="Public-market expectations">
+                {f.marketExpectations}
+              </Field>
+              <div>
+                <p className="label">Earnings catalysts</p>
+                <BulletList items={f.earningsCatalysts} />
               </div>
-              <p className="mt-1 text-sm text-ink-muted">
-                {lead.category} · {lead.hq}
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-x-8 lg:grid-cols-2">
+            <dl>
+              <FactRow label="Capital raised" fact={f.capitalRaised} />
+              <FactRow label="Latest round" fact={f.latestRound} />
+            </dl>
+            <div className="space-y-5 pt-3">
+              <Field label="Capital intensity">{f.capitalIntensity}</Field>
+              <Field label="Expected future financing need">
+                {f.futureFinancingNeed}
+              </Field>
+              <Field label="Ownership and dilution considerations">
+                {f.ownershipConsiderations}
+              </Field>
+              <Field label="Financing risk">{f.financingRisk}</Field>
+            </div>
+          </div>
+        )}
+      </Section>
+
+      {/* Investment view */}
+      <Section
+        title="Investment view"
+        description="The thesis, the cases around it, and what would prove it wrong."
+      >
+        <div className="space-y-5">
+          <Field label="Thesis">{company.investment.thesis}</Field>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-emerald-800">
+                Bull case
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                {company.investment.bullCase}
               </p>
             </div>
-            <div className="flex shrink-0 items-center gap-3">
-              <div className="hidden text-right sm:block">
-                <ScoreBadge score={total} />
-              </div>
-              <button
-                onClick={onClose}
-                className="btn-ghost -mr-2 px-2 py-1 text-sm"
-                aria-label="Close panel"
-              >
-                Close
-              </button>
+            <div className="rounded-lg border border-line bg-canvas p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-ink-soft">
+                Base case
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                {company.investment.baseCase}
+              </p>
+            </div>
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-amber-800">
+                Bear case
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                {company.investment.bearCase}
+              </p>
             </div>
           </div>
-          <div className="mt-2 flex items-center gap-3">
-            <StatusBadge status={lead.status} />
-            <ScoreTierLabel score={total} />
-          </div>
-        </div>
-
-        <div className="px-6 pb-12">
-          {/* The signal comes first, because it is why this record exists. */}
-          <div className="pt-5">
-            <div className="label">Originating signal</div>
-            <SignalCard
-              signal={lead.signal}
-              visibility={lead.visibility}
-              daysAhead={lead.daysAheadOfDatabases}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 border-t border-line py-5 sm:grid-cols-3">
-            <Field label="Founder">
-              {lead.founder}
-              <span className="block text-xs text-ink-muted">
-                {lead.founderTitle}
-              </span>
-            </Field>
-            <Field label="Stage">{lead.stage}</Field>
-            <Field label="Est. raised">
-              {formatFunding(lead.fundingRaisedUSD)}
-              <span className="block text-xs text-ink-muted">estimate</span>
-            </Field>
-            <Field label="Founded">{lead.foundedYear}</Field>
-            <Field label="Region">{lead.region}</Field>
-            <Field label="Surfaced">{formatDate(lead.dateDiscovered)}</Field>
-          </div>
-
-          <div className="flex flex-wrap gap-2 border-t border-line py-4">
-            <a
-              href={lead.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary text-xs"
-            >
-              Website
-            </a>
-            <a
-              href={lead.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary text-xs"
-            >
-              LinkedIn
-            </a>
-            <span className="inline-flex items-center px-1 text-xs text-ink-muted">
-              Sample links resolve to example.com by design.
-            </span>
-          </div>
-
-          <Block title="What the company does">
-            <Prose>{lead.description}</Prose>
-          </Block>
-
-          <Block
-            title="Founder background"
-            subtitle="Assembled from public record. Confidence is stated in the text."
-          >
-            <Prose>{lead.founderBackground}</Prose>
-          </Block>
-
-          <Block title="Why it fits an early technical thesis">
-            <Prose>{lead.thesisFit}</Prose>
-          </Block>
-
-          <Block title="Market opportunity">
-            <Prose>{lead.marketOpportunity}</Prose>
-          </Block>
-
-          <Block title="Why now">
-            <Prose>{lead.whyNow}</Prose>
-          </Block>
-
-          <Block
-            title="Evidence"
-            subtitle="Each claim carries how firmly it is established. Founder-reported is never presented as proven."
-          >
-            <ul className="space-y-2.5">
-              {lead.evidence.map((e, i) => (
-                <li key={i} className="flex flex-wrap items-start gap-2">
-                  <ConfidenceTag confidence={e.confidence} />
-                  <span className="min-w-[12rem] flex-1 text-sm leading-relaxed text-ink-soft">
-                    {e.claim}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </Block>
-
-          <Block title="Concerns">
-            <ul className="space-y-2">
-              {lead.concerns.map((c, i) => (
-                <li
-                  key={i}
-                  className="flex gap-2.5 text-sm leading-relaxed text-ink-soft"
-                >
-                  <span
-                    aria-hidden
-                    className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-400"
-                  />
-                  <span>{c}</span>
-                </li>
-              ))}
-            </ul>
-          </Block>
-
-          <Block title="Diligence questions">
-            <ol className="space-y-2">
-              {lead.diligenceQuestions.map((q, i) => (
-                <li key={i} className="flex gap-2.5">
-                  <span className="mt-0.5 font-mono text-xs text-ink-muted">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="text-sm leading-relaxed text-ink-soft">
-                    {q}
-                  </span>
-                </li>
-              ))}
-            </ol>
-          </Block>
-
-          <Block
-            title="Drafted founder outreach"
-            subtitle="A starting point that references the actual signal. Personalize before sending."
-          >
-            <div className="rounded-lg border border-line bg-canvas p-3.5 text-sm leading-relaxed text-ink-soft">
-              {lead.outreach}
-            </div>
-            <button
-              onClick={copyOutreach}
-              className="btn-secondary mt-3 text-xs"
-            >
-              {copied ? "Copied" : "Copy message"}
-            </button>
-          </Block>
-
-          <Block title="Scoring breakdown">
-            <ScoreBars scores={lead.scores} />
-          </Block>
-
-          <Block
-            title="Workflow"
-            subtitle="Status and notes are saved in this browser only."
-          >
-            <div className="mb-4">
-              <div className="label">Pipeline status</div>
-              <div className="flex flex-wrap gap-1.5">
-                {PIPELINE_STATUSES.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => onStatusChange(lead.id, s)}
-                    aria-pressed={s === lead.status}
-                    className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
-                      s === lead.status
-                        ? "border-accent bg-accent-soft text-accent"
-                        : "border-line text-ink-soft hover:bg-canvas"
-                    }`}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            <div>
+              <p className="label">Catalysts</p>
+              <BulletList items={company.investment.catalysts} tone="positive" />
             </div>
             <div>
-              <label className="label" htmlFor="notes">
-                Notes
-              </label>
-              <textarea
-                id="notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                onBlur={() => onNotesChange(lead.id, notes)}
-                rows={4}
-                placeholder="Add research notes..."
-                className="input resize-y"
-              />
+              <p className="label">Risks</p>
+              <BulletList items={company.investment.risks} tone="risk" />
             </div>
-          </Block>
+            <div>
+              <p className="label">What would invalidate the thesis</p>
+              <BulletList items={company.investment.invalidators} tone="risk" />
+            </div>
+          </div>
+          <div className="rounded-lg border border-accent-line bg-accent-soft p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-accent">
+              Recommended next step
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+              {company.investment.recommendedNextStep}
+            </p>
+          </div>
         </div>
-      </aside>
+      </Section>
+
+      {/* Scoring */}
+      <Section
+        title="Scoring breakdown"
+        description={`Thirteen factors weighted by the active mandate. ${mix.verifiedShare} percent of the ratings on this company rest on verified information, and the rest are analyst judgment, labelled per factor.`}
+      >
+        <div className="mb-4 flex flex-wrap items-center gap-3 rounded-lg border border-line bg-canvas p-4">
+          <ScoreBadge score={result.total} />
+          <p className="text-sm leading-relaxed text-ink-soft">{band.meaning}</p>
+        </div>
+        <ScoreBreakdown result={result} />
+      </Section>
+
+      {/* Diligence */}
+      <Section
+        title="Diligence questions"
+        description={`Company-specific questions, plus the additional questions the ${mandate.name} mandate requires of every company it evaluates.`}
+      >
+        <div className="grid gap-5 sm:grid-cols-2">
+          {DILIGENCE_LABELS.map(({ key, label }) => (
+            <div key={key}>
+              <p className="label">{label}</p>
+              <BulletList items={company.diligence[key]} />
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 rounded-lg border border-accent-line bg-accent-soft p-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-accent">
+            Required by the {mandate.name} mandate
+          </p>
+          <div className="mt-3">
+            <BulletList items={mandate.additionalDiligence} />
+          </div>
+        </div>
+      </Section>
+
+      {/* Outreach */}
+      <Section
+        title="Founder outreach"
+        description="A draft that references the company's actual work. Generic praise is deliberately absent, because it is the fastest way to be ignored."
+      >
+        <div className="card p-4 sm:p-5">
+          <p className="whitespace-pre-line text-sm leading-relaxed text-ink-soft">
+            {company.outreach}
+          </p>
+          {company.marketType === "Private" && (
+            <button
+              type="button"
+              onClick={copyOutreach}
+              className="btn-secondary mt-4"
+            >
+              {copied ? "Copied" : "Copy outreach draft"}
+            </button>
+          )}
+        </div>
+      </Section>
     </div>
   );
 }

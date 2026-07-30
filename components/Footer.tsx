@@ -1,29 +1,35 @@
 import Link from "next/link";
+import { SITE } from "@/lib/site";
 
 export function Footer() {
   return (
-    <footer className="mt-4 border-t border-line bg-surface">
-      <div className="container-page flex flex-col gap-4 py-8 text-xs leading-relaxed text-ink-muted sm:flex-row sm:items-start sm:justify-between">
-        <div className="max-w-lg space-y-1.5">
+    <footer className="mt-8 border-t border-line bg-surface print:mt-4">
+      <div className="container-page flex flex-col gap-5 py-9 text-xs leading-relaxed text-ink-muted lg:flex-row lg:items-start lg:justify-between">
+        <div className="max-w-2xl space-y-2">
           <p className="font-medium text-ink-soft">
-            X Sourcing Engine, an independent demonstration by Sahil Modi.
+            {SITE.name}, an independent research platform by {SITE.author}.
           </p>
-          <p>
-            An independent demonstration project. Not affiliated with,
-            endorsed by, or representing any investment firm or X Corp.
-          </p>
+          <p>{SITE.disclosure}</p>
         </div>
-        <div className="space-y-1.5 sm:text-right">
+        <div className="space-y-2 lg:text-right">
           <p>
-            Every company record is labeled demonstration data. No factual
-            claim is made about any real business, account, or person.
+            Static research snapshot. No live data feed, no account, and no
+            server-side storage of anything you change.
           </p>
-          <Link
-            href="/engine"
-            className="inline-block font-medium text-accent hover:underline"
-          >
-            How the engine works
-          </Link>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 lg:justify-end">
+            <Link
+              href="/methodology"
+              className="font-medium text-accent hover:underline"
+            >
+              Methodology and sources
+            </Link>
+            <Link
+              href="/thesis"
+              className="font-medium text-accent hover:underline"
+            >
+              Featured thesis
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

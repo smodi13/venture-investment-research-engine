@@ -1,17 +1,46 @@
-# Secrets
+# Secrets. The application needs none, but the rule stays so it can never
+# become possible to commit one by accident.
 .env
 .env.*
+.env*
+# The template carries no real values, so it is tracked. Re-asserted after the
+# broad rule above, because a later pattern would otherwise override it.
 !.env.example
 
-# Node / Next.js (web app)
+# Node and Next.js
 node_modules/
 .next/
 out/
+build/
+dist/
 next-env.d.ts
 *.tsbuildinfo
+
+# Deployment
+.vercel
 .vercel/
 
-# Python (sourcing engine)
+# Local databases and any scraped or private research data.
+# These are anchored to the repository root with a leading slash. An unanchored
+# "data/" would also match lib/data/, which is source code and must be tracked.
+*.db
+*.sqlite
+*.sqlite3
+/data/
+/research/
+/private/
+
+# Screenshots, browser automation artifacts, and test output
+*.png
+*.jpg
+*.jpeg
+*.gif
+.playwright-mcp/
+playwright-report/
+test-results/
+coverage/
+
+# Python tooling, in case any is ever reintroduced
 __pycache__/
 *.py[cod]
 .venv/
@@ -20,19 +49,14 @@ venv/
 .pytest_cache/
 .mypy_cache/
 
-# Engine artifacts and any scraped API data (keep out of a public repo)
-data/
-scratch_build/__pycache__/
-config/*_decisions.yaml
+# Local caches and temporary files
+.cache/
+.temp/
+tmp/
+*.log
 
-# OS
+# OS and editor
 .DS_Store
-
-# Local dev artifacts
-.playwright-mcp/
-*.png
-.vercel
-.env*
-
-# Re-assert after the broad .env* rule above: the template carries no real values.
-!.env.example
+Thumbs.db
+.vscode/
+.idea/

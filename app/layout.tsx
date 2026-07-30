@@ -3,6 +3,8 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { MandateProvider } from "@/components/MandateProvider";
+import { SITE } from "@/lib/site";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,18 +18,15 @@ const mono = JetBrains_Mono({
   display: "swap",
 });
 
-const description =
-  "A venture sourcing workflow that finds technical founders through X signals before they appear in mainstream startup databases. Independent demonstration project by Sahil Modi.";
-
 export const metadata: Metadata = {
   title: {
-    default: "X Sourcing Engine",
-    template: "%s | X Sourcing Engine",
+    default: SITE.name,
+    template: `%s | ${SITE.name}`,
   },
-  description,
+  description: SITE.subtitle,
   openGraph: {
-    title: "X Sourcing Engine",
-    description,
+    title: SITE.name,
+    description: SITE.subtitle,
     type: "website",
   },
 };
@@ -46,11 +45,13 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <Nav />
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-        <Footer />
+        <MandateProvider>
+          <Nav />
+          <main id="main" className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </MandateProvider>
       </body>
     </html>
   );

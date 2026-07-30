@@ -1,100 +1,245 @@
-import { COMPANIES } from "./companies";
-import type { Company, LeadRecord, PipelineStatus } from "./types";
+"use client";
 
-const STORAGE_KEY = "vire.leads.v1";
+import { useSyncExternalStore } from "react";
+import type { UniverseRow } from "./rows";
+import type { PipelineFields, PipelineStage, Priority } from "./types";
 
-/** Default pipeline placement for the demo dataset. */
-const DEFAULT_STATUS: Record<string, PipelineStatus> = {
-  "lead-01": "Partner Review",
-  "lead-02": "Researching",
-  "lead-03": "New Signal",
-  "lead-04": "Partner Review",
-  "lead-05": "Founder Outreach",
-  "lead-06": "Researching",
-  "lead-07": "New Signal",
-  "lead-08": "Founder Outreach",
-  "lead-09": "Researching",
-  "lead-10": "New Signal",
-  "lead-11": "Researching",
-  "lead-12": "Founder Outreach",
-  "lead-13": "New Signal",
-  "lead-14": "New Signal",
-  "lead-15": "Partner Review",
-  "lead-16": "Researching",
-  "lead-17": "Partner Review",
-  "lead-18": "New Signal",
-  "lead-19": "Founder Outreach",
-  "lead-20": "Passed",
+/**
+ * Workflow state.
+ *
+ * Everything a user changes lives in this browser only. There is no account,
+ * no database, and no server-side write path anywhere in the application.
+ *
+ * Local storage is treated as what it is: an external store outside React.
+ * It is read through useSyncExternalStore rather than through an effect, so
+ * the server render and the hydrated render agree without a mismatch and
+ * without a cascading re-render on mount.
+ *
+ * This module imports the compact row type rather than the full company
+ * dataset, so adding workflow state to a page does not drag the entire
+ * research corpus into the client bundle.
+ */
+
+const STORAGE_KEY = "vire.pipeline.v1";
+const MANDATE_KEY = "vire.mandate.v1";
+
+export const TODAY = "2026-07-29";
+
+/** Deterministic starting placement, so the platform opens in a considered state. */
+const DEFAULT_STATUS: Record<string, PipelineStage> = {
+  nvda: "Monitoring",
+  amd: "Monitoring",
+  avgo: "Monitoring",
+  mu: "Initial research",
+  arm: "Monitoring",
+  alab: "Initial research",
+  crdo: "Monitoring",
+  vrt: "Deep diligence",
+  ionq: "Monitoring",
+  sdgr: "Initial research",
+  tem: "Monitoring",
+  be: "Passed",
+  "larkspur-systems": "First meeting",
+  "meridian-fabric": "Deep diligence",
+  "coldbrook-thermal": "Investment memo",
+  "halden-compute": "Passed",
+  "anvil-grid": "Partner review",
+  "wrenfield-robotics": "Founder outreach",
+  "tidewater-autonomy": "Deep diligence",
+  "palisade-quantum": "Monitoring",
+  "kestrel-bio": "Initial research",
+  "ferrule-photonics": "Founder outreach",
+  "ravelin-data": "First meeting",
+  "sable-health": "Initial research",
 };
 
+const DEFAULT_PRIORITY: Record<string, Priority> = {
+  vrt: "High",
+  "larkspur-systems": "High",
+  "meridian-fabric": "High",
+  "coldbrook-thermal": "High",
+  "anvil-grid": "High",
+  "ferrule-photonics": "High",
+  "ravelin-data": "High",
+  nvda: "Low",
+  amd: "Low",
+  arm: "Low",
+  crdo: "Low",
+  ionq: "Low",
+  tem: "Low",
+  be: "Low",
+  "halden-compute": "Low",
+  "palisade-quantum": "Low",
+};
+
+/** Notes written on the records where the analyst has an actual view. */
 const DEFAULT_NOTES: Record<string, string> = {
-  "lead-02":
-    "Pre-entity. Worth a call now precisely because there is nothing to look up yet. If a round forms it will form fast and quietly.",
-  "lead-06":
-    "Tracking rather than pursuing. The open question is whether this is a company or a community standard, asked directly in the outreach.",
-  "lead-19":
-    "Highest founder conviction in the pipeline, lowest evidence of commercial intent. Keep warm; do not push a fundraise conversation yet.",
-  "lead-20":
-    "Passed on timing, not quality. Earliness scored 2/13: fully profiled and funded before our signal fired. Retained as a calibration example for the visibility filter.",
+  "anvil-grid":
+    "The strongest asset here is not the software, it is three utility approvals that took two years each. Ask a utility engineer, not the founder, whether the pending standard revision changes anything.",
+  "meridian-fabric":
+    "Everything depends on qualification data we have not seen. Do not progress past diligence until the in-rack thermal numbers arrive. Laboratory results are not the question.",
+  "halden-compute":
+    "Passed on structure rather than on quality. The preference stack means a good outcome returns very little to a new common holder, and the next tape-out must be funded before pilots convert.",
+  "coldbrook-thermal":
+    "Ready for memo. The open item is three-year coolant chemistry from the two oldest sites, which is the risk that would only appear long after we invested.",
+  "ferrule-photonics":
+    "Genuinely overlooked. Everyone funds photonic chips and nobody funds the alignment step that sets their cost. Timing risk on co-packaged optics is a reason to be careful, not a reason to pass.",
+  be: "Passed on capital efficiency and history rather than on current demand. Two decades of losses and repeated financing is a pattern, and the demand driver is a grid constraint utilities are actively working to remove.",
+  "ravelin-data":
+    "Best retention in the private set on the least capital. The single question that matters is retention among customers whose warehouse vendor has already shipped native lineage.",
 };
 
-interface Override {
-  status?: PipelineStatus;
-  notes?: string;
+function truncate(text: string, max: number): string {
+  return text.length > max ? `${text.slice(0, max - 3)}...` : text;
 }
 
-type OverrideMap = Record<string, Override>;
-
-function readOverrides(): OverrideMap {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as OverrideMap) : {};
-  } catch {
-    return {};
-  }
-}
-
-function writeOverrides(map: OverrideMap): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
-}
-
-function baseRecord(company: Company): LeadRecord {
+export function baseFields(row: UniverseRow): PipelineFields {
   return {
-    ...company,
-    status: DEFAULT_STATUS[company.id] ?? "New Signal",
-    notes: DEFAULT_NOTES[company.id] ?? "",
+    status: DEFAULT_STATUS[row.id] ?? "New lead",
+    priority: DEFAULT_PRIORITY[row.id] ?? "Medium",
+    owner: "Sahil Modi",
+    dateSourced: row.lastReviewed,
+    lastActivity: row.lastReviewed,
+    nextStep: truncate(row.recommendedNextStep, 150),
+    nextStepDate: TODAY,
+    notes: DEFAULT_NOTES[row.id] ?? "",
+    keyRisk: row.investmentRisk,
+    source:
+      row.marketType === "Public" ? "Public market screen" : "Sector research",
   };
 }
 
-export function loadLeads(): LeadRecord[] {
-  const overrides = readOverrides();
-  return COMPANIES.map((c) => {
-    const base = baseRecord(c);
-    const o = overrides[c.id];
-    if (!o) return base;
-    return {
-      ...base,
-      status: o.status ?? base.status,
-      notes: o.notes ?? base.notes,
-    };
-  });
+export type Overrides = Record<string, Partial<PipelineFields>>;
+export type WorkflowRow = UniverseRow & PipelineFields;
+
+/* -------------------------------------------------------------------------- */
+/* The external store                                                         */
+/* -------------------------------------------------------------------------- */
+
+const EMPTY_OVERRIDES: Overrides = Object.freeze({});
+
+const listeners = new Set<() => void>();
+
+function subscribe(onChange: () => void): () => void {
+  listeners.add(onChange);
+  // Keep multiple tabs consistent with each other.
+  window.addEventListener("storage", onChange);
+  return () => {
+    listeners.delete(onChange);
+    window.removeEventListener("storage", onChange);
+  };
 }
 
-export function updateStatus(id: string, status: PipelineStatus): void {
-  const overrides = readOverrides();
-  overrides[id] = { ...overrides[id], status };
-  writeOverrides(overrides);
+function emit(): void {
+  for (const listener of listeners) listener();
 }
 
-export function updateNotes(id: string, notes: string): void {
-  const overrides = readOverrides();
-  overrides[id] = { ...overrides[id], notes };
-  writeOverrides(overrides);
+function readRaw(key: string): string | null {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    // Storage can be unavailable in private browsing. Losing local workflow
+    // edits is acceptable; breaking the page is not.
+    return null;
+  }
 }
 
-export function resetDemo(): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.removeItem(STORAGE_KEY);
+function writeRaw(key: string, value: string): void {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Non-fatal, as above.
+  }
+}
+
+/**
+ * useSyncExternalStore requires a referentially stable snapshot, so the parsed
+ * overrides are cached and only re-parsed when the underlying string changes.
+ */
+let cachedRaw: string | null = null;
+let cachedOverrides: Overrides = EMPTY_OVERRIDES;
+
+function getOverridesSnapshot(): Overrides {
+  const raw = readRaw(STORAGE_KEY);
+  if (raw === cachedRaw) return cachedOverrides;
+  cachedRaw = raw;
+  if (!raw) {
+    cachedOverrides = EMPTY_OVERRIDES;
+    return cachedOverrides;
+  }
+  try {
+    cachedOverrides = JSON.parse(raw) as Overrides;
+  } catch {
+    cachedOverrides = EMPTY_OVERRIDES;
+  }
+  return cachedOverrides;
+}
+
+function getOverridesServerSnapshot(): Overrides {
+  return EMPTY_OVERRIDES;
+}
+
+/** The current workflow overrides, kept in sync with local storage. */
+export function useOverrides(): Overrides {
+  return useSyncExternalStore(
+    subscribe,
+    getOverridesSnapshot,
+    getOverridesServerSnapshot,
+  );
+}
+
+export function mergeRow(row: UniverseRow, overrides: Overrides): WorkflowRow {
+  return { ...row, ...baseFields(row), ...(overrides[row.id] ?? {}) };
+}
+
+export function mergeRows(
+  rows: UniverseRow[],
+  overrides: Overrides,
+): WorkflowRow[] {
+  return rows.map((r) => mergeRow(r, overrides));
+}
+
+export function updateRecord(id: string, patch: Partial<PipelineFields>): void {
+  const current = getOverridesSnapshot();
+  const next: Overrides = {
+    ...current,
+    [id]: { ...current[id], ...patch, lastActivity: TODAY },
+  };
+  writeRaw(STORAGE_KEY, JSON.stringify(next));
+  emit();
+}
+
+export function resetWorkflow(): void {
+  try {
+    window.localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Non-fatal.
+  }
+  emit();
+}
+
+/* -------------------------------------------------------------------------- */
+/* Mandate selection, also persisted locally                                  */
+/* -------------------------------------------------------------------------- */
+
+function getMandateSnapshot(): string | null {
+  return readRaw(MANDATE_KEY);
+}
+
+function getMandateServerSnapshot(): string | null {
+  return null;
+}
+
+/** The stored mandate id, or null when the visitor has not chosen one. */
+export function useStoredMandate(): string | null {
+  return useSyncExternalStore(
+    subscribe,
+    getMandateSnapshot,
+    getMandateServerSnapshot,
+  );
+}
+
+export function storeMandate(id: string): void {
+  writeRaw(MANDATE_KEY, id);
+  emit();
 }
