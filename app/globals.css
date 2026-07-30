@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-canvas text-ink antialiased;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Respect users who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@layer components {
+  /* The single page container. Nav, footer, and every page use this so the
+     left and right edges line up across the whole site. */
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Centered reading column for long-form pages. Text inside stays
+     left-aligned; only the column itself is centered. */
+  .content-column {
+    @apply mx-auto w-full max-w-3xl;
+  }
+
+  .card {
+    @apply rounded-xl border border-line bg-surface shadow-card;
+  }
+
+  .card-hover {
+    @apply card transition-shadow hover:shadow-lift;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-accent text-white hover:bg-accent-hover;
+  }
+
+  .btn-secondary {
+    @apply btn border border-line bg-surface text-ink-soft hover:border-line-strong hover:bg-canvas;
+  }
+
+  .btn-ghost {
+    @apply btn text-ink-soft hover:bg-canvas;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors placeholder:text-ink-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20;
+  }
+
+  .label {
+    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-ink-muted;
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-accent;
+  }
+
+  /* Small neutral metadata pill. */
+  .chip {
+    @apply inline-flex items-center whitespace-nowrap rounded-md border border-line bg-canvas px-2 py-0.5 text-xs font-medium text-ink-soft;
+  }
+
+  /* Section heading used across the marketing pages. */
+  .h-section {
+    @apply text-xl font-semibold tracking-tight text-ink sm:text-2xl;
+  }
+}

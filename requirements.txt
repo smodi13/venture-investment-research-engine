@@ -1,0 +1,8 @@
+requests>=2.31
+pydantic>=2.6
+pandas>=2.1
+PyYAML>=6.0
+python-dotenv>=1.0
+pytest>=8.0
+# Optional: LLM analysis for the top-10 candidates (guarded, off by default).
+anthropic>=0.40

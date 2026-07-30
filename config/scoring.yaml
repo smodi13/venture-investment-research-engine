@@ -1,0 +1,113 @@
+# Primary Sourcing Score configuration.
+#
+# The engine calculates EVERY score deterministically from extracted evidence
+# and the weights below. The LLM never assigns a numeric score.
+#
+# Max total = 100. Component maxima are fixed by the mandate; the sub-signal
+# points within each component are tunable but should sum to <= the component max.
+
+components:
+  role_thesis_fit:
+    max: 20
+    # Points per matched technical-keyword category (capped at max).
+    points_per_category: 7
+    # Bonus if the company matched query group A/B/C (core thesis families).
+    core_family_bonus: 6
+
+  founder_startup_fit:            # EXACT phrase required by spec
+    max: 15
+    # Deterministic proxies ONLY. Never follower count / virality / writing style.
+    prior_relevant_work: 4        # bio/text shows directly relevant domain/role history
+    technical_domain_experience: 3
+    prior_products_or_oss: 3      # linked GitHub, "creator of", prior product
+    problem_specificity: 2        # specific problem articulation (deterministic heuristic)
+    evidence_of_shipping: 2       # shipping/changelog signals present
+    focus_consistency: 1          # consistent topic across multiple posts
+
+  product_technical_evidence:
+    max: 20
+    level_a_artifact: 8           # each Level A artifact (capped)
+    per_additional_artifact: 4
+    live_product_bonus: 4
+
+  customer_pull:
+    max: 15
+    # Every customer/adoption input is scored BY EVIDENCE LEVEL, never as proven.
+    level_a_customer_evidence: 8  # public case study / logo / third-party verifiable
+    level_b_customer_claim: 4     # founder-reported customer/metric
+    level_c_third_party: 6        # independent developer/customer discussing usage
+
+  workflow_depth:
+    max: 15
+    deep_integration_signal: 6    # integrations / system-of-record language
+    multi_step_workflow: 5        # replaces a multi-step process, not a point tool
+    retention_signal: 4           # daily/production/embedded usage language
+
+  defensibility:
+    max: 10
+    proprietary_data_loop: 4
+    integrations_moat: 3
+    technical_depth: 3
+
+  shipping_momentum:
+    max: 5
+    recent_shipping_signal: 3     # shipping signal within decay window
+    multiple_shipping_signals: 2
+
+# ---------------------------------------------------------------------------
+# PENALTIES -- configurable and applied SEPARATELY (subtracted after component
+# scoring, floored at 0). Kept transparent so reviewers can tune each one.
+# ---------------------------------------------------------------------------
+penalties:
+  excessive_buzzwords_no_problem: 6   # buzzword density high AND no specific problem
+  no_identifiable_customer_or_usecase: 5
+  services_business_as_software: 8    # "we do X for you" agency-style framing
+  claims_without_evidence: 5          # Level B/D claims with zero Level A/C support
+  outside_sector_focus: 10            # no technical-keyword category matched at all
+
+# Buzzword bank used by the excessive-buzzwords penalty (density heuristic).
+buzzwords:
+  - "revolutionary"
+  - "game-changing"
+  - "cutting-edge"
+  - "next-generation"
+  - "next-gen"
+  - "disrupt"
+  - "disruptive"
+  - "synergy"
+  - "paradigm"
+  - "world-class"
+  - "state-of-the-art"
+  - "unprecedented"
+  - "10x everything"
+  - "supercharge"
+  - "unlock"
+  - "seamless"
+  - "frictionless"
+
+# ---------------------------------------------------------------------------
+# DISCOVERY STATUS -- NON-scoring label. Tie-breaker only. Thresholds are on
+# author follower count (used ONLY here, never in the numeric score).
+# ---------------------------------------------------------------------------
+discovery_status:
+  under_the_radar_max_followers: 500
+  emerging_max_followers: 5000
+  already_visible_max_followers: 50000
+  # Above already_visible_max_followers => "Widely known".
+
+# ---------------------------------------------------------------------------
+# TIME DECAY -- recency weighting for time-sensitive signals only.
+# Enduring facts (founder background, product category, architecture) are exempt
+# (handled in evidence.py via DECAYABLE_SIGNALS).
+# ---------------------------------------------------------------------------
+time_decay:
+  full_weight_days: 7        # 0-7 days   => 1.00
+  high_weight_days: 30       # 8-30 days  => 0.90
+  medium_weight_days: 90     # 31-90 days => 0.70
+  context_only_days: 180     # 91-180 days => 0.30 (context only)
+  weights:
+    full: 1.0
+    high: 0.9
+    medium: 0.7
+    context_only: 0.3
+    background: 0.1          # > 180 days => background only

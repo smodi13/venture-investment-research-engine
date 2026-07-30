@@ -1,0 +1,49 @@
+# X API pricing / cost reference for volume assessment and the staleness gate.
+#
+# The engine does NOT hardcode live prices. These values are a reviewer-supplied
+# reference used only to (a) show a rough volume/cost assessment during approval
+# and (b) force acknowledgement when the reference is stale.
+#
+# If `updated_at` is older than `staleness_days`, a live search must fail closed
+# UNLESS the reviewer passes --acknowledge-stale-pricing.
+
+updated_at: "2026-07-18"        # UTC date this pricing reference was last verified
+staleness_days: 30              # after this many days, pricing is considered stale
+currency: "USD"
+pricing_config_version: 1       # bump when any rate/budget below changes
+
+# NOTE: volume-assessment thresholds are NOT pricing. They live in
+# config/query_analysis.yaml. This file contains only cost/pricing assumptions.
+
+# ---------------------------------------------------------------------------
+# COST RATES (USD). Monetary values are QUOTED DECIMAL STRINGS and are parsed
+# with decimal.Decimal (never floats). The application reads these; it must NOT
+# hardcode rates in source. Reconcile against the real X API console after each run.
+# ---------------------------------------------------------------------------
+costs:
+  post_read_usd: "0.005"              # one Post resource read (recent search)
+  user_read_usd: "0.010"              # one /2/users/... lookup (User resource)
+  counts_recent_request_usd: "0.005"  # one /2/tweets/counts/recent request
+
+# Per-run budgets.
+run_budget:
+  global_run_budget_usd: "5.000"          # historical count-preflight run budget
+  global_canary_budget_usd: "0.070"       # least-privilege ten-post canary budget
+  global_enrichment_budget_usd: "0.040"   # targeted 3-user enrichment (0.030 + 0.010 margin)
+  global_pilot_post_budget_usd: "1.600"   # six-query pilot, 300 posts (1.500 + 0.100 margin)
+  global_pilot_enrichment_budget_usd: "0.100"  # pilot-shortlist 8-user enrichment (0.080 + 0.020 margin)
+  broad_market_count_budget_usd: "0.150"          # 20-query count preflight (0.100 + 0.050 margin)
+  broad_market_post_budget_usd: "20.500"          # 4000-post broad run (20.000 + 0.500 margin)
+  broad_market_future_enrichment_budget_usd: "0.350"  # future 30-profile enrichment (0.300 + 0.050 margin)
+
+# Project-level credit accounting (X API credit allowance).
+project_credit:
+  total_allowance_usd: "25.000"
+  current_estimated_spend_usd: "1.085"
+
+# Project-to-date rollup. `previous_estimated_spend_usd` is the estimated spend
+# of ALL prior runs BEFORE the current run (the auth-preflight user lookup at
+# 0.010). It must NOT be charged against the current-run budget.
+project_to_date:
+  previous_estimated_spend_usd: "0.010"
+  cumulative_observed_console_spend_usd: null   # pending manual reconciliation

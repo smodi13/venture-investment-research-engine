@@ -1,0 +1,80 @@
+# Platform Absorption Risk overlay (0-100, HIGHER IS WORSE) plus the
+# category-specific absorber lookup and the Visible Feature Replication Test.
+#
+# This overlay is SEPARATE from the Primary Sourcing Score. It never reduces the
+# score directly; it routes leads to classifications (see classify.py).
+
+# ---------------------------------------------------------------------------
+# ABSORPTION RISK FACTORS -- each contributes points when its heuristic fires.
+# Sum is capped at 100.
+# ---------------------------------------------------------------------------
+risk_factors:
+  core_value_is_prompt_plus_api: 20     # product is essentially prompt + model API
+  model_provider_offers_adjacent: 15    # a leading model provider ships adjacent function
+  incumbent_owns_workflow: 15           # incumbent owns the primary workflow
+  depends_on_single_model_provider: 10  # single-provider dependency
+  no_proprietary_data_or_loop: 10       # no data/learning loop
+  no_meaningful_integrations: 10        # no meaningful integrations
+  multiple_clones_exist: 10             # multiple credible clones
+  low_switching_cost: 10                # little migration effort to switch away
+
+# ---------------------------------------------------------------------------
+# CATEGORY-SPECIFIC ABSORBER LOOKUP -- small table, not a taxonomy system.
+# Category keys correspond to technical_keywords groups in keywords.yaml.
+# ---------------------------------------------------------------------------
+absorbers:
+  coding_tools:
+    - GitHub
+    - Microsoft
+    - Anthropic
+    - OpenAI
+    - JetBrains
+  observability:
+    - Datadog
+    - Splunk
+    - Grafana
+    - ServiceNow
+    - New Relic
+  data_infrastructure:
+    - Snowflake
+    - Databricks
+    - AWS
+    - Google Cloud
+    - Microsoft Azure
+  security:
+    - Palo Alto Networks
+    - CrowdStrike
+    - Wiz
+    - Microsoft
+    - Cloudflare
+  workflow_software:
+    - Salesforce
+    - ServiceNow
+    - Atlassian
+    - HubSpot
+
+# ---------------------------------------------------------------------------
+# VISIBLE FEATURE REPLICATION TEST (renamed from "Weekend Developer Test").
+# The engine assigns one of these levels deterministically from evidence signals.
+# Higher difficulty = harder for an outsider to replicate from public surface.
+# ---------------------------------------------------------------------------
+replication_levels:
+  - very_low
+  - low
+  - moderate
+  - high
+  - very_high
+
+# Mandatory disclaimer attached to every replication result.
+replication_disclaimer: >-
+  This assessment is based on public product functionality. The company may have
+  deeper infrastructure, data, integrations, or operational complexity that is
+  not publicly visible.
+
+# Heuristic thresholds: each present factor pushes difficulty UP.
+replication_difficulty_signals:
+  proprietary_data_loop: 2
+  deep_integrations: 2
+  technical_depth_artifacts: 1     # github/docs/benchmark present
+  multi_step_workflow: 1
+  # Absence of all of the above => very_low / low.

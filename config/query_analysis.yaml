@@ -1,0 +1,16 @@
+# Query-analysis configuration (NON-pricing).
+#
+# Volume-assessment thresholds for recent-count totals. These labels describe
+# VOLUME ONLY and must never automatically set a human decision.
+#
+# Inclusive upper bounds; anything above broad_max is very_broad:
+#   empty:      0
+#   very_low:   1 - 15
+#   manageable: 16 - 500
+#   broad:      501 - 2000
+#   very_broad: 2001+
+volume_bands:
+  empty_max: 0
+  very_low_max: 15
+  manageable_max: 500
+  broad_max: 2000

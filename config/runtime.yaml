@@ -1,0 +1,17 @@
+# Operational runtime safeguards (non-cost, non-query).
+#
+# Header-aware bounded rate-limit handling. NO fixed 60s retry: the wait is
+# computed from x-rate-limit-reset, bounded by policy, and permits at most one
+# retry that also re-checks approval validity, budget gates, and the relative
+# window before proceeding.
+rate_limit_policy:
+  max_retries: 1
+  max_auto_wait_seconds: 120
+  reset_safety_seconds: 2
+
+# Explicit connect + read timeouts. These are SEPARATE limits, not a single
+# guaranteed total wall-clock ceiling. Both must be present, numeric, finite,
+# > 0, and within the configured maximum.
+http:
+  connect_timeout_seconds: 5
+  read_timeout_seconds: 30

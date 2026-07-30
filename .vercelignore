@@ -1,0 +1,21 @@
+# Never upload secrets to the deployment
+.env
+.env.*
+
+# Python sourcing engine and its data are not part of the web deployment
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+src/
+tests/
+config/
+data/
+scratch_build/
+pyproject.toml
+requirements.txt
+
+# Local dev artifacts
+.playwright-mcp/
+*.png
+docs/

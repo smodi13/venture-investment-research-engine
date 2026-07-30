@@ -1,0 +1,38 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Node / Next.js (web app)
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.vercel/
+
+# Python (sourcing engine)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Engine artifacts and any scraped API data (keep out of a public repo)
+data/
+scratch_build/__pycache__/
+config/*_decisions.yaml
+
+# OS
+.DS_Store
+
+# Local dev artifacts
+.playwright-mcp/
+*.png
+.vercel
+.env*
+
+# Re-assert after the broad .env* rule above: the template carries no real values.
+!.env.example

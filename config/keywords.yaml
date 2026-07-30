@@ -1,0 +1,220 @@
+# Keyword banks for DETERMINISTIC first-pass extraction and filtering.
+# No LLM is involved in any of this. All matching is case-insensitive and done
+# against post text, expanded URLs, and user bios.
+#
+# Every list here is intentionally editable. Reviewers should tune these rather
+# than touching Python logic.
+
+# ---------------------------------------------------------------------------
+# SIGNAL EXTRACTION -- maps a signal category to trigger phrases.
+# Signal categories drive both evidence tagging and time-decay weighting.
+# ---------------------------------------------------------------------------
+signals:
+  launch:
+    - "just launched"
+    - "we launched"
+    - "launching"
+    - "now live"
+    - "go live"
+    - "public beta"
+    - "private beta"
+    - "early access"
+    - "now available"
+    - "ga "
+    - "general availability"
+    - "product hunt"
+    - "shipped"
+    - "just shipped"
+    - "released"
+  customer:
+    - "our customers"
+    - "first customer"
+    - "paying customer"
+    - "signed"
+    - "onboarded"
+    - "in production"
+    - "using us"
+    - "customers are"
+    - "landed"
+    - "closed our first"
+  usage:
+    - "users"
+    - "developers using"
+    - "requests per"
+    - "queries per"
+    - "processed"
+    - "handled"
+    - "downloads"
+    - "stars on github"
+    - "active users"
+  design_partner:
+    - "design partner"
+    - "design partners"
+    - "looking for partners"
+    - "pilot with"
+    - "working with a few"
+    - "select customers"
+  hiring:
+    - "founding engineer"
+    - "founding team"
+    - "we're hiring"
+    - "were hiring"
+    - "join us"
+    - "hiring our first"
+    - "first engineering hire"
+  shipping:
+    - "changelog"
+    - "release notes"
+    - "v1"
+    - "v0."
+    - "new feature"
+    - "just added"
+    - "now supports"
+    - "building in public"
+
+# ---------------------------------------------------------------------------
+# ARTIFACT / URL CLASSIFICATION -- how expanded URLs are categorised.
+# A matched host/path fragment implies a Level A verifiable artifact.
+# ---------------------------------------------------------------------------
+artifact_url_patterns:
+  github: ["github.com", "gitlab.com"]
+  docs: ["docs.", "/docs", "readme", "documentation", "developer."]
+  pricing: ["/pricing", "pricing.", "/plans"]
+  changelog: ["/changelog", "changelog.", "/releases", "release-notes"]
+  demo: ["/demo", "loom.com", "youtube.com/watch", "youtu.be"]
+  producthunt: ["producthunt.com"]
+  # Anything else that looks like a company site is treated as a product URL
+  # (see filters.py PRODUCT_TLD_HINTS).
+
+# ---------------------------------------------------------------------------
+# FOUNDER / BUILDER LANGUAGE -- signals the author is a founder/active builder.
+# Checked in BOTH the post text and the user's bio.
+# ---------------------------------------------------------------------------
+founder_language:
+  - "founder"
+  - "co-founder"
+  - "cofounder"
+  - "ceo"
+  - "cto"
+  - "building"
+  - "we're building"
+  - "were building"
+  - "i'm building"
+  - "im building"
+  - "we are building"
+  - "started a company"
+  - "left my job"
+  - "quit my job"
+  - "working on"
+  - "creator of"
+  - "author of"
+  - "maker of"
+
+# Language that specifically indicates STEALTH status (no public product yet).
+stealth_language:
+  - "stealth"
+  - "coming soon"
+  - "more soon"
+  - "wip"
+  - "work in progress"
+  - "can't share yet"
+  - "cant share yet"
+  - "dm me"
+  - "waitlist"
+  - "early to share"
+
+# ---------------------------------------------------------------------------
+# QUANTITATIVE CLAIM DETECTION -- regex fragments (compiled in filters.py).
+# Presence of a number + a metric noun => a founder-reported quantitative claim.
+# ---------------------------------------------------------------------------
+quant_metric_nouns:
+  - "customers"
+  - "users"
+  - "developers"
+  - "arr"
+  - "mrr"
+  - "revenue"
+  - "requests"
+  - "queries"
+  - "stars"
+  - "downloads"
+  - "signups"
+  - "waitlist"
+  - "%"
+  - "x faster"
+  - "x cheaper"
+
+# ---------------------------------------------------------------------------
+# THIRD-PARTY (Level C) LANGUAGE -- someone describing usage of a product.
+# ---------------------------------------------------------------------------
+third_party_language:
+  - "we've been using"
+  - "we have been using"
+  - "switched to"
+  - "we use"
+  - "shoutout to"
+  - "shout out to"
+  - "check out"
+  - "has been a game changer"
+  - "recommend"
+
+# ---------------------------------------------------------------------------
+# ROLE / THESIS-FIT TECHNICAL KEYWORDS -- relevance to the Headline mandate.
+# Grouped by category to also support Platform Absorption absorber lookup.
+# ---------------------------------------------------------------------------
+technical_keywords:
+  coding_tools:
+    - "code review"
+    - "coding agent"
+    - "autocomplete"
+    - "ide"
+    - "pull request"
+    - "unit test"
+    - "codegen"
+    - "refactor"
+  observability:
+    - "observability"
+    - "tracing"
+    - "monitoring"
+    - "logs"
+    - "metrics"
+    - "incident"
+    - "on-call"
+    - "alerting"
+  data_infrastructure:
+    - "data pipeline"
+    - "etl"
+    - "data warehouse"
+    - "lakehouse"
+    - "streaming"
+    - "data engineering"
+    - "vector database"
+    - "embeddings"
+  security:
+    - "security"
+    - "vulnerability"
+    - "threat"
+    - "sast"
+    - "secrets"
+    - "compliance"
+    - "soc2"
+    - "pentest"
+  workflow_software:
+    - "workflow"
+    - "automation"
+    - "crm"
+    - "back-office"
+    - "operations"
+    - "ticket"
+    - "integration"
+    - "system of record"
+  agent_infra:
+    - "agent"
+    - "mcp"
+    - "orchestration"
+    - "sandbox"
+    - "runtime"
+    - "inference"
+    - "eval"
+    - "model serving"
+    - "context"
