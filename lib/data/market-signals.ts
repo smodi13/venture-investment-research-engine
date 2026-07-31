@@ -25,7 +25,7 @@ export const MARKET_SIGNALS: MarketSignalCompany[] = [
     ticker: "NVDA",
     exchange: "NASDAQ",
     website: "https://investor.nvidia.com/",
-    sector: "AI Infrastructure",
+    sector: "AI Software Infrastructure",
     signalUses: [
       "Capital expenditure trend",
       "Customer demand indicator",
@@ -37,7 +37,7 @@ export const MARKET_SIGNALS: MarketSignalCompany[] = [
     howToRead:
       "Read the direction and the constraint commentary, not the absolute figures. What it does not tell you is how that compute is split between training and inference, which is the variable that matters most for the private inference companies in this universe and which no company discloses precisely.",
     relatedPrivateIds: ["etched", "d-matrix", "ayar-labs", "lightmatter"],
-    sourceIds: ["nvda-ir", "sec-edgar"],
+    sourceIds: ["nvda-edgar", "nvda-ir", "sec-edgar"],
     lastReviewed: REVIEWED,
   },
   {
@@ -109,7 +109,7 @@ export const MARKET_SIGNALS: MarketSignalCompany[] = [
     howToRead:
       "Book-to-bill is a leading indicator for the whole downstream chain. A sustained reading below one would be an early warning for every company in this universe that depends on data centre construction.",
     relatedPrivateIds: ["base-power", "antora-energy", "radiant-industries"],
-    sourceIds: ["vrt-ir", "sec-edgar"],
+    sourceIds: ["vrt-edgar", "vrt-ir", "sec-edgar"],
     lastReviewed: REVIEWED,
   },
   {

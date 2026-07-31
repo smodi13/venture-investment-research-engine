@@ -101,7 +101,7 @@ export const COMPANIES_G: PrivateCompany[] = [
         {
           claim:
             "The February 2026 round, its investors, and the expansion of production deployments across health plans were independently reported.",
-          sourceId: "anterior-fierce",
+          sourceId: "anterior-medcity",
           basis: "verified",
           provenance: "Independently verified",
         },
@@ -254,7 +254,7 @@ export const COMPANIES_G: PrivateCompany[] = [
     dataConfidence: "Medium",
     dataConfidenceNote:
       "Financing, investors, the named health plan customer, and the platform integration are supported by the company's own announcement with independent reporting of the Series A. Founders, founding year, revenue, pricing, and the series designation of the most recent round are not disclosed.",
-    sourceIds: ["anterior-raise", "anterior-fierce"],
+    sourceIds: ["anterior-raise", "anterior-medcity"],
     lastReviewed: REVIEWED,
   },
 

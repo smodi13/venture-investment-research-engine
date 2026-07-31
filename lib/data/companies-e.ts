@@ -657,7 +657,7 @@ export const COMPANIES_E: PrivateCompany[] = [
     region: "Europe",
     foundedYear: 2022,
     founders: ["Nikolaus West", "Emil Ernerfeldt", "Moritz Schiebold"],
-    sector: "AI Infrastructure",
+    sector: "AI Software Infrastructure",
     subsector: "Multimodal data infrastructure for physical AI",
     description:
       "Builds an open source framework for logging and visualising the multimodal data that robots and autonomous systems produce, and a commercial database designed for that data shape.",
@@ -743,10 +743,10 @@ export const COMPANIES_E: PrivateCompany[] = [
         },
         {
           claim:
-            "The company describes the multimodal data stack and the commercial database it is building on top of the open source framework.",
-          sourceId: "rerun-arctic",
+            "Original reporting on the seed round, the lead investor, the Stockholm base, the 2022 founding, total funding of 20.2 million dollars, and adoption of the open source framework by major technology companies.",
+          sourceId: "rerun-techcrunch",
           basis: "verified",
-          provenance: "Company-reported",
+          provenance: "Independently verified",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -956,7 +956,7 @@ export const COMPANIES_E: PrivateCompany[] = [
     dataConfidence: "High",
     dataConfidenceNote:
       "Founders, founding year, financing, investors, total raised, and named open source adoption are supported by the company's funding announcement with the company's own technical writing corroborating the product direction. Revenue, pricing, and paid customer counts are not disclosed.",
-    sourceIds: ["rerun-globenewswire", "rerun-arctic"],
+    sourceIds: ["rerun-globenewswire", "rerun-techcrunch"],
     lastReviewed: REVIEWED,
   },
 

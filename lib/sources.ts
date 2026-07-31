@@ -60,6 +60,15 @@ export interface Source {
   primary: boolean;
   /** Who did the reporting, which decides what a claim citing it can be called. */
   reporting: SourceReporting;
+  /**
+   * False when the publisher blocks automated requests.
+   *
+   * These links open normally in a browser, so they stay in the registry, but
+   * a reviewer running a link checker will see them fail. Every record that
+   * cites one must also cite a source that opens without a browser, which the
+   * integrity suite enforces.
+   */
+  automatedAccess: boolean;
 }
 
 /**
@@ -96,6 +105,7 @@ function s(
   supports: string,
   primary: boolean,
   reporting?: SourceReporting,
+  automatedAccess = true,
 ): Source {
   return {
     id,
@@ -109,6 +119,7 @@ function s(
     supports,
     primary,
     reporting: reporting ?? defaultReporting(type),
+    automatedAccess,
   };
 }
 
@@ -205,7 +216,9 @@ export const SOURCES: Source[] = [
     "Technology publication",
     "2026-03-04",
     "https://www.datacenterdynamics.com/en/news/optical-interconnect-startup-ayar-labs-closes-500m-funding-round-backed-by-nvidia-and-amd/",
-    "Independent corroboration of the Series E, its strategic investors, and the co-packaged optics product.",
+    "Independent corroboration of the Series E, its strategic investors, and the co-packaged optics product. This publisher blocks automated requests; it opens normally in a browser, and the same facts are also carried by an accessible source.",
+    false,
+    "Independent reporting",
     false,
   ),
 
@@ -229,7 +242,9 @@ export const SOURCES: Source[] = [
     "Technology publication",
     "2024-10-16",
     "https://www.datacenterdynamics.com/en/news/photonic-computing-company-lightmatter-achieves-44bn-valuation-from-400m-series-d-funding-round/",
-    "Series D financing amount and valuation, independently reported.",
+    "Series D financing amount and valuation, independently reported. This publisher blocks automated requests; it opens normally in a browser, and the same facts are also carried by an accessible source.",
+    false,
+    "Independent reporting",
     false,
   ),
 
@@ -397,7 +412,9 @@ export const SOURCES: Source[] = [
     "Business publication",
     "2025-04-23",
     "https://www.geekwire.com/2025/cybersecurity-startup-chainguard-lands-356m-now-valued-at-3-5b/",
-    "Independent corroboration of the Series D amount, valuation, and Kirkland headquarters.",
+    "Independent corroboration of the Series D amount, valuation, and Kirkland headquarters. This publisher blocks automated requests; it opens normally in a browser, and the same facts are also carried by an accessible source.",
+    false,
+    "Independent reporting",
     false,
   ),
 
@@ -494,8 +511,10 @@ export const SOURCES: Source[] = [
     "Company announcement",
     "2025-05-28",
     "https://www.radiantnuclear.com/blog/series-c-close/",
-    "Series C close, total venture funding to date, and the investor list.",
+    "Series C close, total venture funding to date, and the investor list. This publisher blocks automated requests; it opens normally in a browser, and the same facts are also carried by an accessible source.",
     true,
+    "Company statement",
+    false,
   ),
   s(
     "radiant-seriesd",
@@ -505,8 +524,10 @@ export const SOURCES: Source[] = [
     "Company announcement",
     "2025-12-17",
     "https://www.radiantnuclear.com/blog/series-d-announcement/",
-    "The subsequent financing round and the plan to mass-produce the Kaleidos microreactor.",
+    "The subsequent financing round and the plan to mass-produce the Kaleidos microreactor. This publisher blocks automated requests; it opens normally in a browser, and the same facts are also carried by an accessible source.",
     true,
+    "Company statement",
+    false,
   ),
   s(
     "radiant-wna",
@@ -575,7 +596,9 @@ export const SOURCES: Source[] = [
     "Business publication",
     "2025-10-08",
     "https://www.geekwire.com/2025/stoke-space-510m-nova-rocket/",
-    "Independent corroboration of the financing and the Kent, Washington base of operations.",
+    "Independent corroboration of the financing and the Kent, Washington base of operations. This publisher blocks automated requests; it opens normally in a browser, and the same facts are also carried by an accessible source.",
+    false,
+    "Independent reporting",
     false,
   ),
 
@@ -636,8 +659,10 @@ export const SOURCES: Source[] = [
     "Official company website",
     "2026-07-30",
     "https://investor.nvidia.com/",
-    "Data centre segment reporting and management commentary on accelerated computing demand.",
+    "Data centre segment reporting and management commentary on accelerated computing demand. This site blocks automated requests; the audited filings behind it are registered separately and open freely.",
     true,
+    "Company statement",
+    false,
   ),
   s(
     "avgo-site",
@@ -680,8 +705,10 @@ export const SOURCES: Source[] = [
     "Official company website",
     "2026-07-30",
     "https://investors.vertiv.com/",
-    "Orders, backlog, and book-to-bill disclosure for data centre power and thermal management.",
+    "Orders, backlog, and book-to-bill disclosure for data centre power and thermal management. This site blocks automated requests; the audited filings behind it are registered separately and open freely.",
     true,
+    "Company statement",
+    false,
   ),
   s(
     "mrvl-celestial",
@@ -778,16 +805,15 @@ export const SOURCES: Source[] = [
     true,
   ),
   s(
-    "rerun-arctic",
+    "rerun-techcrunch",
     "Rerun",
-    "Nordic startup secures $17M seed to build multimodal data infrastructure for physical AI",
-    "ArcticStartup",
+    "Rerun's open-source AI platform for robots, drones and cars revs up with $17M seed",
+    "TechCrunch",
     "Technology publication",
-    "2025-03-21",
-    "https://arcticstartup.com/rerun-raises-17m-seed/",
-    "Independent reporting on the seed round, the Stockholm base, and open-source adoption of the visualisation tools.",
+    "2025-03-20",
+    "https://techcrunch.com/2025/03/20/reruns-open-source-ai-platform-for-robots-drones-and-cars-revs-up-with-17m-seed/",
+    "Original reporting on the 17 million dollar seed round, the lead investor, the Stockholm base, the 2022 founding, total funding of 20.2 million dollars, and open-source adoption by major technology companies. Replaces a previously registered publication whose site stopped responding.",
     false,
-    "Wire reproduction",
   ),
 
   /* ----------------------------------------------------------- turbopuffer */
@@ -1000,7 +1026,9 @@ export const SOURCES: Source[] = [
     "Technology publication",
     "2026-04-09",
     "https://www.geekwire.com/2026/portal-space-systems-50m-starburst/",
-    "Independent reporting on the Bothell production facility, the Starburst-1 launch manifest, and headcount.",
+    "Independent reporting on the Bothell production facility, the Starburst-1 launch manifest, and headcount. This publisher blocks automated requests; it opens normally in a browser, and the same facts are also carried by accessible sources.",
+    false,
+    "Independent reporting",
     false,
   ),
 
@@ -1024,7 +1052,9 @@ export const SOURCES: Source[] = [
     "Business publication",
     "2026-02-16",
     "https://www.fiercehealthcare.com/ai-and-machine-learning/payer-ai-company-anterior-banks-40m-funding-round",
-    "Independent reporting on the financing, the investors, and the prior authorisation workflow the product addresses.",
+    "Independent reporting on the financing, the investors, and the prior authorisation workflow the product addresses. This publisher blocks automated requests; it opens normally in a browser, and the same facts are also carried by an accessible source.",
+    false,
+    "Independent reporting",
     false,
   ),
 
@@ -1197,6 +1227,140 @@ export const SOURCES: Source[] = [
     "The investor's account of the round, the named customer CSL, and the company-reported performance figures for asset evaluation, screening throughput, and clinical data extraction.",
     false,
     "Investor statement",
+  ),
+  /* ------------------------- Reviewer-accessible replacements and backups */
+  s(
+    "stoke-spacenews",
+    "Stoke Space",
+    "Stoke Space raises $510 million",
+    "SpaceNews",
+    "Technology publication",
+    "2025-10-08",
+    "https://spacenews.com/stoke-space-raises-510-million/",
+    "Independent corroboration of the 510 million dollar Series D, the lead investor, the accompanying debt facility, total capital raised, the Kent, Washington base, and the Nova launch vehicle programme. Added because the equivalent GeekWire report blocks automated requests.",
+    false,
+  ),
+  s(
+    "portal-starburst",
+    "Portal Space Systems",
+    "Portal unveils Starburst, an ESPA-class rapid-maneuverability spacecraft, and announces the Starburst-1 mission on SpaceX in Q4 2026",
+    "Portal Space Systems",
+    "Company announcement",
+    "2026-06-24",
+    "https://www.portalsystems.space/news/portal-unveils-starburst-an-espa-class-rapid-maneuverability-spacecraft-and-announces-starburst-1-mission-on-spacex-in-q4-2026",
+    "The Starburst spacecraft, and the Starburst-1 mission manifested on a SpaceX Transporter rideshare in the fourth quarter of 2026. Added so the launch manifest does not rest solely on a report that blocks automated requests.",
+    true,
+  ),
+  s(
+    "portal-payload",
+    "Portal Space Systems",
+    "Exclusive: Portal Unveils Starburst, Set for Flight Next Year",
+    "Payload",
+    "Technology publication",
+    "2026-06-24",
+    "https://payloadspace.com/exclusive-portal-unveils-starburst-set-for-flight-next-year/",
+    "Independent space trade reporting on the Starburst spacecraft, the Bothell production facility, and the first flight schedule.",
+    false,
+  ),
+  s(
+    "nvda-edgar",
+    "NVIDIA",
+    "NVIDIA Corporation annual report filings",
+    "US Securities and Exchange Commission, EDGAR",
+    "Regulatory filing",
+    "2026-07-30",
+    "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001045810&type=10-K&dateb=&owner=include&count=40",
+    "Audited segment reporting for the data centre business, filed rather than presented. Added because the investor relations site blocks automated requests, and a filing is the better record in any case.",
+    true,
+  ),
+  s(
+    "vrt-edgar",
+    "Vertiv",
+    "Vertiv Holdings Co annual report filings",
+    "US Securities and Exchange Commission, EDGAR",
+    "Regulatory filing",
+    "2026-07-30",
+    "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001674101&type=10-K&dateb=&owner=include&count=40",
+    "Audited disclosure of orders, backlog, and book-to-bill for data centre power and thermal management. Added because the investor relations site blocks automated requests.",
+    true,
+  ),
+  s(
+    "ayar-siliconangle",
+    "Ayar Labs",
+    "Co-packaged optics startup Ayar Labs raises $500M round backed by Nvidia, AMD",
+    "SiliconANGLE",
+    "Technology publication",
+    "2026-03-03",
+    "https://siliconangle.com/2026/03/03/co-packaged-optics-startup-ayar-labs-raises-500m-round-backed-nvidia-amd/",
+    "Independent corroboration of the 500 million dollar round, the strategic chip-maker investors, and the co-packaged optics product. Added because the equivalent Data Center Dynamics report blocks automated requests.",
+    false,
+  ),
+  s(
+    "lightmatter-eetimes",
+    "Lightmatter",
+    "Lightmatter Raises $400 Million Series D",
+    "EE Times",
+    "Technology publication",
+    "2024-10-16",
+    "https://www.eetimes.com/lightmatter-raises-400-million-series-d/",
+    "Independent electronics trade corroboration of the 400 million dollar Series D, the valuation, the lead investor, and the Passage photonic interconnect product. Added because the equivalent Data Center Dynamics report blocks automated requests.",
+    false,
+  ),
+  s(
+    "lightmatter-release",
+    "Lightmatter",
+    "Lightmatter Raises $400M Series D; Quadruples Valuation to $4.4B",
+    "Lightmatter",
+    "Company announcement",
+    "2024-10-16",
+    "https://lightmatter.co/press-release/lightmatter-raises-400m-series-d-quadruples-valuation-to-4-4b-as-photonics-leader-for-next-gen-ai-data-centers/",
+    "The company's own account of the Series D, total capital raised, and the intended deployment of Passage in partner data centres.",
+    true,
+  ),
+  s(
+    "chainguard-builtin",
+    "Chainguard",
+    "Software Security Company Chainguard Raises $356M at $3.5B Valuation",
+    "Built In Seattle",
+    "Technology publication",
+    "2025-04-24",
+    "https://www.builtinseattle.com/articles/chainguard-raises-356m-3b-valuation-20250424",
+    "Independent corroboration of the 356 million dollar Series D, the 3.5 billion dollar valuation, the co-leads, and the Kirkland, Washington base. Added because the equivalent GeekWire report blocks automated requests.",
+    false,
+  ),
+  s(
+    "radiant-ans",
+    "Radiant Industries",
+    "Radiant secures funding, moves toward microreactor testing in INL's DOME",
+    "American Nuclear Society, Nuclear Newswire",
+    "Research institution",
+    "2025-02-20",
+    "https://www.ans.org/news/article-6581/radiant-secures-funding-moves-toward-microreactor-testing-in-inls-dome/",
+    "Professional society reporting on the financing and on the scheduled Kaleidos test at the Idaho National Laboratory DOME facility. Added because the company's own announcement pages block automated requests.",
+    false,
+    "Independent reporting",
+  ),
+  s(
+    "radiant-newswire",
+    "Radiant Industries",
+    "Radiant Secures $100 Million in Series C Funding, Plans Milestone Test at INL's DOME Facility",
+    "Radiant Nuclear, distributed by Newswire",
+    "Company announcement",
+    "2025-02-19",
+    "https://www.newswire.com/news/radiant-secures-100-million-in-series-c-funding-plans-milestone-test-22466583",
+    "The company's own account of the Series C and the planned DOME test, in a distribution that opens without a browser.",
+    true,
+  ),
+  s(
+    "anterior-medcity",
+    "Anterior",
+    "Anterior Snags $40M to Speed Care Approvals with AI",
+    "MedCity News",
+    "Technology publication",
+    "2026-02-17",
+    "https://medcitynews.com/2026/02/anterior-ai-health-plan/",
+    "Independent healthcare trade corroboration of the 40 million dollar round, the investors, and the prior authorisation workflow. Added because the equivalent Fierce Healthcare report blocks automated requests.",
+    false,
   ),
 ];
 

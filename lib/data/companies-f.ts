@@ -1308,7 +1308,7 @@ export const COMPANIES_F: PrivateCompany[] = [
     technicalDifferentiation:
       "Solar thermal propulsion concentrates sunlight to heat propellant, which the company positions as delivering performance approaching nuclear thermal propulsion without carrying a reactor.",
     tractionSignal:
-      "Starburst-1, the company's first orbital vehicle, is manifested on a scheduled rideshare launch, and headcount has grown to roughly 40 with a stated plan to reach 100.",
+      "The company announced Starburst-1, its first free-flying mission with live payloads, manifested on a SpaceX Transporter rideshare in the fourth quarter of 2026, and headcount has grown to roughly 40 with a stated plan to reach 100.",
     tractionProvenance: "Independently verified",
     tractionAsOf: "2026-04-09",
     recentCatalyst:
@@ -1430,10 +1430,10 @@ export const COMPANIES_F: PrivateCompany[] = [
       adoptionEvidence: [
         {
           claim:
-            "Funding raised to support named missions. No customer contract is disclosed.",
-          sourceId: "portal-spacenews",
+            "Starburst-1 is manifested on a SpaceX Transporter rideshare in the fourth quarter of 2026, carrying live third-party payloads. No customer contract value is disclosed.",
+          sourceId: "portal-starburst",
           basis: "verified",
-          provenance: "Independently verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden: "Not applicable until a spacecraft flies.",
@@ -1531,7 +1531,12 @@ export const COMPANIES_F: PrivateCompany[] = [
     dataConfidence: "Low",
     dataConfidenceNote:
       "Financing, investors, headquarters, chief executive, the production facility, and the mission schedule are supported by the company's own press release with corroboration from two independent space publications. Total capital raised, founding year, business model, revenue, and any customer contract are not disclosed, which is why this record is marked low confidence.",
-    sourceIds: ["portal-seriesa", "portal-spacenews", "portal-geekwire"],
+    sourceIds: [
+      "portal-seriesa",
+      "portal-starburst",
+      "portal-spacenews",
+      "portal-payload",
+    ],
     lastReviewed: REVIEWED,
   },
 ];

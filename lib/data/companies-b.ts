@@ -99,7 +99,7 @@ export const COMPANIES_B: PrivateCompany[] = [
         {
           claim:
             "Series D financing and valuation independently reported by technology press.",
-          sourceId: "lightmatter-dcd",
+          sourceId: "lightmatter-eetimes",
           basis: "verified",
           provenance: "Independently verified",
         },
@@ -145,7 +145,7 @@ export const COMPANIES_B: PrivateCompany[] = [
         {
           claim:
             "The Series D was raised to fund commercial rollout of Passage, per independent reporting.",
-          sourceId: "lightmatter-dcd",
+          sourceId: "lightmatter-eetimes",
           basis: "verified",
           provenance: "Independently verified",
         },
@@ -309,7 +309,12 @@ export const COMPANIES_B: PrivateCompany[] = [
     dataConfidence: "Low",
     dataConfidenceNote:
       "Founders, founding year, product line, and the Series D are supported by the company site and independent technology press. Nothing commercial is disclosed: no customer, revenue, benchmark, or total raised. The record is marked low confidence for that reason.",
-    sourceIds: ["lightmatter-site", "lightmatter-dcd"],
+    sourceIds: [
+      "lightmatter-release",
+      "lightmatter-eetimes",
+      "lightmatter-site",
+      "lightmatter-dcd",
+    ],
     lastReviewed: REVIEWED,
   },
 

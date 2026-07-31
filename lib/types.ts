@@ -108,7 +108,7 @@ export interface Evidence {
 /* -------------------------------------------------------------------------- */
 
 export type Sector =
-  | "AI Infrastructure"
+  | "AI Software Infrastructure"
   | "Semiconductors & Advanced Computing"
   | "Robotics & Autonomy"
   | "Quantum Computing"
@@ -120,7 +120,7 @@ export type Sector =
   | "Healthcare Technology";
 
 export const SECTORS: Sector[] = [
-  "AI Infrastructure",
+  "AI Software Infrastructure",
   "Semiconductors & Advanced Computing",
   "Robotics & Autonomy",
   "Quantum Computing",

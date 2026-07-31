@@ -29,6 +29,16 @@ export interface Mandate {
   targetStages: string;
   /** Quality-factor weights, summing to 100. Relevance is applied separately. */
   weights: Record<FactorKey, number>;
+  /**
+   * The sectors this mandate considers squarely in scope, written out by hand.
+   *
+   * This duplicates what `sectorAffinity` already encodes, deliberately. An
+   * affinity table is a grid of numbers and it is easy to leave a 5 somewhere
+   * that nobody intended; a hand-written list is a second, independent
+   * statement of intent. The integrity suite fails if the two disagree, which
+   * is what catches a sector quietly acquiring core status.
+   */
+  coreSectors: Sector[];
   /** 0 to 5. Relevance takes the weaker of sector and stage affinity. */
   sectorAffinity: Record<Sector, number>;
   stageAffinity: Record<Stage, number>;
@@ -72,8 +82,17 @@ export const MANDATES: Mandate[] = [
       regulatoryRisk: 4,
       sourcingOriginality: 6,
     },
+    coreSectors: [
+      "AI Software Infrastructure",
+      "Semiconductors & Advanced Computing",
+      "Robotics & Autonomy",
+      "Quantum Computing",
+      "Energy Systems",
+      "Advanced Materials",
+      "Space & Aerospace",
+    ],
     sectorAffinity: {
-      "AI Infrastructure": 5,
+      "AI Software Infrastructure": 5,
       "Semiconductors & Advanced Computing": 5,
       "Robotics & Autonomy": 5,
       "Quantum Computing": 5,
@@ -93,7 +112,7 @@ export const MANDATES: Mandate[] = [
       "Later stage": 3,
     },
     emphasisedSectors: [
-      "AI Infrastructure",
+      "AI Software Infrastructure",
       "Semiconductors & Advanced Computing",
       "Robotics & Autonomy",
       "Quantum Computing",
@@ -139,8 +158,9 @@ export const MANDATES: Mandate[] = [
       regulatoryRisk: 1,
       sourcingOriginality: 2,
     },
+    coreSectors: ["AI Software Infrastructure", "Enterprise Infrastructure Software"],
     sectorAffinity: {
-      "AI Infrastructure": 5,
+      "AI Software Infrastructure": 5,
       "Semiconductors & Advanced Computing": 1,
       "Robotics & Autonomy": 2,
       "Quantum Computing": 1,
@@ -161,7 +181,7 @@ export const MANDATES: Mandate[] = [
     },
     emphasisedSectors: [
       "Enterprise Infrastructure Software",
-      "AI Infrastructure",
+      "AI Software Infrastructure",
       "Healthcare Technology",
     ],
     additionalDiligence: [
@@ -203,8 +223,9 @@ export const MANDATES: Mandate[] = [
       regulatoryRisk: 13,
       sourcingOriginality: 2,
     },
+    coreSectors: ["Biotechnology & Research Tools", "Healthcare Technology"],
     sectorAffinity: {
-      "AI Infrastructure": 2,
+      "AI Software Infrastructure": 2,
       "Semiconductors & Advanced Computing": 1,
       "Robotics & Autonomy": 2,
       "Quantum Computing": 1,
@@ -265,8 +286,16 @@ export const MANDATES: Mandate[] = [
       regulatoryRisk: 1,
       sourcingOriginality: 2,
     },
+    coreSectors: [
+      "AI Software Infrastructure",
+      "Robotics & Autonomy",
+      "Biotechnology & Research Tools",
+      "Energy Systems",
+      "Enterprise Infrastructure Software",
+      "Healthcare Technology",
+    ],
     sectorAffinity: {
-      "AI Infrastructure": 5,
+      "AI Software Infrastructure": 5,
       "Semiconductors & Advanced Computing": 3,
       "Robotics & Autonomy": 5,
       "Quantum Computing": 2,
@@ -287,7 +316,7 @@ export const MANDATES: Mandate[] = [
     },
     emphasisedSectors: [
       "Enterprise Infrastructure Software",
-      "AI Infrastructure",
+      "AI Software Infrastructure",
     ],
     additionalDiligence: [
       "What has this team built before, and what does the way they describe the hard part tell you about how they think?",

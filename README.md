@@ -154,6 +154,33 @@ Company-reported is not a criticism. Most of what is publicly known about a
 private company comes from the company. The label exists so the difference is
 visible at a glance.
 
+## Mandate scope, stated twice
+
+Relevance takes the weaker of sector and stage affinity, so a sector rated 5 by
+accident hands out core status silently. Each mandate therefore also declares
+`coreSectors` by hand, and the integrity suite fails if the list and the
+affinity table disagree.
+
+This caught a real error. Inference silicon had been filed under a sector named
+"AI Infrastructure", a bucket that was doing double duty for software
+infrastructure *and* for chips. Enterprise Software rates AI software
+infrastructure 5, which is correct for a data and visualisation stack, and a
+chip company sitting in the same bucket inherited that rating and ranked core to
+a software mandate. Two fixes: the company moved to Semiconductors and Advanced
+Computing alongside its direct competitors, and the sector was renamed **AI
+Software Infrastructure** so the boundary is unambiguous. A test now fails if
+any company whose subsector describes hardware sits in a software sector.
+
+## Source accessibility
+
+Ten registered sources sit behind bot protection. They open normally in a
+browser and fail an automated link check, which is a problem for a reviewer who
+runs the checker and sees red. Each is marked `automatedAccess: false`, says so
+in its registry entry, and is paired with an accessible source carrying the same
+facts. The integrity suite fails if any company, market signal, or individual
+claim rests solely on a blocked link, and `npm run test:links` reports declared
+blocks separately from genuine breakage.
+
 ## Comparison
 
 The `/compare` route puts up to four private companies side by side under a
@@ -170,6 +197,7 @@ Mandates live in `lib/mandates.ts`. A mandate carries:
 | Field | Purpose |
 | --- | --- |
 | `weights` | Points assigned to each of the twelve quality factors, summing to 100 |
+| `coreSectors` | The sectors the mandate considers squarely in scope, written out by hand as a second statement of intent |
 | `sectorAffinity` | 0 to 5 affinity per sector |
 | `stageAffinity` | 0 to 5 affinity per financing stage |
 | `emphasisedSectors` | Sectors the interface surfaces first |
@@ -236,7 +264,7 @@ Confidence describes how certain the conclusion is, not how good the company is.
 
 ## Source registry
 
-Ninety-one registered sources, each with subject, title, publisher, type, publication
+One hundred and three registered sources, each with subject, title, publisher, type, publication
 date, access date, URL, and the specific fact it supports. Only primary sources
 and independent corroborating publications are registered. Every link was
 checked, opens in a new tab, and uses `rel="noopener noreferrer"`. No
@@ -282,6 +310,7 @@ npm start
 npm run lint            # ESLint
 npx tsc --noEmit        # TypeScript
 npm run test:integrity  # data-integrity and investment-logic checks
+npm run test:links      # every registered source URL
 npm run test:e2e        # headless browser suite, needs a running build
 ```
 
@@ -291,6 +320,14 @@ primary and a corroborating source, that missing fields use the not-disclosed
 sentinel, that no firm-specific name or em dash appears, that the GitHub link is
 present where required, and that no credential pattern or environment variable
 appears anywhere.
+
+It also asserts semantic mandate fit: that each mandate's declared core sectors
+match its affinity table, that no company reaches core through an undeclared
+sector, that a semiconductor company cannot be core to Enterprise Software
+unless that mandate declares semiconductors, that no hardware company is core to
+a software-focused mandate, that every top-six company sits in a core sector at
+a stage the mandate rates 4 or higher, that the rendered explanation states the
+affinities the model actually used, and that no record stores a rank or tier.
 
 It also asserts claim provenance: that every quantified claim carries a
 classification, that every classified claim resolves to a registered source,
@@ -308,7 +345,7 @@ database search would miss, named remaining evidence, sector-appropriate top
 fives under each mandate, and that the confidence and freshness adjustments can
 never overturn a clear score difference.
 
-The **end-to-end suite** runs 96 checks in an isolated headless Chromium
+The **end-to-end suite** runs 101 checks in an isolated headless Chromium
 profile: navigation, mandate switching and recalculation, search, filters,
 sorting including sort by signal freshness, company details, the comparison
 tool and its four-company cap, pipeline editing, local storage persistence, CSV

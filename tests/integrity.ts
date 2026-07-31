@@ -12,7 +12,13 @@ import { COMPANIES, UNIVERSE_STATS } from "../lib/companies";
 import { MARKET_SIGNALS } from "../lib/data/market-signals";
 import { MANDATES, type MandateId } from "../lib/mandates";
 import { UNIVERSE_ROWS, topRanked } from "../lib/rows";
-import { scoreBand, scoreCompany, weightTotal, FACTORS } from "../lib/scoring";
+import {
+  mandateRelevance,
+  scoreBand,
+  scoreCompany,
+  weightTotal,
+  FACTORS,
+} from "../lib/scoring";
 import { SOURCES, SOURCE_BY_ID } from "../lib/sources";
 import { INTELLIGENCE } from "../lib/intelligence";
 import { baseFields } from "../lib/storage";
@@ -393,18 +399,18 @@ for (const m of MANDATES) {
   // On-thesis sectors per mandate, used to check economic reasonableness.
   const ON: Record<MandateId, Sector[]> = {
     "frontier-technology": [
-      "AI Infrastructure", "Semiconductors & Advanced Computing",
+      "AI Software Infrastructure", "Semiconductors & Advanced Computing",
       "Robotics & Autonomy", "Quantum Computing", "Energy Systems",
       "Advanced Materials", "Space & Aerospace", "Biotechnology & Research Tools",
     ],
     "enterprise-software": [
-      "Enterprise Infrastructure Software", "AI Infrastructure",
+      "Enterprise Infrastructure Software", "AI Software Infrastructure",
     ],
     "healthcare-technology": [
       "Healthcare Technology", "Biotechnology & Research Tools",
     ],
     "generalist-early-stage": [
-      "Enterprise Infrastructure Software", "AI Infrastructure",
+      "Enterprise Infrastructure Software", "AI Software Infrastructure",
       "Healthcare Technology", "Robotics & Autonomy",
       "Biotechnology & Research Tools", "Energy Systems",
       "Advanced Materials", "Semiconductors & Advanced Computing",
@@ -575,7 +581,7 @@ check(
     (r) => COMPANIES.find((c) => c.id === r.id)!,
   );
   const software = top.filter((c) =>
-    ["Enterprise Infrastructure Software", "AI Infrastructure"].includes(
+    ["Enterprise Infrastructure Software", "AI Software Infrastructure"].includes(
       c.sector,
     ),
   ).length;
@@ -788,6 +794,251 @@ for (const m of MANDATES) {
     "Generalist Early Stage top six are all Pre-Seed, Seed, or Series A",
     top.every((c) => EARLY_ONLY.includes(c.financing.stage)),
     top.map((c) => `${c.name} (${c.financing.stage})`).join("; "),
+  );
+}
+
+console.log("\n=== Semantic mandate fit ===");
+
+/**
+ * Sectors that build physical hardware. A mandate focused on software should
+ * never rate one of these core unless it says so in coreSectors explicitly.
+ */
+const HARDWARE_SECTORS: Sector[] = [
+  "Semiconductors & Advanced Computing",
+  "Quantum Computing",
+  "Robotics & Autonomy",
+  "Advanced Materials",
+  "Space & Aerospace",
+  "Energy Systems",
+];
+
+// 28: the two statements of mandate scope must agree
+{
+  const mismatches: string[] = [];
+  for (const m of MANDATES) {
+    const derived = (Object.entries(m.sectorAffinity) as [Sector, number][])
+      .filter(([, v]) => v === 5)
+      .map(([k]) => k)
+      .sort();
+    const declared = [...m.coreSectors].sort();
+    if (JSON.stringify(derived) !== JSON.stringify(declared)) {
+      mismatches.push(
+        `${m.name}: declared [${declared.join(", ")}] vs affinity [${derived.join(", ")}]`,
+      );
+    }
+  }
+  check(
+    "each mandate's declared core sectors match its affinity table exactly",
+    mismatches.length === 0,
+    mismatches.join(" | "),
+  );
+}
+
+// 29: no company can reach core through a sector the mandate never declared
+{
+  const offenders: string[] = [];
+  for (const m of MANDATES) {
+    for (const c of COMPANIES) {
+      const rel = mandateRelevance(c, m);
+      if (rel.tier.id === "core" && !m.coreSectors.includes(c.sector)) {
+        offenders.push(`${c.name} (${c.sector}) core to ${m.name}`);
+      }
+    }
+  }
+  check(
+    "no company is core to a mandate through an undeclared sector",
+    offenders.length === 0,
+    offenders.slice(0, 4).join("; "),
+  );
+}
+
+// 30: the specific bug this audit found
+{
+  const es = MANDATES.find((m) => m.id === "enterprise-software")!;
+  const semisDeclared = es.coreSectors.includes(
+    "Semiconductors & Advanced Computing",
+  );
+  const offenders = COMPANIES.filter(
+    (c) =>
+      c.sector === "Semiconductors & Advanced Computing" &&
+      mandateRelevance(c, es).tier.id === "core",
+  );
+  check(
+    "a semiconductor company cannot be core to Enterprise Software unless the mandate declares semiconductors",
+    semisDeclared || offenders.length === 0,
+    offenders.map((c) => c.name).join(", ") || "no semiconductor company is core",
+  );
+}
+
+// 31: the same guard generalised to every hardware sector
+{
+  const softwareMandates = MANDATES.filter(
+    (m) => m.id === "enterprise-software" || m.id === "healthcare-technology",
+  );
+  const offenders: string[] = [];
+  for (const m of softwareMandates) {
+    for (const sector of HARDWARE_SECTORS) {
+      if (m.coreSectors.includes(sector)) continue;
+      for (const c of COMPANIES.filter((x) => x.sector === sector)) {
+        if (mandateRelevance(c, m).tier.id === "core") {
+          offenders.push(`${c.name} (${sector}) core to ${m.name}`);
+        }
+      }
+    }
+  }
+  check(
+    "no hardware company is core to a software-focused mandate that excludes its sector",
+    offenders.length === 0,
+    offenders.slice(0, 4).join("; "),
+  );
+}
+
+// 32: every top-six company sits in a sector its mandate declares core
+{
+  const offenders: string[] = [];
+  for (const m of MANDATES) {
+    for (const r of topRanked(m.id, 6)) {
+      const c = COMPANIES.find((x) => x.id === r.id)!;
+      if (!m.coreSectors.includes(c.sector)) {
+        offenders.push(`${m.name}: ${c.name} (${c.sector})`);
+      }
+    }
+  }
+  check(
+    "every top-six company sits in a sector its mandate declares core",
+    offenders.length === 0,
+    offenders.join("; "),
+  );
+}
+
+// 33: every top-six company sits at a stage the mandate actually wants
+{
+  const offenders: string[] = [];
+  for (const m of MANDATES) {
+    for (const r of topRanked(m.id, 6)) {
+      const c = COMPANIES.find((x) => x.id === r.id)!;
+      if (m.stageAffinity[c.financing.stage] < 4) {
+        offenders.push(
+          `${m.name}: ${c.name} (${c.financing.stage}, affinity ${m.stageAffinity[c.financing.stage]})`,
+        );
+      }
+    }
+  }
+  check(
+    "every top-six company sits at a stage its mandate rates 4 or higher",
+    offenders.length === 0,
+    offenders.join("; "),
+  );
+}
+
+// 34: the rendered explanation must state the numbers the model actually used
+{
+  const offenders: string[] = [];
+  for (const m of MANDATES) {
+    for (const c of COMPANIES) {
+      const rel = mandateRelevance(c, m);
+      const saysSector = rel.explanation.includes(
+        `Sector affinity ${rel.sectorAffinity} of 5`,
+      );
+      const saysStage = rel.explanation.includes(
+        `stage affinity ${rel.stageAffinity} of 5`,
+      );
+      const saysMandate = rel.explanation.includes(m.name);
+      if (!saysSector || !saysStage || !saysMandate) {
+        offenders.push(`${c.name} under ${m.name}`);
+      }
+    }
+  }
+  check(
+    "the displayed relevance explanation states the affinities the model actually used",
+    offenders.length === 0,
+    offenders.slice(0, 3).join("; "),
+  );
+}
+
+// 35: relevance is computed, never stored
+{
+  const raw = readFileSync(join(process.cwd(), "lib/scoring.ts"), "utf8");
+  const dataFiles = readdirSync(join(process.cwd(), "lib/data")).filter((f) =>
+    f.endsWith(".ts"),
+  );
+  const storedTier = dataFiles.some((f) =>
+    /\b(tier|relevance|rank|score)\s*:/.test(
+      readFileSync(join(process.cwd(), "lib/data", f), "utf8"),
+    ),
+  );
+  check(
+    "no company record stores a rank, score, or relevance tier",
+    !storedTier && /Math\.min/.test(raw),
+    storedTier ? "a data file stores a ranking field" : "relevance derived at runtime",
+  );
+}
+
+// 36: a company's sector must match the kind of thing its subsector describes
+{
+  const HARDWARE_WORDS =
+    /\b(silicon|chip|accelerator|wafer|photonic|interconnect|robot|spacecraft|satellite|launch|reactor|battery|cement|laborator(y|ies)|hardware)\b/i;
+  const offenders = COMPANIES.filter(
+    (c) =>
+      !HARDWARE_SECTORS.includes(c.sector) &&
+      c.sector !== "Healthcare Technology" &&
+      c.sector !== "Biotechnology & Research Tools" &&
+      HARDWARE_WORDS.test(c.subsector),
+  ).map((c) => `${c.name}: ${c.sector} / ${c.subsector}`);
+  check(
+    "no company describing hardware sits in a software sector",
+    offenders.length === 0,
+    offenders.join("; "),
+  );
+}
+
+console.log("\n=== Source accessibility ===");
+
+// 37
+{
+  const blocked = SOURCES.filter((x) => !x.automatedAccess);
+  const offenders = COMPANIES.filter(
+    (c) => !c.sourceIds.some((id) => SOURCE_BY_ID[id]?.automatedAccess),
+  ).map((c) => c.name);
+  check(
+    "every company cites at least one source that opens without a browser",
+    offenders.length === 0,
+    `${blocked.length} source(s) block automated requests: ${blocked.map((x) => x.id).join(", ")}`,
+  );
+}
+// 38
+{
+  const offenders = MARKET_SIGNALS.filter(
+    (m) => !m.sourceIds.some((id) => SOURCE_BY_ID[id]?.automatedAccess),
+  ).map((m) => m.name);
+  check(
+    "every market signal cites at least one source that opens without a browser",
+    offenders.length === 0,
+    offenders.join(", "),
+  );
+}
+// 39
+{
+  const offenders = COMPANIES.flatMap((c) =>
+    [...c.technology.supportingEvidence, ...c.commercial.adoptionEvidence]
+      .filter((e) => !SOURCE_BY_ID[e.sourceId]?.automatedAccess)
+      .map((e) => `${c.name}: ${e.sourceId}`),
+  );
+  check(
+    "no individual claim rests solely on a source that blocks automated requests",
+    offenders.length === 0,
+    offenders.join("; "),
+  );
+}
+// 40
+{
+  const offenders = SOURCES.filter(
+    (x) => !x.automatedAccess && !/blocks automated requests/i.test(x.supports),
+  ).map((x) => x.id);
+  check(
+    "every blocked source says so in its registry entry",
+    offenders.length === 0,
+    offenders.join(", "),
   );
 }
 

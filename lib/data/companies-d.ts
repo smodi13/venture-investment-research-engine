@@ -113,7 +113,7 @@ export const COMPANIES_D: PrivateCompany[] = [
         {
           claim:
             "Series D amount, valuation, and Kirkland headquarters independently reported.",
-          sourceId: "chainguard-geekwire",
+          sourceId: "chainguard-builtin",
           basis: "verified",
           provenance: "Independently verified",
         },
@@ -288,7 +288,7 @@ export const COMPANIES_D: PrivateCompany[] = [
         "High",
         "Five named founders from a shared background in open source software supply chain security.",
         "Directly relevant and well documented.",
-        "chainguard-geekwire",
+        "chainguard-builtin",
       ),
       capitalEfficiency: fa(
         4,
@@ -310,7 +310,7 @@ export const COMPANIES_D: PrivateCompany[] = [
         "Medium",
         "Large recent round with a low capital requirement business model.",
         "Low on cash. Rated down slightly for valuation relative to disclosed revenue.",
-        "chainguard-geekwire",
+        "chainguard-builtin",
       ),
       regulatoryRisk: fa(
         5,
@@ -330,7 +330,7 @@ export const COMPANIES_D: PrivateCompany[] = [
     dataConfidence: "High",
     dataConfidenceNote:
       "Founders, founding year, headquarters, financing, catalogue growth, customer count, and revenue trajectory are supported by the company's own announcement with independent corroboration. The revenue figure dates from April 2025 and has not been publicly updated.",
-    sourceIds: ["chainguard-announcement", "chainguard-geekwire"],
+    sourceIds: ["chainguard-announcement", "chainguard-builtin"],
     lastReviewed: REVIEWED,
   },
 
@@ -1388,7 +1388,7 @@ export const COMPANIES_D: PrivateCompany[] = [
         {
           claim:
             "Series C of 165 million dollars closed May 2025 bringing total venture funding to 225 million dollars, followed by more than 300 million dollars in December 2025.",
-          sourceId: "radiant-seriesc",
+          sourceId: "radiant-newswire",
           basis: "verified",
           provenance: "Company-reported",
         },
@@ -2017,8 +2017,8 @@ export const COMPANIES_D: PrivateCompany[] = [
         },
         {
           claim:
-            "Independent business press corroborated the financing and the Kent, Washington base of operations.",
-          sourceId: "stoke-geekwire",
+            "Independent space trade press corroborated the financing, the debt facility, total capital raised, the Kent, Washington base, and the Nova programme.",
+          sourceId: "stoke-spacenews",
           basis: "verified",
           provenance: "Independently verified",
         },
@@ -2225,7 +2225,7 @@ export const COMPANIES_D: PrivateCompany[] = [
     dataConfidence: "Medium",
     dataConfidenceNote:
       "Headquarters, leadership, financing and its extension, and the launch complex refurbishment are supported by the company's own announcements with independent business press corroboration. Founding year, business model, launch pricing, and first flight date are not disclosed.",
-    sourceIds: ["stoke-announcement", "stoke-extension", "stoke-geekwire"],
+    sourceIds: ["stoke-announcement", "stoke-extension", "stoke-spacenews"],
     lastReviewed: REVIEWED,
   },
 

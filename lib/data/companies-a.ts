@@ -29,7 +29,7 @@ export const COMPANIES_A: PrivateCompany[] = [
     region: "North America",
     foundedYear: 2022,
     founders: ["Gavin Uberti", "Chris Zhu", "Robert Wachen"],
-    sector: "AI Infrastructure",
+    sector: "Semiconductors & Advanced Computing",
     subsector: "Transformer-specific inference silicon and rack systems",
     description:
       "Designs Sohu, an application-specific integrated circuit that implements the transformer architecture directly in hardware, and sells it as complete inference racks rather than as discrete chips.",
@@ -1001,7 +1001,12 @@ export const COMPANIES_A: PrivateCompany[] = [
     dataConfidence: "Medium",
     dataConfidenceNote:
       "Product, headquarters, strategic investors, the Series E amount, its lead investor, its close date, and total capital raised are supported by the company's own announcement with independent corroboration from technology press. Founding year, founder names, revenue, and any named shipping platform are not publicly disclosed, which is why this is medium rather than high.",
-    sourceIds: ["ayar-seriese", "ayar-dcd", "ayar-site"],
+    sourceIds: [
+      "ayar-seriese",
+      "ayar-siliconangle",
+      "ayar-site",
+      "ayar-dcd",
+    ],
     lastReviewed: REVIEWED,
   },
 ];

@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint .",
     "test:e2e": "node tests/e2e.js",
-    "test:integrity": "tsx tests/integrity.ts"
+    "test:integrity": "tsx tests/integrity.ts",
+    "test:links": "tsx tests/links.ts"
   },
   "dependencies": {
     "next": "^16.2.12",

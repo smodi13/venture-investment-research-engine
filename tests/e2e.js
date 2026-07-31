@@ -325,6 +325,39 @@ const FIRMS = ["LDV", "Remoti", "Matchstick", "Magid", "Boston Millennia"];
     await page.waitForTimeout(300);
   }
 
+  /* Semantic mandate fit ------------------------------------------------ */
+  {
+    await page.goto(BASE + "/universe", { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Enterprise Software" }).first().click();
+    await page.waitForTimeout(400);
+    const names = await page.locator("table tbody tr td:nth-child(1) a").allTextContents();
+    const sectors = await page.locator("table tbody tr td:nth-child(2)").allTextContents();
+    const top6 = names.slice(0, 6).map((s) => s.trim());
+    const top6Sectors = sectors.slice(0, 6).map((s) => s.trim());
+    record("Enterprise Software top six contains no semiconductor company",
+      !top6Sectors.some((s) => /Semiconductor|Quantum|Space|Advanced Materials/.test(s)),
+      top6.map((n, i) => `${n} (${top6Sectors[i]})`).join("; "));
+    record("Enterprise Software top six are software sectors only",
+      top6Sectors.every((s) => /Enterprise Infrastructure Software|AI Software Infrastructure/.test(s)),
+      top6Sectors.join(", "));
+
+    // The inference-silicon company must not be core to a software mandate.
+    const rowIndex = names.findIndex((n) => n.trim() === "Etched");
+    const tierCell = await page.locator("table tbody tr").nth(rowIndex).locator("td:last-child").textContent();
+    record("the inference-silicon company is not core to Enterprise Software",
+      !/Core to mandate/.test(tierCell), tierCell.replace(/\s+/g, " ").trim());
+
+    await page.goto(BASE + "/universe/etched", { waitUntil: "networkidle" });
+    const body = await page.textContent("body");
+    record("its detail page shows a semiconductor sector",
+      /Semiconductors & Advanced Computing/.test(body));
+    record("relevance explanation states the affinities used",
+      /Sector affinity \d of 5/.test(body) && /stage affinity \d of 5/.test(body));
+
+    await page.getByRole("button", { name: "Frontier Technology" }).first().click();
+    await page.waitForTimeout(300);
+  }
+
   /* Comparison tool ----------------------------------------------------- */
   {
     await page.goto(BASE + "/compare", { waitUntil: "networkidle" });

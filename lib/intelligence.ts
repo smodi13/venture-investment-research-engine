@@ -60,7 +60,7 @@ export const INTELLIGENCE: IntelligenceEntry[] = [
     id: "int-etched-launch",
     date: "2026-06-30",
     subject: "Etched exits stealth with working silicon and contracted demand",
-    sector: "AI Infrastructure",
+    sector: "AI Software Infrastructure",
     category: "Product launch",
     summary:
       "Etched disclosed 800 million dollars raised across four private financings, a working Sohu chip, more than one billion dollars in customer contracts, and first rack shipments beginning this summer.",
