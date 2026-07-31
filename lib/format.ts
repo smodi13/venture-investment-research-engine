@@ -1,4 +1,4 @@
-import { NOT_DISCLOSED } from "./types";
+import { NOT_DISCLOSED, type SignalFreshness } from "./types";
 
 export function formatDate(iso: string): string {
   const d = new Date(`${iso}T00:00:00`);
@@ -39,4 +39,21 @@ export function display(value: string | number): string {
 
 export function isMissing(value: string | number): boolean {
   return value === NOT_DISCLOSED;
+}
+
+/**
+ * How recent the signal that put a company into the pipeline actually is.
+ *
+ * This is deliberately separate from the score. A stale signal does not make a
+ * company worse, it makes the reason for looking at it now weaker, and those
+ * are different questions that a single number would blur together.
+ */
+export function signalFreshness(
+  iso: string,
+  today = "2026-07-30",
+): SignalFreshness {
+  const days = ageInDays(iso, today);
+  if (days <= 90) return "Fresh";
+  if (days <= 365) return "Recent";
+  return "Established";
 }

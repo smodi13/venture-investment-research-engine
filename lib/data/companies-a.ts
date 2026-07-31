@@ -56,6 +56,8 @@ export const COMPANIES_A: PrivateCompany[] = [
     mainFinancingRisk:
       "Each silicon generation costs more than the last, and the funding decision for the next one arrives before the current one has proven itself in production.",
     sourcing: {
+      discoveryChannel: "Product launch",
+      signalDate: "2026-06-30",
       signal: "Product launch",
       dateSourced: "2026-07-01",
       channel: "Frontier compute value-chain scan, inference layer",
@@ -65,10 +67,15 @@ export const COMPANIES_A: PrivateCompany[] = [
         "Inference is becoming the larger share of deployed AI compute, and inference is the workload where fixed-function silicon has the strongest economic argument. The window in which an architecture-specific part is both feasible and valuable is open now and closes if model architectures diversify.",
       whyOverlooked:
         "Not overlooked. This company is widely covered in technology press and has raised from well-known investors. It is retained in the universe because the specific question of whether hardwired transformer silicon survives an architecture shift is under-examined relative to the attention the company receives.",
+      whyNotObvious:
+        "A database search surfaces this company immediately. What a search does not surface is that four of its financings were unannounced, so the visible funding history understates both the capital consumed and how long it operated without scrutiny.",
+      evidenceNeeded:
+        "Independent confirmation from a named customer that a rack has been delivered and accepted, which would convert a company statement into an externally checkable fact.",
       wellRecognised: true,
     },
     financing: {
-      stage: "Later stage",
+      stage: "Series C",
+      disclosedRound: "Series C",
       latestRound:
         "The company states 800 million dollars raised across four private financings, with investors including Sequoia Capital, Andreessen Horowitz, SK Hynix, Jane Street, Two Sigma, and Jump Trading.",
       latestRoundDate: "2026-06-30",
@@ -372,6 +379,8 @@ export const COMPANIES_A: PrivateCompany[] = [
     mainFinancingRisk:
       "450 million dollars disclosed against a category where the incumbent spends more than that on a single product generation.",
     sourcing: {
+      discoveryChannel: "Funding announcement",
+      signalDate: "2025-11-12",
       signal: "Recent financing",
       dateSourced: "2025-11-12",
       channel: "Frontier compute value-chain scan, inference layer",
@@ -381,10 +390,15 @@ export const COMPANIES_A: PrivateCompany[] = [
         "Inference workloads are memory-bandwidth bound before they are arithmetic bound. An architecture that attacks weight movement directly is addressing the constraint that currently binds, which was not true when this company started.",
       whyOverlooked:
         "Covered by trade press but far less than the best-known inference silicon companies, and the in-memory compute approach is technically harder to evaluate than a conventional accelerator, which tends to reduce generalist investor attention.",
+      whyNotObvious:
+        "The company appears in database searches for AI chips, but the search result does not distinguish in-memory compute from a conventional accelerator, which is the entire investment question here.",
+      evidenceNeeded:
+        "A named end customer running production traffic, disclosed with volume, rather than an ecosystem partnership announcement.",
       wellRecognised: false,
     },
     financing: {
       stage: "Series C",
+      disclosedRound: "Series C",
       latestRound:
         "275 million dollar Series C announced 12 November 2025, bringing disclosed total funding to 450 million dollars.",
       latestRoundDate: "2025-11-12",
@@ -693,6 +707,8 @@ export const COMPANIES_A: PrivateCompany[] = [
     mainFinancingRisk:
       "Low near term after a large round, with a valuation that requires the co-packaged optics transition to arrive on schedule.",
     sourcing: {
+      discoveryChannel: "Strategic partnership",
+      signalDate: "2026-03-03",
       signal: "Strategic investor participation",
       dateSourced: "2026-06-15",
       channel: "Frontier compute value-chain scan, interconnect layer",
@@ -702,10 +718,15 @@ export const COMPANIES_A: PrivateCompany[] = [
         "Electrical signalling reach shortens as data rates rise, which moves the crossover point where optics becomes necessary from between racks to inside them. That transition is underway now.",
       whyOverlooked:
         "The interconnect layer receives far less attention than accelerators despite growing faster than accelerator unit volumes, because content per rack rises with each generation. The category also became harder to read after a direct competitor was acquired by a public company, which removed the most obvious comparable.",
+      whyNotObvious:
+        "A database search returns the funding but not the unusual fact that two competing merchant accelerator vendors appear on the same cap table, which is the signal worth acting on.",
+      evidenceNeeded:
+        "The founding team and total capital raised, neither of which the company publishes, plus a platform vendor disclosing a shipping product with the optical engine designed in.",
       wellRecognised: false,
     },
     financing: {
       stage: "Later stage",
+      disclosedRound: "Series E",
       latestRound:
         "500 million dollar Series E led by Neuberger Berman, closed 3 March 2026, with strategic participation from AMD, NVIDIA, MediaTek, and Alchip.",
       latestRoundDate: "2026-03-03",

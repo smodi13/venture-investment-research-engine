@@ -18,7 +18,18 @@ import { INTELLIGENCE } from "../lib/intelligence";
 import { baseFields } from "../lib/storage";
 import { THESIS } from "../lib/thesis";
 import { SITE, NAV_LINKS } from "../lib/site";
-import { NOT_DISCLOSED, type Sector } from "../lib/types";
+import {
+  DISCOVERY_CHANNELS,
+  NOT_DISCLOSED,
+  SIGNAL_FRESHNESS_MEANING,
+  type Sector,
+} from "../lib/types";
+import { signalFreshness } from "../lib/format";
+import {
+  CONFIDENCE_BONUS,
+  FRESHNESS_BONUS,
+  sourcingPriority,
+} from "../lib/rows";
 import { readFileSync, readdirSync, statSync } from "fs";
 import { join } from "path";
 
@@ -456,6 +467,178 @@ check(
   "pipeline defaults resolve for every company",
   UNIVERSE_ROWS.every((r) => Boolean(baseFields(r).status)),
 );
+
+console.log("\n=== Portfolio construction: stage mix, sourcing depth, and freshness ===");
+
+const EARLY_STAGES = ["Seed", "Series A"] as const;
+const LATER_STAGES = ["Series D", "Series E", "Growth", "Later stage"] as const;
+const earlyCount = COMPANIES.filter((c) =>
+  (EARLY_STAGES as readonly string[]).includes(c.financing.stage),
+).length;
+const laterCount = COMPANIES.filter((c) =>
+  (LATER_STAGES as readonly string[]).includes(c.financing.stage),
+).length;
+const seedCount = COMPANIES.filter((c) => c.financing.stage === "Seed").length;
+
+// 1
+check(
+  "universe holds at least 28 verified private companies",
+  COMPANIES.length >= 28,
+  `${COMPANIES.length} companies`,
+);
+// 2
+check(
+  "at least a quarter of the universe is Seed or Series A",
+  earlyCount / COMPANIES.length >= 0.25,
+  `${earlyCount} of ${COMPANIES.length} (${((100 * earlyCount) / COMPANIES.length).toFixed(1)}%)`,
+);
+// 3
+check(
+  "at least four companies are at Seed stage",
+  seedCount >= 4,
+  `${seedCount} seed-stage companies`,
+);
+// 4
+check(
+  "later-stage companies are no more than a quarter of the universe",
+  laterCount / COMPANIES.length <= 0.25,
+  `${laterCount} of ${COMPANIES.length} (${((100 * laterCount) / COMPANIES.length).toFixed(1)}%)`,
+);
+// 5
+check(
+  "no company reports a generic stage bucket as its disclosed round",
+  COMPANIES.every(
+    (c) =>
+      !/^(later stage|growth|unknown|n\/a)$/i.test(
+        String(c.financing.disclosedRound).trim(),
+      ),
+  ),
+  COMPANIES.filter((c) =>
+    /^(later stage|growth|unknown|n\/a)$/i.test(
+      String(c.financing.disclosedRound).trim(),
+    ),
+  )
+    .map((c) => c.name)
+    .join(", "),
+);
+// 6
+check(
+  "every company records a discovery channel from the declared list",
+  COMPANIES.every((c) =>
+    DISCOVERY_CHANNELS.includes(c.sourcing.discoveryChannel),
+  ),
+);
+// 7
+check(
+  "every sourcing signal is a valid date at or before the snapshot date",
+  COMPANIES.every(
+    (c) =>
+      /^\d{4}-\d{2}-\d{2}$/.test(c.sourcing.signalDate) &&
+      c.sourcing.signalDate <= SITE.snapshotDate,
+  ),
+  COMPANIES.filter((c) => c.sourcing.signalDate > SITE.snapshotDate)
+    .map((c) => c.name)
+    .join(", "),
+);
+// 8
+check(
+  "signal freshness classifies correctly at the 90 day and 12 month boundaries",
+  signalFreshness("2026-05-01") === "Fresh" &&
+    signalFreshness("2026-04-01") === "Recent" &&
+    signalFreshness("2025-07-01") === "Established" &&
+    Object.keys(SIGNAL_FRESHNESS_MEANING).length === 3,
+);
+// 9
+check(
+  "every company states why a database search would miss it, distinctly from why it entered",
+  COMPANIES.every(
+    (c) =>
+      c.sourcing.whyNotObvious.trim().length >= 60 &&
+      c.sourcing.whyNotObvious !== c.sourcing.whyEntered,
+  ),
+  COMPANIES.filter((c) => c.sourcing.whyNotObvious.trim().length < 60)
+    .map((c) => c.name)
+    .join(", "),
+);
+// 10
+check(
+  "every company names the additional evidence still needed",
+  COMPANIES.every((c) => c.sourcing.evidenceNeeded.trim().length >= 40),
+  COMPANIES.filter((c) => c.sourcing.evidenceNeeded.trim().length < 40)
+    .map((c) => c.name)
+    .join(", "),
+);
+// 11
+{
+  const top = topRanked("enterprise-software", 5).map(
+    (r) => COMPANIES.find((c) => c.id === r.id)!,
+  );
+  const software = top.filter((c) =>
+    ["Enterprise Infrastructure Software", "AI Infrastructure"].includes(
+      c.sector,
+    ),
+  ).length;
+  check(
+    "the enterprise software mandate top five is majority software companies",
+    software >= 3,
+    top.map((c) => `${c.name} (${c.sector})`).join("; "),
+  );
+}
+// 12
+{
+  const top = topRanked("healthcare-technology", 5).map(
+    (r) => COMPANIES.find((c) => c.id === r.id)!,
+  );
+  const health = top.every((c) =>
+    ["Healthcare Technology", "Biotechnology & Research Tools"].includes(
+      c.sector,
+    ),
+  );
+  check(
+    "the healthcare mandate top five contains only healthcare and life-science companies",
+    health,
+    top.map((c) => `${c.name} (${c.sector})`).join("; "),
+  );
+}
+// 13
+{
+  const top = topRanked("generalist-early-stage", 5).map(
+    (r) => COMPANIES.find((c) => c.id === r.id)!,
+  );
+  const early = top.every((c) =>
+    ["Seed", "Series A", "Series B"].includes(c.financing.stage),
+  );
+  check(
+    "the generalist early stage mandate top five contains no company past Series B",
+    early,
+    top.map((c) => `${c.name} (${c.financing.stage})`).join("; "),
+  );
+}
+// 14
+{
+  const maxAdjustment =
+    Math.max(...Object.values(CONFIDENCE_BONUS)) +
+    Math.max(...Object.values(FRESHNESS_BONUS));
+  let violation = "";
+  for (const m of MANDATES) {
+    for (const a of UNIVERSE_ROWS) {
+      for (const b of UNIVERSE_ROWS) {
+        const gap = a.scores[m.id] - b.scores[m.id];
+        if (
+          gap > maxAdjustment &&
+          sourcingPriority(b, m.id) > sourcingPriority(a, m.id)
+        ) {
+          violation = `${b.name} overtook ${a.name} under ${m.name}`;
+        }
+      }
+    }
+  }
+  check(
+    "confidence and freshness adjustments never overturn a clear score difference",
+    maxAdjustment <= 6 && violation === "",
+    `maximum adjustment ${maxAdjustment} points${violation ? "; " + violation : ""}`,
+  );
+}
 
 console.log("\n=== Universe composition ===");
 console.log(`  Companies: ${UNIVERSE_STATS.total}`);

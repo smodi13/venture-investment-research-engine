@@ -10,8 +10,13 @@ import { MANDATES } from "@/lib/mandates";
 import { SOURCES } from "@/lib/sources";
 import { UNIVERSE_STATS } from "@/lib/companies";
 import { MARKET_SIGNAL_DISCLOSURE } from "@/lib/data/market-signals";
-import { DATA_CONFIDENCE_LEVELS, DATA_CONFIDENCE_MEANING } from "@/lib/types";
-import { ConfidenceBadge } from "@/components/Provenance";
+import {
+  DATA_CONFIDENCE_LEVELS,
+  DATA_CONFIDENCE_MEANING,
+  SIGNAL_FRESHNESS_LEVELS,
+  SIGNAL_FRESHNESS_MEANING,
+} from "@/lib/types";
+import { ConfidenceBadge, FreshnessBadge } from "@/components/Provenance";
 import {
   BulletList,
   DisclosureNote,
@@ -314,6 +319,50 @@ export default function MethodologyPage() {
             oriented so 5 is always most favourable, which on the three risk
             factors means 5 signals low risk. Raising more capital is never
             itself rewarded, and neither is publishing more information.
+          </p>
+        </Section>
+
+        <Section
+          title="How companies are discovered, and how freshness is treated"
+          description="Every company records the channel it surfaced through and the date of the signal that surfaced it."
+        >
+          <div className="space-y-2">
+            {SIGNAL_FRESHNESS_LEVELS.map((level) => (
+              <div
+                key={level}
+                className="flex flex-col gap-2 rounded-lg border border-line bg-surface p-4 sm:flex-row sm:items-start sm:gap-4"
+              >
+                <div className="sm:w-44 sm:shrink-0">
+                  <FreshnessBadge freshness={level} />
+                </div>
+                <p className="text-sm leading-relaxed text-ink-soft">
+                  {SIGNAL_FRESHNESS_MEANING[level]}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-ink-soft">
+            Freshness is never folded into the quality score. A company is not a
+            better investment because it announced something last month, and a
+            ranking that rewarded recency heavily would simply reproduce the news
+            cycle. Freshness answers a different question: whether the reason for
+            looking now still holds.
+          </p>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-ink-soft">
+            The overview page orders companies by quality score plus a capped
+            adjustment of up to three points for data confidence and up to three
+            for signal freshness. Six points is the maximum, which is small
+            enough that it cannot overturn a clear score difference. The
+            integrity suite asserts that directly, and both the underlying score
+            and the adjustment are printed on every card. Everywhere else in the
+            platform, ranking is the quality score alone.
+          </p>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-ink-soft">
+            Each record also states what a funding-database search would fail to
+            surface about the company, and what evidence is still missing that
+            would change the assessment. Both are written before any conclusion
+            is drawn, so a reader can judge whether the sourcing reasoning holds
+            independently of whether the score does.
           </p>
         </Section>
 

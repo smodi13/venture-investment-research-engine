@@ -49,6 +49,8 @@ export const COMPANIES_D: PrivateCompany[] = [
     mainFinancingRisk:
       "A valuation set at a high multiple of the disclosed revenue figure.",
     sourcing: {
+      discoveryChannel: "Funding announcement",
+      signalDate: "2025-04-23",
       signal: "Open-source adoption",
       dateSourced: "2026-01-22",
       channel: "Developer infrastructure adoption scan",
@@ -58,10 +60,15 @@ export const COMPANIES_D: PrivateCompany[] = [
         "Software supply chain requirements have moved from guidance to procurement conditions in regulated industries and government contracting, which converts a security preference into a purchasing requirement.",
       whyOverlooked:
         "Not overlooked in its own category, which is well covered. Retained because the specific question of whether a rebuild pipeline is defensible against a cloud provider bundling the same thing is under-examined relative to the attention the company receives.",
+      whyNotObvious:
+        "Widely covered, so nothing here is hard to find. The under-examined question is whether a rebuild pipeline stays defensible once a cloud provider bundles the same thing.",
+      evidenceNeeded:
+        "Current revenue against the April 2025 disclosure, and retention among customers whose platform vendor already ships hardened images.",
       wellRecognised: true,
     },
     financing: {
       stage: "Later stage",
+      disclosedRound: "Series D",
       latestRound:
         "356 million dollar Series D led by Kleiner Perkins and IVP at a reported 3.5 billion dollar valuation.",
       latestRoundDate: "2025-04-23",
@@ -360,6 +367,8 @@ export const COMPANIES_D: PrivateCompany[] = [
     mainFinancingRisk:
       "Commercial plants are capital projects, and project finance for first-of-a-kind facilities is difficult and expensive.",
     sourcing: {
+      discoveryChannel: "Strategic partnership",
+      signalDate: "2024-09-24",
       signal: "Strategic investor participation",
       dateSourced: "2026-02-05",
       channel: "Industrial decarbonisation supply chain scan",
@@ -369,10 +378,15 @@ export const COMPANIES_D: PrivateCompany[] = [
         "Cement is roughly a tenth of global industrial emissions with no available efficiency route to deep reduction, and procurement rules in several markets now specify embodied carbon.",
       whyOverlooked:
         "Materials companies have long commercialisation cycles and are frequently overlooked by investors accustomed to software timelines. Cement in particular is a slow, unglamorous industry with few venture-scale comparables.",
+      whyNotObvious:
+        "Filed under climate technology, where a search returns hundreds of companies and does not distinguish the ones whose own incumbents have invested in them.",
+      evidenceNeeded:
+        "Whether the strategic investments carry offtake commitments, and the projected cost per tonne at the commercial facility.",
       wellRecognised: false,
     },
     financing: {
       stage: "Series B",
+      disclosedRound: "Series B",
       latestRound:
         "Combined 75 million dollar strategic investment from CRH and Holcim, announced September 2024.",
       latestRoundDate: "2024-09-24",
@@ -664,6 +678,8 @@ export const COMPANIES_D: PrivateCompany[] = [
     mainFinancingRisk:
       "Batteries are financed on the balance sheet ahead of the grid services revenue that pays for them.",
     sourcing: {
+      discoveryChannel: "Funding announcement",
+      signalDate: "2026-01-15",
       signal: "New facility",
       dateSourced: "2026-01-20",
       channel: "Distributed energy and grid services scan",
@@ -673,10 +689,15 @@ export const COMPANIES_D: PrivateCompany[] = [
         "Grid reliability events in Texas have made home backup a mainstream purchase, and distributed batteries have become a recognised grid resource in market rules.",
       whyOverlooked:
         "Not overlooked. The company is widely covered, partly because of its founder. It is retained because the regulatory dependency of the business model receives much less scrutiny than the funding does.",
+      whyNotObvious:
+        "Heavily covered. What receives far less attention than the funding is that the business depends on grid services market rules set by regulators rather than on the hardware.",
+      evidenceNeeded:
+        "Modelled economics under a materially less favourable grid services regime, and evidence the model transfers to a second regulatory jurisdiction.",
       wellRecognised: true,
     },
     financing: {
-      stage: "Later stage",
+      stage: "Series C",
+      disclosedRound: "Series C",
       latestRound:
         "One billion dollar Series C, funding a domestic battery factory and expansion beyond Texas.",
       latestRoundDate: "2026-01-15",
@@ -971,6 +992,8 @@ export const COMPANIES_D: PrivateCompany[] = [
     mainFinancingRisk:
       "Manufacturing capacity is funded ahead of the order book that would justify it.",
     sourcing: {
+      discoveryChannel: "Government grant",
+      signalDate: "2026-06-01",
       signal: "Government grant",
       dateSourced: "2026-03-11",
       channel: "Industrial decarbonisation and federal research award tracking",
@@ -980,10 +1003,15 @@ export const COMPANIES_D: PrivateCompany[] = [
         "Industrial heat is roughly a quarter of industrial energy use and has no straightforward electrification path, while intermittent renewable generation is producing periods of very low-cost electricity that thermal storage can absorb.",
       whyOverlooked:
         "Industrial heat is unglamorous and the customers are slow-moving, so the category receives far less attention than grid-scale electrochemical storage despite addressing a larger share of emissions.",
+      whyNotObvious:
+        "Industrial heat sits outside the categories most energy searches use, and the ARPA-E technical documentation is published separately from any funding record.",
+      evidenceNeeded:
+        "Performance of the commissioned project against specification through a full production year, reported by the industrial partner.",
       wellRecognised: false,
     },
     financing: {
       stage: "Series C",
+      disclosedRound: "Series C",
       latestRound:
         "550 million dollar Series C co-led by G2 Venture Partners and Eclipse, expanding US manufacturing and deployment.",
       latestRoundDate: "2026-06-01",
@@ -1276,6 +1304,8 @@ export const COMPANIES_D: PrivateCompany[] = [
     mainFinancingRisk:
       "Capital must be committed for years ahead of any licensed commercial deployment.",
     sourcing: {
+      discoveryChannel: "Regulatory milestone",
+      signalDate: "2025-12-17",
       signal: "Regulatory milestone",
       dateSourced: "2026-01-08",
       channel: "National laboratory demonstration programme tracking",
@@ -1285,10 +1315,15 @@ export const COMPANIES_D: PrivateCompany[] = [
         "Data centre power demand and defence interest in resilient off-grid power have converged, and the federal government has created demonstration pathways that did not previously exist.",
       whyOverlooked:
         "Nuclear has a long commercialisation cycle and a history of disappointing investors, which suppresses venture attention relative to the scale of the potential market.",
+      whyNotObvious:
+        "Funding searches return the rounds. The DOME test assignment is published through Department of Energy channels and is the stronger signal, because it is administered by someone other than the company.",
+      evidenceNeeded:
+        "The pass criteria for the fuelled test, and a realistic licensing timeline including a first rejection.",
       wellRecognised: false,
     },
     financing: {
       stage: "Series C",
+      disclosedRound: "Series C",
       latestRound:
         "More than 300 million dollars raised in December 2025, following a 165 million dollar Series C closed 28 May 2025 that brought total venture funding to 225 million dollars.",
       latestRoundDate: "2025-12-17",
@@ -1578,6 +1613,8 @@ export const COMPANIES_D: PrivateCompany[] = [
     mainFinancingRisk:
       "Factory capacity is being built ahead of demonstrated flight heritage.",
     sourcing: {
+      discoveryChannel: "Product launch",
+      signalDate: "2025-12-12",
       signal: "Manufacturing milestone",
       dateSourced: "2026-02-18",
       channel: "Space manufacturing capacity scan",
@@ -1587,10 +1624,15 @@ export const COMPANIES_D: PrivateCompany[] = [
         "National security demand for resilient space capability has risen sharply, and high-power satellites enable missions that constellations of small satellites cannot perform.",
       whyOverlooked:
         "Space manufacturing outside launch attracts relatively little attention, and the company is less covered than launch providers despite comparable capital raised.",
+      whyNotObvious:
+        "Space searches are dominated by launch companies, and satellite manufacturing is filed underneath them despite comparable capital intensity.",
+      evidenceNeeded:
+        "Confirmation that the first production satellite has flown and how it performed on orbit.",
       wellRecognised: false,
     },
     financing: {
       stage: "Series C",
+      disclosedRound: "Series C",
       latestRound:
         "250 million dollar Series C led by Redpoint at a stated 3 billion dollar valuation.",
       latestRoundDate: "2025-12-12",
@@ -1882,6 +1924,8 @@ export const COMPANIES_D: PrivateCompany[] = [
     mainFinancingRisk:
       "Launch development consumes very large capital over many years before first revenue.",
     sourcing: {
+      discoveryChannel: "Regulatory milestone",
+      signalDate: "2026-02-10",
       signal: "New facility",
       dateSourced: "2026-03-02",
       channel: "Launch infrastructure and range activity tracking",
@@ -1891,10 +1935,15 @@ export const COMPANIES_D: PrivateCompany[] = [
         "Launch demand continues to exceed supply, and full reusability including the upper stage is the remaining structural cost reduction available in launch.",
       whyOverlooked:
         "Overshadowed by far larger launch providers, and located outside the traditional aerospace hubs, which reduces visibility relative to capital raised.",
+      whyNotObvious:
+        "Overshadowed by far larger launch providers in every search. The launch complex assignment is a range allocation record rather than a funding record.",
+      evidenceNeeded:
+        "The current first flight schedule and what has slipped against the original plan.",
       wellRecognised: false,
     },
     financing: {
       stage: "Later stage",
+      disclosedRound: "Series D",
       latestRound:
         "Series D of 510 million dollars announced 8 October 2025 led by US Innovative Technology Fund, extended to 860 million dollars in February 2026.",
       latestRoundDate: "2026-02-10",
@@ -2183,6 +2232,8 @@ export const COMPANIES_D: PrivateCompany[] = [
     mainFinancingRisk:
       "Wet lab capacity is capital consuming alongside software development.",
     sourcing: {
+      discoveryChannel: "Customer signal",
+      signalDate: "2024-11-26",
       signal: "Customer announcement",
       dateSourced: "2026-04-08",
       channel: "Life sciences tooling adoption scan",
@@ -2192,10 +2243,15 @@ export const COMPANIES_D: PrivateCompany[] = [
         "Protein design models have improved enough to be useful outside specialist groups, and the constraint has shifted from model quality to the experimental data needed to fine-tune them.",
       whyOverlooked:
         "Based in Amsterdam and Zurich rather than in a major US biotechnology hub, and selling tooling rather than therapeutics, which attracts less attention despite lower risk.",
+      whyNotObvious:
+        "Based in Amsterdam and Zurich rather than a US biotechnology hub, and selling tooling rather than therapeutics, which most life sciences searches rank lower.",
+      evidenceNeeded:
+        "A prospective benchmark against current open source protein models, and whether a named customer has moved a designed protein into development.",
       wellRecognised: false,
     },
     financing: {
       stage: "Series B",
+      disclosedRound: "Series B",
       latestRound:
         "73 million dollar Series B led by IVP, with continued participation from Index Ventures and Kindred Capital, bringing total funding to more than 100 million dollars.",
       latestRoundDate: "2024-11-26",
@@ -2484,6 +2540,8 @@ export const COMPANIES_D: PrivateCompany[] = [
     mainFinancingRisk:
       "A valuation that rose steeply within a single year, setting a demanding reference point.",
     sourcing: {
+      discoveryChannel: "Funding announcement",
+      signalDate: "2026-01-21",
       signal: "Recent financing",
       dateSourced: "2026-01-21",
       channel: "Healthcare application adoption scan",
@@ -2493,10 +2551,15 @@ export const COMPANIES_D: PrivateCompany[] = [
         "Clinical literature volume has outgrown what physicians can track, and retrieval over licensed content has become good enough to be trusted at the point of care.",
       whyOverlooked:
         "Not overlooked. This is among the most widely covered healthcare technology companies, and its founder is publicly profiled. It is retained because the question of how adoption converts to durable revenue is much less examined than the growth is.",
+      whyNotObvious:
+        "Among the most covered healthcare companies in existence. The under-examined part is not the growth but the absence of any public business model.",
+      evidenceNeeded:
+        "The business model and the content licensing terms, neither of which is public.",
       wellRecognised: true,
     },
     financing: {
       stage: "Later stage",
+      disclosedRound: "Series D",
       latestRound:
         "250 million dollar Series D led by Thrive Capital and DST Global, at a reported 12 billion dollar valuation.",
       latestRoundDate: "2026-01-21",

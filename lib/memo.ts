@@ -43,7 +43,7 @@ export function buildMemo(
       heading: "Executive summary",
       body: [company.description, company.investment.thesis],
       points: [
-        `Stage: ${company.financing.stage}, headquartered in ${company.headquarters}`,
+        `Most recent disclosed round: ${company.financing.disclosedRound}, headquartered in ${company.headquarters}`,
         `Latest disclosed financing: ${company.financing.latestRound}`,
         `Data confidence: ${company.dataConfidence}. ${company.dataConfidenceNote}`,
       ],

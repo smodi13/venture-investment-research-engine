@@ -50,8 +50,14 @@ reject a specific rating and see exactly which source decided it.
 
 ## Real-company research policy
 
-The sourcing universe contains **18 real private companies**. There are no
+The sourcing universe contains **33 real private companies**. There are no
 fictional companies anywhere in production data.
+
+The universe is deliberately weighted toward the stages a sourcing process
+actually works at: 10 of the 33 companies (30 percent) are Seed or Series A,
+and only 6 (18 percent) are past Series C. Every record names the specific
+disclosed round rather than a generic bucket, so a company grouped as later
+stage for mandate purposes still shows the round it actually announced.
 
 Every record required all of the following before inclusion:
 
@@ -61,7 +67,9 @@ Every record required all of the following before inclusion:
   an official record such as a government or laboratory publication
 - At least one independent corroborating publication
 - A date last reviewed
-- A specific sourcing rationale
+- A specific sourcing rationale, including the discovery channel, the date of
+  the originating signal, why a database search would miss the company, and the
+  additional evidence still needed
 
 A company was excluded if it was publicly traded, acquired, no longer operating
 independently, or impossible to verify as currently private. During this
@@ -94,6 +102,38 @@ relevance tier, and no pipeline status, so it cannot be ranked.
 Public companies appear only on the **Market Signals** route and in clearly
 labelled comparable sections, where they are read for capital expenditure
 direction, supply constraints, earnings read-through, and competitive context.
+
+## Sourcing provenance
+
+Every company records how it was found and when, not only that it was found.
+
+| Field | Purpose |
+| --- | --- |
+| `discoveryChannel` | The kind of public channel the company surfaced through: a research publication, a funding announcement, open-source activity, a government grant, a regulatory milestone, a customer signal, and so on |
+| `signalDate` | The date of the originating signal, which drives freshness |
+| `signalFreshness` | Fresh within 90 days, Recent within 12 months, Established beyond that |
+| `whyNotObvious` | What a funding-database search would fail to surface about this company |
+| `evidenceNeeded` | The specific evidence that is still missing and would change the assessment |
+
+Freshness is shown next to confidence and is never folded into the quality
+score. A company is not a better investment because it announced something last
+month. Freshness answers a different question: whether the reason for looking
+now still holds.
+
+The overview page orders companies by quality score plus a capped adjustment of
+up to three points for data confidence and up to three for signal freshness.
+The cap is deliberate. A six point maximum cannot overturn a clear score
+difference, and the integrity suite asserts exactly that. Both the underlying
+score and the adjustment are printed on every card.
+
+## Comparison
+
+The `/compare` route puts up to four private companies side by side under a
+stated mandate, showing disclosed round, headquarters, funding, investors,
+discovery channel, signal freshness, data confidence, commercial readiness,
+capital intensity, main technical risk, evidence still needed, and recommended
+next step. Public companies cannot appear: the rows come from the private
+universe, which by type has no public members.
 
 ## Mandate configuration
 
@@ -168,7 +208,7 @@ Confidence describes how certain the conclusion is, not how good the company is.
 
 ## Source registry
 
-Fifty registered sources, each with subject, title, publisher, type, publication
+Eighty-six registered sources, each with subject, title, publisher, type, publication
 date, access date, URL, and the specific fact it supports. Only primary sources
 and independent corroborating publications are registered. Every link was
 checked, opens in a new tab, and uses `rel="noopener noreferrer"`. No
@@ -224,9 +264,18 @@ sentinel, that no firm-specific name or em dash appears, that the GitHub link is
 present where required, and that no credential pattern or environment variable
 appears anywhere.
 
-The **end-to-end suite** runs 66 checks in an isolated headless Chromium
+It also asserts the portfolio-construction rules: at least 28 companies, at
+least a quarter of them at Seed or Series A, no more than a quarter past Series
+C, no generic stage bucket standing in for a disclosed round, a valid discovery
+channel and dated signal on every company, a distinct explanation of what a
+database search would miss, named remaining evidence, sector-appropriate top
+fives under each mandate, and that the confidence and freshness adjustments can
+never overturn a clear score difference.
+
+The **end-to-end suite** runs 81 checks in an isolated headless Chromium
 profile: navigation, mandate switching and recalculation, search, filters,
-sorting, company details, pipeline editing, local storage persistence, CSV
+sorting including sort by signal freshness, company details, the comparison
+tool and its four-company cap, pipeline editing, local storage persistence, CSV
 export, memo generation and download, mobile layout, external link safety, the
 custom 404, and browser console output.
 
@@ -278,11 +327,14 @@ No environment variables are required.
   that the compression can be inspected and disagreed with.
 - **This is a dated research snapshot** taken on 30 July 2026. Private status in
   particular expires and must be re-verified before any decision.
-- **The universe skews later stage.** Every company is Series B or beyond,
-  because earlier-stage companies rarely meet the two-source verification
-  standard this platform requires. The Generalist Early Stage mandate is
-  therefore under-served by this universe, and the rankings correctly show most
-  companies as marginal under it rather than inflating them.
+- **Early-stage records are thinner by construction.** Seed and Series A
+  companies disclose less, so several of them carry Medium or Low confidence.
+  That is a statement about the public record, not about the companies. The
+  confidence rating exists so the difference is visible rather than smoothed
+  over.
+- **Signal freshness expires.** Freshness is computed against the snapshot date
+  of 30 July 2026. Everything labelled Fresh today becomes Recent and then
+  Established without anything about the company changing.
 
 ## Source policy
 
@@ -298,13 +350,14 @@ app/
   page.tsx             Overview
   mandates/            Mandate configuration and weights
   universe/            Private-company universe and per-company records
+  compare/             Side-by-side comparison of private companies
   pipeline/            Ten stage investment pipeline
   market-signals/      Public companies, market context only
   thesis/              Featured frontier technology thesis
   intelligence/        Dated market intelligence tracker
   memo/                Investment memo generated from a sourced record
   methodology/         Methodology and source registry
-components/            Mandate state, scoring views, evidence display, tables
+components/            Mandate state, scoring views, evidence display, tables, comparison
 lib/
   types.ts             Domain types, including the not-disclosed sentinel
   mandates.ts          The four mandates and their weights
@@ -316,7 +369,8 @@ lib/
   thesis.ts            Featured thesis
   intelligence.ts      Market intelligence entries
   memo.ts              Memo generated from a company record
-  rows.ts              Compact client projection with precomputed scores
+  rows.ts              Compact client projection, precomputed scores, sourcing priority
+  format.ts            Dates, ages, signal freshness, not-disclosed rendering
   storage.ts           Local workflow state
 tests/
   integrity.ts         Data-integrity and investment-logic checks

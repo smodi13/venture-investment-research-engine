@@ -5,9 +5,9 @@ import { useMemo } from "react";
 import { useMandate } from "./MandateProvider";
 import { MandateSelector } from "./MandateSelector";
 import { RelevanceBadge, ScoreBadge, ScoreBar } from "./Score";
-import { ConfidenceBadge } from "./Provenance";
+import { ConfidenceBadge, FreshnessBadge } from "./Provenance";
 import { RELEVANCE_TIERS } from "@/lib/scoring";
-import type { UniverseRow } from "@/lib/rows";
+import { priorityAdjustment, sourcingPriority, type UniverseRow } from "@/lib/rows";
 import { mergeRows, useOverrides } from "@/lib/storage";
 import { PIPELINE_STAGES } from "@/lib/types";
 import { formatDate } from "@/lib/format";
@@ -24,7 +24,11 @@ export function TopSourced({ rows }: { rows: UniverseRow[] }) {
   const top = useMemo(
     () =>
       [...rows]
-        .sort((a, b) => b.scores[mandateId] - a.scores[mandateId])
+        .sort(
+          (a, b) =>
+            sourcingPriority(b, mandateId) - sourcingPriority(a, mandateId) ||
+            b.scores[mandateId] - a.scores[mandateId],
+        )
         .slice(0, 6),
     [rows, mandateId],
   );
@@ -68,6 +72,10 @@ export function TopSourced({ rows }: { rows: UniverseRow[] }) {
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
                   <ConfidenceBadge confidence={r.dataConfidence} />
+                  <FreshnessBadge
+                    freshness={r.signalFreshness}
+                    signalDate={r.signalDate}
+                  />
                   <span
                     className="chip"
                     title={RELEVANCE_TIERS[r.tiers[mandateId]].meaning}
@@ -83,25 +91,37 @@ export function TopSourced({ rows }: { rows: UniverseRow[] }) {
                     <dd className="text-ink-muted">{r.latestRound}</dd>
                   </div>
                   <div>
-                    <dt className="font-medium text-ink-soft">Why sourced</dt>
+                    <dt className="font-medium text-ink-soft">
+                      Discovered through
+                    </dt>
                     <dd className="text-ink-muted">
-                      {r.sourcingSignal}. {r.whyEntered.slice(0, 150)}
-                      {r.whyEntered.length > 150 ? "..." : ""}
+                      {r.discoveryChannel}. {r.whyEntered.slice(0, 140)}
+                      {r.whyEntered.length > 140 ? "..." : ""}
                     </dd>
                   </div>
                 </dl>
                 <p className="mt-2 text-[11px] text-ink-muted">
-                  Reviewed {formatDate(r.lastReviewed)}
+                  Quality score {r.scores[mandateId]}
+                  {priorityAdjustment(r) > 0
+                    ? ` plus ${priorityAdjustment(r)} for confidence and signal freshness`
+                    : " with no confidence or freshness adjustment"}
+                  . Signal dated {formatDate(r.signalDate)}. Reviewed{" "}
+                  {formatDate(r.lastReviewed)}.
                 </p>
               </Link>
             </li>
           ))}
         </ol>
         <p className="mt-3 text-xs leading-relaxed text-ink-muted">
-          Switching the mandate re-weights all twelve quality factors and
-          re-ranks every company. Only private companies appear here. Public
-          companies are used as market signals and comparables and are kept on a
-          separate route.
+          Ordered by quality score plus a capped adjustment of up to three
+          points for data confidence and up to three for signal freshness, so a
+          well-evidenced company with a recent signal edges ahead of an
+          equally scored one without either. The adjustment is deliberately
+          small: recency is a reason to look now, not a reason to rate a company
+          higher. Both numbers are printed on every card. Switching the mandate
+          re-weights all twelve quality factors and re-ranks every company. Only
+          private companies appear here. Public companies are used as market
+          signals and comparables and are kept on a separate route.
         </p>
       </div>
     </div>

@@ -22,6 +22,7 @@ export const NAV_LINKS = [
   { href: "/", label: "Overview" },
   { href: "/mandates", label: "Mandates" },
   { href: "/universe", label: "Company Universe" },
+  { href: "/compare", label: "Compare" },
   { href: "/pipeline", label: "Pipeline" },
   { href: "/market-signals", label: "Market Signals" },
   { href: "/thesis", label: "Featured Thesis" },

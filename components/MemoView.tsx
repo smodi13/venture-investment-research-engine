@@ -86,7 +86,7 @@ export function MemoView() {
           </div>
           <div className="flex gap-1.5">
             <dt className="font-medium text-ink-soft">Stage</dt>
-            <dd>{company.financing.stage}</dd>
+            <dd>{company.financing.disclosedRound}</dd>
           </div>
           {isDisclosed(company.foundedYear) && (
             <div className="flex gap-1.5">

@@ -197,7 +197,58 @@ export const SOURCING_SIGNALS: SourcingSignal[] = [
   "Strategic investor participation",
 ];
 
+/** How the company was discovered. Not a proprietary channel claim. */
+export type DiscoveryChannel =
+  | "Research publication"
+  | "Funding announcement"
+  | "Open-source activity"
+  | "University spinout"
+  | "Government grant"
+  | "Product launch"
+  | "Regulatory milestone"
+  | "Founder research"
+  | "Industry event"
+  | "Strategic partnership"
+  | "Customer signal";
+
+export const DISCOVERY_CHANNELS: DiscoveryChannel[] = [
+  "Research publication",
+  "Funding announcement",
+  "Open-source activity",
+  "University spinout",
+  "Government grant",
+  "Product launch",
+  "Regulatory milestone",
+  "Founder research",
+  "Industry event",
+  "Strategic partnership",
+  "Customer signal",
+];
+
+/**
+ * How old the originating signal is. Derived from the signal date rather than
+ * stored, so it cannot drift out of step with the date it describes.
+ */
+export type SignalFreshness = "Fresh" | "Recent" | "Established";
+
+export const SIGNAL_FRESHNESS_LEVELS: SignalFreshness[] = [
+  "Fresh",
+  "Recent",
+  "Established",
+];
+
+export const SIGNAL_FRESHNESS_MEANING: Record<SignalFreshness, string> = {
+  Fresh: "The originating signal occurred within the last 90 days.",
+  Recent: "The originating signal occurred within the last 12 months.",
+  Established:
+    "The originating signal is more than 12 months old. The company may still be worth pursuing, but the sourcing edge from this particular signal has largely passed.",
+};
+
 export interface SourcingRationale {
+  /** How the company was found. */
+  discoveryChannel: DiscoveryChannel;
+  /** ISO date the originating signal itself occurred. Drives freshness. */
+  signalDate: string;
   /** The primary signal type that surfaced the company. */
   signal: SourcingSignal;
   /** ISO date the signal was observed. */
@@ -207,6 +258,14 @@ export interface SourcingRationale {
   /** Specific, evidenced statement of why this entered the pipeline. */
   whyEntered: string;
   whyTimely: string;
+  /**
+   * Why a straightforward database or keyword search would be unlikely to
+   * surface this company, or would surface it without the context that makes
+   * it interesting.
+   */
+  whyNotObvious: string;
+  /** What would materially raise conviction, stated as a concrete artefact. */
+  evidenceNeeded: string;
   /**
    * Why the company may be under-examined. When the evidence does not support
    * an overlooked claim, this states plainly that the company is already well
@@ -254,7 +313,15 @@ export interface CommercialAssessment {
 }
 
 export interface FinancingAssessment {
+  /**
+   * The bucket used for mandate relevance. Rounds beyond Series C all group
+   * into "Later stage" here, while `disclosedRound` preserves what was
+   * actually announced so the user is never shown a vaguer label than the
+   * evidence supports.
+   */
   stage: Stage;
+  /** The specific round as publicly disclosed, for example "Series D". */
+  disclosedRound: string;
   /** Human-readable description of the latest disclosed round. */
   latestRound: string;
   /** ISO date the latest round was announced. */

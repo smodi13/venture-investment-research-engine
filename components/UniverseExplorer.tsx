@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { useMandate } from "./MandateProvider";
 import { MandateSelector } from "./MandateSelector";
 import { RelevanceBadge, ScoreBadge, ScoreBar } from "./Score";
-import { ConfidenceBadge } from "./Provenance";
+import { ConfidenceBadge, FreshnessBadge } from "./Provenance";
 import { RELEVANCE_ORDER, RELEVANCE_TIERS, mandateRelevance } from "@/lib/scoring";
 import type { UniverseRow } from "@/lib/rows";
 import { downloadCsv, recordsToCsv } from "@/lib/csv";
@@ -25,6 +25,7 @@ type SortKey =
   | "score"
   | "reviewed"
   | "funded"
+  | "freshness"
   | "name"
   | "stage"
   | "confidence"
@@ -34,6 +35,7 @@ const SORTS: { key: SortKey; label: string }[] = [
   { key: "score", label: "Highest score" },
   { key: "reviewed", label: "Recently reviewed" },
   { key: "funded", label: "Recently funded" },
+  { key: "freshness", label: "Freshest sourcing signal" },
   { key: "name", label: "Company name" },
   { key: "stage", label: "Financing stage" },
   { key: "confidence", label: "Data confidence" },
@@ -42,6 +44,7 @@ const SORTS: { key: SortKey; label: string }[] = [
 
 const ANY = "Any";
 const CONFIDENCE_ORDER = { High: 3, Medium: 2, Low: 1 } as const;
+const FRESHNESS_ORDER = { Fresh: 3, Recent: 2, Established: 1 } as const;
 
 function Select({
   label,
@@ -133,6 +136,11 @@ export function UniverseExplorer({
           return b.lastReviewed.localeCompare(a.lastReviewed);
         case "funded":
           return b.latestRoundDate.localeCompare(a.latestRoundDate);
+        case "freshness":
+          return (
+            b.signalDate.localeCompare(a.signalDate) ||
+            b.scores[mandateId] - a.scores[mandateId]
+          );
         case "stage":
           return stageOrder(a.stage) - stageOrder(b.stage);
         case "confidence":
@@ -203,8 +211,8 @@ export function UniverseExplorer({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <label className="block flex-1">
           <span className="label">
-            Search company, founder, technology, product, sector, or sourcing
-            signal
+            Search company, founder, technology, product, sector, discovery
+            channel, or sourcing signal
           </span>
           <input
             type="search"
@@ -363,7 +371,18 @@ export function UniverseExplorer({
                   </div>
                 </td>
                 <td className="max-w-[14rem] py-3 px-3 text-xs leading-relaxed text-ink-soft">
-                  <span className="chip mb-1 inline-flex">{r.sourcingSignal}</span>
+                  <span className="chip mb-1 inline-flex">
+                    {r.discoveryChannel}
+                  </span>
+                  <div className="mb-1">
+                    <FreshnessBadge
+                      freshness={r.signalFreshness}
+                      signalDate={r.signalDate}
+                    />
+                  </div>
+                  <div className="text-ink-muted">
+                    Signal {formatDate(r.signalDate)}
+                  </div>
                   <div className="text-ink-muted">
                     Sourced {formatDate(r.dateSourced)}
                   </div>

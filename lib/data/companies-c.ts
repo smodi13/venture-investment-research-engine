@@ -41,6 +41,8 @@ export const COMPANIES_C: PrivateCompany[] = [
     mainFinancingRisk:
       "Hardware manufacturing capacity must be funded ahead of orders.",
     sourcing: {
+      discoveryChannel: "Industry event",
+      signalDate: "2025-03-04",
       signal: "Industry bottleneck",
       dateSourced: "2026-04-10",
       channel: "Manufacturing labour constraint scan",
@@ -50,10 +52,15 @@ export const COMPANIES_C: PrivateCompany[] = [
         "Perception and planning have improved enough that high-mix welding is approachable, and the labour shortage has become severe enough that fabricators are willing to change how they work.",
       whyOverlooked:
         "Located outside the major venture hubs, selling into a slow-moving industry, and working on a category that is unglamorous relative to humanoid robotics, which absorbs most robotics attention.",
+      whyNotObvious:
+        "Columbus-based, selling into fabrication, in a robotics category that funding databases file alongside far more visible humanoid companies.",
+      evidenceNeeded:
+        "The deployment time for a second cell at an existing customer compared with the first, which distinguishes a product from a consultancy.",
       wellRecognised: false,
     },
     financing: {
       stage: "Later stage",
+      disclosedRound: "Series D",
       latestRound:
         "100 million dollar Series D led by Matter Venture Partners and Drive Capital.",
       latestRoundDate: "2025-03-04",
@@ -343,6 +350,8 @@ export const COMPANIES_C: PrivateCompany[] = [
     mainFinancingRisk:
       "Raised quickly at an early stage, which sets a high bar for the next round.",
     sourcing: {
+      discoveryChannel: "Founder research",
+      signalDate: "2024-04-16",
       signal: "Founder background",
       dateSourced: "2026-03-18",
       channel: "Robotics founder and operating background scan",
@@ -352,10 +361,15 @@ export const COMPANIES_C: PrivateCompany[] = [
         "Labour availability in logistics and healthcare material handling continues to tighten, and collaborative safety standards have matured enough to make shared-space deployment practical.",
       whyOverlooked:
         "Discloses very little publicly, and the robotics conversation is dominated by humanoid form factors, which draws attention away from purpose-built mobile robots.",
+      whyNotObvious:
+        "The company discloses almost nothing, so a database search returns a funding row and a two-year-old date with no way to tell whether anything has happened since.",
+      evidenceNeeded:
+        "Any financing after April 2024, and a named multi-site customer deployment.",
       wellRecognised: false,
     },
     financing: {
       stage: "Series B",
+      disclosedRound: "Series B",
       latestRound:
         "100 million dollar Series B led by General Catalyst, announced 16 April 2024, bringing total capital raised to more than 140 million dollars.",
       latestRoundDate: "2024-04-16",
@@ -643,6 +657,8 @@ export const COMPANIES_C: PrivateCompany[] = [
     mainFinancingRisk:
       "Hardware inventory and manufacturing working capital scale with orders.",
     sourcing: {
+      discoveryChannel: "Customer signal",
+      signalDate: "2025-07-30",
       signal: "Customer announcement",
       dateSourced: "2026-02-12",
       channel: "Enterprise infrastructure customer disclosure scan",
@@ -652,10 +668,15 @@ export const COMPANIES_C: PrivateCompany[] = [
         "Data sovereignty requirements and the cost of sustained cloud workloads have made owned infrastructure a live consideration again, which was not true five years ago.",
       whyOverlooked:
         "Hardware companies selling to enterprises attract far less venture attention than software, and the company's technical audience is narrow even though the buyers are large.",
+      whyNotObvious:
+        "Databases classify this as a hardware company, which buries the more interesting fact that two US national laboratories chose it, and laboratory procurement is among the hardest to win.",
+      evidenceNeeded:
+        "Disclosed repeat rack orders from an existing customer, which would separate a product from a series of bespoke wins.",
       wellRecognised: false,
     },
     financing: {
       stage: "Series B",
+      disclosedRound: "Series B",
       latestRound:
         "100 million dollar Series B led by US Innovative Technology Fund, with participation from all existing investors.",
       latestRoundDate: "2025-07-30",

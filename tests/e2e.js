@@ -34,11 +34,15 @@ function watch(page, label) {
 }
 
 const ROUTES = [
-  "/", "/mandates", "/universe", "/pipeline", "/market-signals",
+  "/", "/mandates", "/universe", "/compare", "/pipeline", "/market-signals",
   "/thesis", "/intelligence", "/memo", "/methodology",
   "/universe/etched", "/universe/sublime-systems", "/universe/oxide-computer",
-  "/universe/quera", "/universe/path-robotics",
+  "/universe/quera", "/universe/path-robotics", "/universe/socket",
+  "/universe/anterior", "/universe/rerun",
 ];
+
+/** Kept in step with lib/companies.ts. */
+const UNIVERSE_SIZE = 33;
 
 /** Public companies that must never appear as sourcing candidates. */
 const PUBLIC_NAMES = ["NVIDIA", "Broadcom", "Micron", "Advanced Micro Devices", "Vertiv", "Marvell"];
@@ -117,7 +121,7 @@ const FIRMS = ["LDV", "Remoti", "Matchstick", "Magid", "Boston Millennia"];
     const names = await page.locator("table tbody tr td:nth-child(1) a").allTextContents();
     const offenders = names.filter((n) => PUBLIC_NAMES.some((p) => n.trim() === p));
     record("no public company in the private-company universe", offenders.length === 0, offenders.join(", "));
-    record("universe lists 18 verified private companies", names.length === 18, `${names.length} rows`);
+    record(`universe lists ${UNIVERSE_SIZE} verified private companies`, names.length === UNIVERSE_SIZE, `${names.length} rows`);
 
     await page.goto(BASE + "/pipeline", { waitUntil: "networkidle" });
     const pipeNames = await page.locator("table tbody tr td:nth-child(1) a").allTextContents();
@@ -217,8 +221,84 @@ const FIRMS = ["LDV", "Remoti", "Matchstick", "Magid", "Boston Millennia"];
     await page.waitForTimeout(300);
   }
 
+  /* Signal freshness and discovery channel ------------------------------ */
+  {
+    await page.goto(BASE + "/universe", { waitUntil: "networkidle" });
+    const badges = await page.locator("table tbody tr").locator("text=/ signal$/i").count();
+    record("universe rows show a signal freshness badge", badges > 0, `${badges} badges`);
+
+    const sortSel = page.locator("label").filter({ hasText: /^Sort by/ }).locator("select");
+    await sortSel.selectOption("freshness");
+    await page.waitForTimeout(400);
+    const dates = await page.locator("table tbody tr td:nth-child(5)").allTextContents();
+    const parsed = dates.map((t) => {
+      const m = t.match(/Signal ([A-Za-z]{3} \d{1,2}, \d{4})/);
+      return m ? Date.parse(m[1]) : NaN;
+    }).filter((n) => !Number.isNaN(n));
+    const descending = parsed.every((v, i) => i === 0 || parsed[i - 1] >= v);
+    record("sort by signal freshness orders newest signal first", parsed.length > 0 && descending,
+      `${parsed.length} dated signals`);
+    await sortSel.selectOption("score");
+    await page.waitForTimeout(300);
+
+    await page.goto(BASE + "/universe/rerun", { waitUntil: "networkidle" });
+    const body = await page.textContent("body");
+    record("company detail shows the discovery channel and dated signal",
+      /Originating signal dated/.test(body) && /Open-source activity/.test(body));
+    record("company detail states why a database search would miss the company",
+      body.includes("Why a database search would miss this"));
+    record("company detail names the additional evidence needed",
+      body.includes("Additional evidence needed"));
+    record("company detail shows a specific disclosed round, not a generic bucket",
+      /Most recent disclosed round/.test(body) && !/Most recent disclosed round\s*Later stage/.test(body));
+  }
+
+  /* Comparison tool ----------------------------------------------------- */
+  {
+    await page.goto(BASE + "/compare", { waitUntil: "networkidle" });
+    record("compare page renders with no table before a selection",
+      (await page.locator("table").count()) === 0);
+
+    const chips = page.locator("button[data-compare-chip]");
+    const chipCount = await chips.count();
+    record("compare page offers every private company for selection",
+      chipCount === UNIVERSE_SIZE, `${chipCount} selectable companies`);
+
+    const chipNames = await chips.allTextContents();
+    record("no public company can be selected for comparison",
+      !chipNames.some((t) => PUBLIC_NAMES.some((p) => t.trim().startsWith(p))));
+
+    await chips.nth(0).click();
+    await chips.nth(1).click();
+    await page.waitForTimeout(300);
+    const cols = await page.locator("table thead th").count();
+    record("comparison table appears with a column per selected company", cols === 3, `${cols} columns`);
+
+    await chips.nth(2).click();
+    await chips.nth(3).click();
+    await page.waitForTimeout(300);
+    record("comparison accepts four companies", (await page.locator("table thead th").count()) === 5);
+
+    const disabled = await page.locator("button[data-compare-chip][disabled]").count();
+    record("comparison caps the selection at four", disabled === UNIVERSE_SIZE - 4, `${disabled} disabled`);
+
+    const cmpBody = await page.textContent("body");
+    record("comparison shows disclosed round, confidence, and freshness",
+      /Most recent disclosed round/.test(cmpBody) &&
+      /Data confidence/.test(cmpBody) &&
+      /Signal freshness/.test(cmpBody));
+    record("comparison shows the evidence still needed and the next step",
+      /Additional evidence needed/.test(cmpBody) && /Recommended next step/.test(cmpBody));
+
+    await page.getByRole("button", { name: /clear selection/i }).click();
+    await page.waitForTimeout(300);
+    record("clearing the selection removes the comparison table",
+      (await page.locator("table").count()) === 0);
+  }
+
   /* CSV export ---------------------------------------------------------- */
   {
+    await page.goto(BASE + "/universe", { waitUntil: "networkidle" });
     const [dl] = await Promise.all([
       page.waitForEvent("download"),
       page.getByRole("button", { name: /Export .* to CSV/i }).click(),
@@ -228,7 +308,7 @@ const FIRMS = ["LDV", "Remoti", "Matchstick", "Magid", "Boston Millennia"];
     const csv = fs.readFileSync(file, "utf8");
     const lines = csv.trim().split("\n");
     record("CSV export downloads", fs.existsSync(file), dl.suggestedFilename());
-    record("CSV has preamble, header, and one row per company", lines.length === 4 + 1 + 18, `${lines.length} lines`);
+    record("CSV has preamble, header, and one row per company", lines.length === 4 + 1 + UNIVERSE_SIZE, `${lines.length} lines`);
     record("CSV states no public or fictional companies are included",
       /No public companies and no fictional companies are included/.test(csv));
     record("CSV carries sourcing and confidence columns",
@@ -380,7 +460,7 @@ const FIRMS = ["LDV", "Remoti", "Matchstick", "Magid", "Boston Millennia"];
     await menuBtn.click();
     await mp.waitForTimeout(300);
     record("mobile: menu opens with all nav links",
-      (await mp.locator("#mobile-nav a").count()) === 8, `${await mp.locator("#mobile-nav a").count()} links`);
+      (await mp.locator("#mobile-nav a").count()) === 9, `${await mp.locator("#mobile-nav a").count()} links`);
     await mp.locator("#mobile-nav a", { hasText: "Market Signals" }).click();
     await mp.waitForTimeout(600);
     record("mobile: navigation works and menu closes",

@@ -38,6 +38,8 @@ export const COMPANIES_B: PrivateCompany[] = [
     mainFinancingRisk:
       "A 4.4 billion dollar valuation set before any public evidence of volume deployment.",
     sourcing: {
+      discoveryChannel: "Funding announcement",
+      signalDate: "2024-10-16",
       signal: "Recent financing",
       dateSourced: "2026-06-15",
       channel: "Frontier compute value-chain scan, interconnect layer",
@@ -47,10 +49,15 @@ export const COMPANIES_B: PrivateCompany[] = [
         "Rack-scale architectures have made die-to-die and tray-to-tray bandwidth the binding constraint on usable compute, which was not true when the company was founded.",
       whyOverlooked:
         "Photonics is technically harder for generalist investors to evaluate than accelerators, and the company discloses very little commercially, which suppresses coverage relative to its funding level.",
+      whyNotObvious:
+        "The funding is easy to find. What is missing everywhere, including in databases, is any commercial datapoint at all, which is precisely why the record is low confidence.",
+      evidenceNeeded:
+        "A single named design win, disclosed by the customer rather than the company.",
       wellRecognised: false,
     },
     financing: {
       stage: "Later stage",
+      disclosedRound: "Series D",
       latestRound:
         "400 million dollar Series D at a reported 4.4 billion dollar valuation.",
       latestRoundDate: "2024-10-16",
@@ -340,6 +347,8 @@ export const COMPANIES_B: PrivateCompany[] = [
     mainFinancingRisk:
       "Continuous capital requirement with no path to operating profitability on any near-term plan.",
     sourcing: {
+      discoveryChannel: "Government grant",
+      signalDate: "2025-02-11",
       signal: "Government contract",
       dateSourced: "2026-05-20",
       channel: "Quantum programme and national laboratory award tracking",
@@ -349,10 +358,15 @@ export const COMPANIES_B: PrivateCompany[] = [
         "Published error-correction milestones have moved from physical qubit counts to logical operations, which is the transition that determines whether the category ever becomes useful.",
       whyOverlooked:
         "Neutral-atom approaches receive less attention than superconducting ones, and the company is less widely covered than the listed quantum companies despite comparable technical standing.",
+      whyNotObvious:
+        "Database searches return the financing but not the DARPA programme progression, which is the only externally administered technical filter in this category and is published separately from any funding record.",
+      evidenceNeeded:
+        "Logical qubit counts measured against the published 2028 roadmap, and the conditions releasing the milestone-contingent portion of the financing.",
       wellRecognised: false,
     },
     financing: {
       stage: "Series C",
+      disclosedRound: "Series C",
       latestRound:
         "More than 230 million dollars announced 11 February 2025 with Google and SoftBank Vision Fund 2 among new investors. The company disclosed that 60 million dollars of the total is contingent on achieving technical milestones.",
       latestRoundDate: "2025-02-11",
@@ -653,6 +667,8 @@ export const COMPANIES_B: PrivateCompany[] = [
     mainFinancingRisk:
       "A material share of the announced funding is a letter of intent with a government department rather than committed capital.",
     sourcing: {
+      discoveryChannel: "Research publication",
+      signalDate: "2026-06-17",
       signal: "Technical benchmark",
       dateSourced: "2026-06-17",
       channel: "Quantum error-correction publication tracking",
@@ -662,10 +678,15 @@ export const COMPANIES_B: PrivateCompany[] = [
         "The industry has moved from physical qubit counts to logical error rates as the meaningful measure, and this result speaks directly to the new measure.",
       whyOverlooked:
         "Smaller and less covered than the listed quantum companies, and neutral-atom approaches receive less generalist attention than superconducting ones.",
+      whyNotObvious:
+        "The company is smaller and less covered than the listed quantum names, and the toric code result was published as a technical claim rather than as a funding event, so it does not surface in funding-led searches.",
+      evidenceNeeded:
+        "Independent replication of the error-correction result by another group, and the terms attached to the government letter of intent.",
       wellRecognised: false,
     },
     financing: {
       stage: "Series C",
+      disclosedRound: "Series C",
       latestRound:
         "More than 300 million dollars announced 17 June 2026, comprising a 100 million dollar Series C led by Third Point Ventures and a signed letter of intent with the US Department of Commerce for 100 million dollars.",
       latestRoundDate: "2026-06-17",

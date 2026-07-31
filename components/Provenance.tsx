@@ -1,8 +1,10 @@
 import {
   DATA_CONFIDENCE_MEANING,
   NOT_DISCLOSED,
+  SIGNAL_FRESHNESS_MEANING,
   type Basis,
   type DataConfidence,
+  type SignalFreshness,
 } from "@/lib/types";
 import { getSource } from "@/lib/sources";
 import { formatDate } from "@/lib/format";
@@ -34,6 +36,41 @@ export function ConfidenceBadge({
       className={`inline-flex items-center whitespace-nowrap rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${CONFIDENCE_TONE[confidence]} ${className}`}
     >
       {confidence} confidence
+    </span>
+  );
+}
+
+const FRESHNESS_TONE: Record<SignalFreshness, string> = {
+  Fresh: "border-sky-200 bg-sky-50 text-sky-800",
+  Recent: "border-slate-200 bg-slate-50 text-slate-700",
+  Established: "border-stone-200 bg-stone-50 text-stone-600",
+};
+
+/**
+ * How recent the originating signal is.
+ *
+ * Kept visually distinct from the confidence badge because the two answer
+ * different questions. Confidence is about how solid the evidence is. Freshness
+ * is about whether the reason to look now still holds.
+ */
+export function FreshnessBadge({
+  freshness,
+  signalDate,
+  className = "",
+}: {
+  freshness: SignalFreshness;
+  signalDate?: string;
+  className?: string;
+}) {
+  const detail = signalDate
+    ? `${SIGNAL_FRESHNESS_MEANING[freshness]} Signal dated ${formatDate(signalDate)}.`
+    : SIGNAL_FRESHNESS_MEANING[freshness];
+  return (
+    <span
+      title={detail}
+      className={`inline-flex items-center whitespace-nowrap rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${FRESHNESS_TONE[freshness]} ${className}`}
+    >
+      {freshness} signal
     </span>
   );
 }

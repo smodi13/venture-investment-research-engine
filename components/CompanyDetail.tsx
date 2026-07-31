@@ -11,6 +11,7 @@ import {
   EvidenceLine,
   SourceLink,
   Value,
+  FreshnessBadge,
 } from "./Provenance";
 import { BulletList, Field, Section } from "./ui";
 import {
@@ -22,7 +23,7 @@ import {
 import { getSource } from "@/lib/sources";
 import { signalsForCompany } from "@/lib/data/market-signals";
 import { intelligenceForCompany } from "@/lib/intelligence";
-import { formatDate, describeAge } from "@/lib/format";
+import { formatDate, describeAge, signalFreshness } from "@/lib/format";
 import { isDisclosed, NOT_DISCLOSED, type PrivateCompany } from "@/lib/types";
 
 const DILIGENCE_LABELS: {
@@ -126,12 +127,21 @@ export function CompanyDetail({ company }: { company: PrivateCompany }) {
       <section className="rounded-xl border border-accent-line bg-accent-soft p-5 sm:p-6">
         <h2 className="h-section">Why this company entered the pipeline</h2>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="chip bg-surface">{company.sourcing.signal}</span>
           <span className="chip bg-surface">
-            Sourced {formatDate(company.sourcing.dateSourced)}
+            {company.sourcing.discoveryChannel}
           </span>
+          <span className="chip bg-surface">{company.sourcing.signal}</span>
+          <FreshnessBadge
+            freshness={signalFreshness(company.sourcing.signalDate)}
+            signalDate={company.sourcing.signalDate}
+          />
           <span className="chip bg-surface">{company.sourcing.channel}</span>
         </div>
+        <p className="mt-2 text-xs text-ink-muted">
+          Originating signal dated {formatDate(company.sourcing.signalDate)},{" "}
+          {describeAge(company.sourcing.signalDate)}. Added to the pipeline{" "}
+          {formatDate(company.sourcing.dateSourced)}.
+        </p>
         <p className="mt-4 text-sm leading-relaxed text-ink-soft">
           {company.sourcing.whyEntered}
         </p>
@@ -150,6 +160,18 @@ export function CompanyDetail({ company }: { company: PrivateCompany }) {
             </p>
             <p className="text-sm leading-relaxed text-ink-soft">
               {company.sourcing.whyOverlooked}
+            </p>
+          </div>
+          <div>
+            <p className="label">Why a database search would miss this</p>
+            <p className="text-sm leading-relaxed text-ink-soft">
+              {company.sourcing.whyNotObvious}
+            </p>
+          </div>
+          <div>
+            <p className="label">Additional evidence needed</p>
+            <p className="text-sm leading-relaxed text-ink-soft">
+              {company.sourcing.evidenceNeeded}
             </p>
           </div>
         </div>
@@ -328,7 +350,14 @@ export function CompanyDetail({ company }: { company: PrivateCompany }) {
             />
           </dl>
           <div className="space-y-5 pt-3">
-            <Field label="Current financing stage">{f.stage}</Field>
+            <Field label="Most recent disclosed round">
+              {f.disclosedRound}
+              {f.disclosedRound !== f.stage ? (
+                <span className="mt-1 block text-xs text-ink-muted">
+                  Grouped as {f.stage} for mandate stage affinity.
+                </span>
+              ) : null}
+            </Field>
             <Field label="Named investors">
               {f.namedInvestors.length > 0
                 ? f.namedInvestors.join(", ")
