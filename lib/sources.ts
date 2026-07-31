@@ -1248,7 +1248,7 @@ export const SOURCES: Source[] = [
     "Company announcement",
     "2026-06-24",
     "https://www.portalsystems.space/news/portal-unveils-starburst-an-espa-class-rapid-maneuverability-spacecraft-and-announces-starburst-1-mission-on-spacex-in-q4-2026",
-    "The Starburst spacecraft, and the Starburst-1 mission manifested on a SpaceX Transporter rideshare in the fourth quarter of 2026. Added so the launch manifest does not rest solely on a report that blocks automated requests.",
+    "The Starburst spacecraft, and the Starburst-1 mission manifested for a SpaceX Transporter rideshare scheduled for the fourth quarter of 2026. This is an announced launch manifest, not a flown mission. Added so the manifest does not rest solely on a report that blocks automated requests.",
     true,
   ),
   s(

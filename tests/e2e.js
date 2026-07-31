@@ -358,6 +358,28 @@ const FIRMS = ["LDV", "Remoti", "Matchstick", "Magid", "Boston Millennia"];
     await page.waitForTimeout(300);
   }
 
+  /* Future missions read as future in rendered copy ---------------------- */
+  {
+    await page.goto(BASE + "/universe/portal-space", { waitUntil: "networkidle" });
+    // innerText, not textContent: textContent includes the serialised RSC
+    // payload inside <script>, which has no sentence boundaries and turns the
+    // whole page into one blob.
+    const body = (await page.locator("body").innerText()).replace(/\s+/g, " ");
+    const sentences = body.split(/(?<=[.!?]) /).filter((x) => /Starburst-1|Supernova/.test(x));
+    const negated = /\b(?:has|have|had|which has|which have)\s+(?:never|not|not yet|yet)\s+\w+|\bneither\s+of\s+which\s+(?:has|have)\s+\w+|\bbefore\s+[^.]*?\bhas\s+flown\b/gi;
+    const completed = /\b(launched|has flown|have flown|flew|completed|deployed|achieved|reached orbit|successfully (?:launched|flew|completed|deployed))\b/i;
+    const bad = sentences.filter((x) => completed.test(x.replace(negated, " ")));
+    record("rendered copy never says a future mission launched or completed",
+      bad.length === 0, bad.slice(0, 2).join(" | ") || `${sentences.length} sentences checked`);
+    record("rendered copy frames the rideshare as scheduled and not yet flown",
+      /manifested for a SpaceX Transporter rideshare scheduled for the fourth quarter of 2026/.test(body) &&
+      /has not yet launched/.test(body));
+    record("rendered copy states the propulsion has never flown",
+      /has never flown/.test(body) && /unflown propulsion/i.test(body));
+    record("rendered copy carries no launched, deployed, or achieved framing for Starburst-1",
+      !/Starburst-1[^.]*\b(launched|flew|deployed|achieved|completed)\b/i.test(body));
+  }
+
   /* Comparison tool ----------------------------------------------------- */
   {
     await page.goto(BASE + "/compare", { waitUntil: "networkidle" });

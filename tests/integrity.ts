@@ -1042,6 +1042,143 @@ console.log("\n=== Source accessibility ===");
   );
 }
 
+console.log("\n=== Future milestones are described as future ===");
+
+/**
+ * Milestones the corpus names that have not happened yet.
+ *
+ * Each carries the date it is scheduled for. The first check asserts that date
+ * is still in the future relative to the snapshot, so when one of these
+ * actually flies the suite fails and forces the copy to be revisited rather
+ * than silently going stale.
+ */
+const FUTURE_MILESTONES: { term: string; scheduled: string }[] = [
+  { term: "Starburst-1", scheduled: "2026-10-01" },
+  { term: "Supernova", scheduled: "2027-01-01" },
+];
+
+/** Verbs that would assert the thing already happened. */
+const COMPLETED_ACTION =
+  /\b(launched|has flown|have flown|flew|completed|deployed|achieved|delivered to orbit|reached orbit|successfully (?:launched|flew|completed|deployed))\b/i;
+
+/**
+ * Negated constructions, stripped before looking for completed actions.
+ * "has never flown" and "neither of which has flown" contain the verb and
+ * assert the opposite of it.
+ */
+const NEGATED =
+  /\b(?:has|have|had|which has|which have)\s+(?:never|not|not yet|yet)\s+\w+|\bneither\s+of\s+which\s+(?:has|have)\s+\w+|\bno[tn]e?\s+(?:of\s+\w+\s+)?(?:has|have)\s+\w+/gi;
+
+/** A date that has not arrived yet, relative to the snapshot. */
+const FUTURE_DATE = /\b(fourth quarter of 2026|Q4 2026|202[7-9]|20[3-9]\d)\b/i;
+
+/** Language that marks a statement as forward-looking. */
+const FORWARD_LOOKING =
+  /\b(scheduled|planned|plans?\s+to|manifested|targets?|targeting|expected|intends?|would be|will be|not yet|upcoming|ahead of|due|until)\b/i;
+
+/** Every sentence of company copy that a reader actually sees. */
+function companyProse(c: (typeof COMPANIES)[number]): string[] {
+  const parts = [
+    c.description,
+    String(c.tractionSignal),
+    c.recentCatalyst,
+    c.technicalDifferentiation,
+    c.mainTechnicalRisk,
+    c.mainCommercialRisk,
+    c.technology.howItWorks,
+    c.technology.coreAdvantage,
+    c.technology.milestoneForScale,
+    c.market.currentCatalyst,
+    c.commercial.expansionOpportunity,
+    c.commercial.goToMarketRisk,
+    c.investment.thesis,
+    c.investment.bullCase,
+    c.investment.baseCase,
+    c.investment.bearCase,
+    c.investment.recommendedNextStep,
+    c.outreach,
+    c.sourcing.whyEntered,
+    c.sourcing.whyTimely,
+    c.sourcing.whyNotObvious,
+    ...c.technology.supportingEvidence.map((e) => e.claim),
+    ...c.commercial.adoptionEvidence.map((e) => e.claim),
+    ...Object.values(c.factors).map((f) => `${f.evidence} ${f.explanation}`),
+  ];
+  return parts
+    .join(" ")
+    .split(/(?<=[.!?])\s+/)
+    .map((x) => x.trim())
+    .filter(Boolean);
+}
+
+// 41
+{
+  const past = FUTURE_MILESTONES.filter((m) => m.scheduled <= SITE.snapshotDate);
+  check(
+    "every milestone listed as future is still scheduled after the snapshot date",
+    past.length === 0,
+    past.length > 0
+      ? `${past.map((m) => m.term).join(", ")} is now in the past; revisit the copy`
+      : FUTURE_MILESTONES.map((m) => `${m.term} ${m.scheduled}`).join(", "),
+  );
+}
+// 42
+{
+  const offenders: string[] = [];
+  for (const c of COMPANIES) {
+    for (const sentence of companyProse(c)) {
+      for (const m of FUTURE_MILESTONES) {
+        if (!sentence.includes(m.term)) continue;
+        const asserted = sentence.replace(NEGATED, " ");
+        if (COMPLETED_ACTION.test(asserted)) {
+          offenders.push(`${c.name}: "${sentence.slice(0, 110)}"`);
+        }
+      }
+    }
+  }
+  check(
+    "no future mission is described with a completed-action verb",
+    offenders.length === 0,
+    offenders.slice(0, 3).join(" | "),
+  );
+}
+// 43
+{
+  const offenders: string[] = [];
+  for (const c of COMPANIES) {
+    for (const sentence of companyProse(c)) {
+      for (const m of FUTURE_MILESTONES) {
+        // Only sentences pairing the mission with a date that has not
+        // arrived need the hedge. A sentence dated to a past financing round
+        // is talking about the round, not the flight.
+        if (!sentence.includes(m.term)) continue;
+        if (!FUTURE_DATE.test(sentence)) continue;
+        if (!FORWARD_LOOKING.test(sentence)) {
+          offenders.push(`${c.name}: "${sentence.slice(0, 110)}"`);
+        }
+      }
+    }
+  }
+  check(
+    "every dated mention of a future mission carries forward-looking language",
+    offenders.length === 0,
+    offenders.slice(0, 3).join(" | "),
+  );
+}
+// 44
+{
+  const offenders = SOURCES.filter(
+    (x) =>
+      FUTURE_MILESTONES.some((m) => x.supports.includes(m.term)) &&
+      COMPLETED_ACTION.test(x.supports.replace(NEGATED, " ")),
+  ).map((x) => x.id);
+  check(
+    "no source registry entry describes a future mission as completed",
+    offenders.length === 0,
+    offenders.join(", "),
+  );
+}
+
 console.log("\n=== Universe composition ===");
 console.log(`  Companies: ${UNIVERSE_STATS.total}`);
 console.log(`  Sectors: ${UNIVERSE_STATS.sectorCount}`);

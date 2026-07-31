@@ -1308,11 +1308,11 @@ export const COMPANIES_F: PrivateCompany[] = [
     technicalDifferentiation:
       "Solar thermal propulsion concentrates sunlight to heat propellant, which the company positions as delivering performance approaching nuclear thermal propulsion without carrying a reactor.",
     tractionSignal:
-      "The company announced Starburst-1, its first free-flying mission with live payloads, manifested on a SpaceX Transporter rideshare in the fourth quarter of 2026, and headcount has grown to roughly 40 with a stated plan to reach 100.",
+      "The company has announced Starburst-1, which would be its first free-flying mission with live payloads. It is manifested for a SpaceX Transporter rideshare scheduled for the fourth quarter of 2026 and has not yet launched. Headcount has grown to roughly 40, with a stated plan to reach 100.",
     tractionProvenance: "Independently verified",
     tractionAsOf: "2026-04-09",
     recentCatalyst:
-      "50 million dollar Series A announced 9 April 2026, co-led by Geodesic Capital and Mach33, funding a 52,000 square foot production facility in Bothell and the Starburst and Supernova vehicles.",
+      "50 million dollar Series A announced 9 April 2026, co-led by Geodesic Capital and Mach33, funding a 52,000 square foot production facility in Bothell and development of the Starburst and Supernova vehicles, neither of which has flown.",
     primaryCompetitors: [
       "Conventional chemical propulsion spacecraft builders",
       "Electric propulsion satellite manufacturers",
@@ -1430,7 +1430,7 @@ export const COMPANIES_F: PrivateCompany[] = [
       adoptionEvidence: [
         {
           claim:
-            "Starburst-1 is manifested on a SpaceX Transporter rideshare in the fourth quarter of 2026, carrying live third-party payloads. No customer contract value is disclosed.",
+            "Starburst-1 is manifested for a SpaceX Transporter rideshare scheduled for the fourth quarter of 2026 and is planned to carry live third-party payloads. The mission has not flown, and no customer contract value is disclosed.",
           sourceId: "portal-starburst",
           basis: "verified",
           provenance: "Company-reported",
