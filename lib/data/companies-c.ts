@@ -28,6 +28,8 @@ export const COMPANIES_C: PrivateCompany[] = [
       "Perception and planning that tolerate the part-to-part variation of real fabrication, which is what defeats conventional programmed welding robots.",
     tractionSignal:
       "Two products shipping, the AW-3 handling parts up to seventy feet and the AF-1 performing pick, fit, and weld without human intervention.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "Series D of 100 million dollars led by Matter Venture Partners and Drive Capital.",
     primaryCompetitors: [
@@ -97,12 +99,14 @@ export const COMPANIES_C: PrivateCompany[] = [
             "Two robotic welding products in market, the AW-3 and AF-1, with the AF-1 performing pick, fit, and weld without human intervention.",
           sourceId: "path-robotreport",
           basis: "verified",
+          provenance: "Independently verified",
         },
         {
           claim:
             "Founded in 2018 by brothers Andy and Alex Lonsberry, who welded before earning doctorates and building the company.",
           sourceId: "path-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -147,6 +151,7 @@ export const COMPANIES_C: PrivateCompany[] = [
           claim: "Two products commercially available and in market.",
           sourceId: "path-robotreport",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       implementationBurden:
@@ -336,6 +341,8 @@ export const COMPANIES_C: PrivateCompany[] = [
     technicalDifferentiation:
       "A form factor and safety design intended for shared human environments rather than an industrial arm adapted to them.",
     tractionSignal: NOT_DISCLOSED,
+    tractionProvenance: "Not sufficiently supported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "Series B of 100 million dollars led by General Catalyst in April 2024, bringing total capital raised to more than 140 million dollars in under two years.",
     primaryCompetitors: [
@@ -407,12 +414,14 @@ export const COMPANIES_C: PrivateCompany[] = [
             "Series B of 100 million dollars with named institutional investors and the Mayo Clinic participating.",
           sourceId: "cobot-prnewswire",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Founded in 2022 by Brad Porter, previously vice president of robotics at Amazon.",
           sourceId: "cobot-prnewswire",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -457,6 +466,7 @@ export const COMPANIES_C: PrivateCompany[] = [
             "The Mayo Clinic participated in the Series B as an investor, indicating a healthcare deployment interest.",
           sourceId: "cobot-prnewswire",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -644,6 +654,8 @@ export const COMPANIES_C: PrivateCompany[] = [
       "Designing the hardware and the control plane together, including replacing the conventional server firmware stack, which no other vendor at this scale attempts.",
     tractionSignal:
       "Named customers displayed by the company include Lawrence Livermore National Laboratory, Idaho National Laboratory, Stoke Space, and Jump Trading.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "Series B of 100 million dollars led by Thomas Tull's US Innovative Technology Fund, announced 30 July 2025.",
     primaryCompetitors: [
@@ -705,12 +717,14 @@ export const COMPANIES_C: PrivateCompany[] = [
             "Named customers including Lawrence Livermore National Laboratory, Idaho National Laboratory, Stoke Space, and Jump Trading are displayed by the company.",
           sourceId: "oxide-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Series B of 100 million dollars with all existing investors participating.",
           sourceId: "oxide-prnewswire",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -760,6 +774,7 @@ export const COMPANIES_C: PrivateCompany[] = [
             "Two US national laboratories are displayed as customers on the company site.",
           sourceId: "oxide-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:

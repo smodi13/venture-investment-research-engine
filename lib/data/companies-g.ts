@@ -28,6 +28,8 @@ export const COMPANIES_G: PrivateCompany[] = [
       "The output is a clinical determination traced to the specific policy criteria and the specific chart evidence, which is what makes the decision auditable and therefore usable by a regulated payer.",
     tractionSignal:
       "The company names Geisinger Health Plan among its customers and has an integration with a widely deployed care management platform.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-02-16",
     recentCatalyst:
       "40 million dollar financing announced February 2026, bringing total funding to 64 million dollars, following a 20 million dollar Series A led by NEA in June 2024.",
     primaryCompetitors: [
@@ -94,12 +96,14 @@ export const COMPANIES_G: PrivateCompany[] = [
             "The company announced a 40 million dollar financing and names a regional health plan among its customers.",
           sourceId: "anterior-raise",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "The February 2026 round, its investors, and the expansion of production deployments across health plans were independently reported.",
           sourceId: "anterior-fierce",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks:
@@ -145,6 +149,7 @@ export const COMPANIES_G: PrivateCompany[] = [
             "A named regional health plan customer and an integration with a widely deployed care management platform.",
           sourceId: "anterior-raise",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -276,6 +281,8 @@ export const COMPANIES_G: PrivateCompany[] = [
       "Building for the document as it actually arrives, degraded and unstructured, rather than assuming an interoperability standard that most of the referral chain does not use.",
     tractionSignal:
       "The company states it has helped process millions of patients across hundreds of providers and more than tripled revenue since the Series B eight months earlier, without disclosing the absolute figure.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2025-06-18",
     recentCatalyst:
       "101 million dollar Series C at a 605 million dollar valuation led by IVP in June 2025, following a 37 million dollar Series B in October 2024.",
     primaryCompetitors: [
@@ -344,12 +351,14 @@ export const COMPANIES_G: PrivateCompany[] = [
             "A 101 million dollar Series C at a 605 million dollar valuation led by IVP.",
           sourceId: "tennr-seriesc",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
-            "The company stated it had more than tripled revenue since the Series B, and the round was independently reported.",
+            "The round, its valuation, and the investor list were independently reported. The revenue tripling within that reporting is the company's own statement, with no absolute figure given.",
           sourceId: "tennr-fortune",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -392,9 +401,10 @@ export const COMPANIES_G: PrivateCompany[] = [
       adoptionEvidence: [
         {
           claim:
-            "The company stated revenue had more than tripled since the Series B eight months earlier. The absolute figure was not disclosed.",
+            "The company stated revenue had more than tripled since the Series B eight months earlier. The absolute figure was not disclosed and the growth rate was not independently checked.",
           sourceId: "tennr-fortune",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -521,7 +531,9 @@ export const COMPANIES_G: PrivateCompany[] = [
     technicalDifferentiation:
       "The physician sign-off is the product architecture rather than a compliance wrapper, which sets a hard ceiling on automation and a hard floor on clinical accountability.",
     tractionSignal:
-      "The company states it serves more than 100,000 members nationwide, with a 96 percent issue resolution rate, two minute physician response times, and 381 dollars in average annual savings per engaged member.",
+      "On its own site the company reports a 96 percent issue resolution rate without escalation, 381 dollars in average annual savings per engaged member, 4.85 out of 5 member satisfaction, and a net promoter score of 76, in a post dated 23 October 2025 and updated 13 February 2026. A figure of more than 100,000 members appears only in a trade publication reproducing the 16 October 2025 financing announcement, and is company-reported rather than independently verified. None of these figures has a published methodology.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2025-10-23",
     recentCatalyst:
       "25 million dollar Series A led by Andreessen Horowitz and GV announced 16 October 2025, bringing total funding to 36 million dollars.",
     primaryCompetitors: [
@@ -575,7 +587,8 @@ export const COMPANIES_G: PrivateCompany[] = [
         "Revenue",
         "Physician review time per encounter",
         "Founders and founding year",
-        "How the 381 dollar savings figure is calculated",
+        "How the 381 dollar savings figure and the 96 percent resolution rate are calculated",
+        "Any independent confirmation of the member count",
       ],
     },
     technology: {
@@ -586,15 +599,17 @@ export const COMPANIES_G: PrivateCompany[] = [
       supportingEvidence: [
         {
           claim:
-            "More than 100,000 members served nationwide, a 96 percent issue resolution rate, two minute physician response times, and 381 dollars average annual savings per engaged member.",
-          sourceId: "counsel-hit",
+            "A 96 percent issue resolution rate without escalation, 381 dollars average annual savings per engaged member, 4.85 out of 5 satisfaction, and a net promoter score of 76, stated on the company's own site.",
+          sourceId: "counsel-seriesa",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "The lead investor describes the chief executive as a Stanford-trained physician and AI researcher, previously chief medical officer at a health technology company.",
           sourceId: "counsel-a16z",
           basis: "verified",
+          provenance: "Investor-reported",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -636,9 +651,10 @@ export const COMPANIES_G: PrivateCompany[] = [
       adoptionEvidence: [
         {
           claim:
-            "More than 100,000 members served nationwide. No institutional customer is named and no revenue is disclosed.",
+            "More than 100,000 members served nationwide. This figure appears only in a trade publication reproducing the 16 October 2025 financing announcement, so it is the company speaking, not an independent count. No institutional customer is named and no revenue is disclosed.",
           sourceId: "counsel-hit",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden: "Low for patients, moderate for institutional channels.",
@@ -670,7 +686,7 @@ export const COMPANIES_G: PrivateCompany[] = [
         "Retention consistent with prior virtual care models",
       ],
       recommendedNextStep:
-        "Ask for physician review time per encounter over the last four quarters. If it is not falling, the model is a staffing business regardless of how good the drafting gets.",
+        "Ask for physician review time per encounter over the last four quarters, and for the definitions behind the resolution rate and the savings figure. Every operating number on this company is its own, and none has a published methodology.",
       confidence: "Medium",
     },
     diligence: {
@@ -679,7 +695,7 @@ export const COMPANIES_G: PrivateCompany[] = [
       ],
       product: ["What clinical scope is in and out of bounds for the service?"],
       customers: [
-        "Which channels do the 100,000 members come through, and how is a resolved issue defined?",
+        "How is a member counted, which channels do they come through, and how is a resolved issue defined?",
       ],
       competition: ["How does this differ from telehealth with a chat interface?"],
       unitEconomics: ["What is contribution margin per encounter after physician time?"],
@@ -695,27 +711,27 @@ export const COMPANIES_G: PrivateCompany[] = [
       technicalDifferentiation: fa(3, "judgment", "Medium",
         "Physician sign-off built into the architecture rather than added as a compliance layer.",
         "A deliberate design constraint rather than a technical advantage."),
-      technicalEvidence: fa(3, "verified", "Medium",
-        "A stated 96 percent issue resolution rate and two minute physician response times across more than 100,000 members, with no clinical outcome data and no independent audit.",
-        "Operating metrics at real scale, self-reported and not clinical endpoints.", "counsel-hit"),
+      technicalEvidence: fa(2, "verified", "Low",
+        "Company-stated operating metrics including a 96 percent resolution rate and a 381 dollar annual saving per engaged member, with no published methodology, no clinical outcome data, and no independent audit of any figure.",
+        "Every number here is the company's own, and the definitions behind them are not published.", "counsel-seriesa"),
       defensibility: fa(2, "judgment", "Low",
         "A licensed physician network and accumulated clinical workflow, both reproducible with capital.",
         "Weak. The model is describable and the components are purchasable."),
       marketImportance: fa(4, "judgment", "Medium",
         "Primary care access is a durable structural problem with rising demand and flat clinician supply.",
         "Genuinely important, and historically hard to monetise."),
-      commercialReadiness: fa(3, "verified", "Medium",
-        "More than 100,000 members served nationwide, with no named institutional customer, pricing, or revenue disclosed.",
-        "Operating at real scale with the commercial structure undisclosed.", "counsel-hit"),
-      customerEvidence: fa(3, "verified", "Medium",
-        "More than 100,000 members served, stated by the company and independently reported. No institutional customer is named.",
-        "Scale is evidenced; the buyer relationships behind it are not.", "counsel-hit"),
+      commercialReadiness: fa(3, "verified", "Low",
+        "A company-reported member base above 100,000, with no named institutional customer, pricing, or revenue disclosed and no independent confirmation of the count.",
+        "Apparent scale with an undisclosed commercial structure and an unverified denominator.", "counsel-hit"),
+      customerEvidence: fa(2, "verified", "Low",
+        "A company-reported member count above 100,000, carried only by a publication reproducing the financing announcement. No institutional customer is named and no independent source confirms the figure.",
+        "The scale claim rests entirely on the company's own voice repeated once.", "counsel-hit"),
       teamCredibility: fa(3, "verified", "Medium",
         "Led by a Stanford-trained physician and AI researcher who was previously chief medical officer at a health technology company. Founder status and founding year are not established.",
         "Relevant clinical and operating background, with the wider founding record unclear.", "counsel-a16z"),
-      capitalEfficiency: fa(4, "judgment", "Medium",
-        "More than 100,000 members reached on 36 million dollars total, with no revenue disclosed.",
-        "Efficient on the member measure; revenue efficiency cannot be assessed."),
+      capitalEfficiency: fa(3, "judgment", "Low",
+        "A company-reported member base above 100,000 reached on 36 million dollars total, with no revenue disclosed and no independent confirmation of the member figure.",
+        "Efficient if the member count holds. It has not been checked by anyone outside the company."),
       competitiveIntensity: fa(2, "judgment", "Medium",
         "Telehealth providers, health system virtual care, and consumer applications all overlap.",
         "A crowded category with a difficult history."),
@@ -729,9 +745,9 @@ export const COMPANIES_G: PrivateCompany[] = [
         "Backed by well-known investors, in a category most observers have written off.",
         "The category neglect creates some originality; the investor list removes most of it."),
     },
-    dataConfidence: "Medium",
+    dataConfidence: "Low",
     dataConfidenceNote:
-      "Financing rounds, lead investors, total funding, the physician-supervised model, and the operating metrics are supported by the company's own announcement with independent trade press corroboration. Founder status, founding year, revenue, pricing, and any clinical outcome data are not disclosed, and the resolution rate and savings figures are self-reported without a published methodology.",
+      "Financing rounds, lead investors, and total funding are supported by the company's own announcement and by the lead investor's announcement. Every operating metric on this record is company-reported: the resolution rate, savings, satisfaction, and net promoter score come from the company's own site, and the member count appears only in a trade publication reproducing the financing announcement, which is not independent corroboration. No methodology is published for any figure, and no clinical outcome data exists. This record is marked low confidence for that reason.",
     sourceIds: ["counsel-seriesa", "counsel-a16z", "counsel-hit"],
     lastReviewed: REVIEWED,
   },
@@ -758,7 +774,9 @@ export const COMPANIES_G: PrivateCompany[] = [
     technicalDifferentiation:
       "Automating the laboratory procedure itself rather than adding decision support around it, which is the difference between relieving the constraint and observing it.",
     tractionSignal:
-      "The company reports 18 healthy babies born from an earlier prototype study and an ongoing 100 patient pilot trial, with United States commercial availability planned for early 2026.",
+      "A peer-reviewed proof-of-concept study in Human Reproduction, sponsored by the company, treated 11 patients between April and October 2024. Twelve single warmed blastocysts were transferred from the automated arm, producing five live births, three biochemical pregnancies, and one early loss, a live birth rate of 5 of 12 per transfer. The same paper records that automated execution without human intervention was achieved only in sperm preparation and selected ICSI tasks, not across the whole workflow. The company states separately that the current AURA platform is in an IRB-approved validation study, with no enrolment figures or outcomes published for it.",
+    tractionProvenance: "Independently verified",
+    tractionAsOf: "2026-02-01",
     recentCatalyst:
       "50 million dollar Series A led by Advance Venture Partners announced 15 September 2025, bringing total funding to 70 million dollars including a 20 million dollar seed round closed in December 2022.",
     primaryCompetitors: [
@@ -767,7 +785,7 @@ export const COMPANIES_G: PrivateCompany[] = [
       "Embryo selection software vendors",
     ],
     mainTechnicalRisk:
-      "Automated procedures have to match or exceed skilled manual outcomes on a clinical endpoint, and while live births from a prototype are reported, no comparative rate has been published.",
+      "Automated procedures have to match or exceed skilled manual outcomes on a clinical endpoint. Five live births from twelve transfers is a real result on a small sample, and the paper itself records that autonomy was reached only in sperm preparation and selected ICSI tasks rather than across the workflow.",
     mainCommercialRisk:
       "Clinics buy on comparative outcome rates, and none has been published.",
     mainFinancingRisk:
@@ -779,7 +797,7 @@ export const COMPANIES_G: PrivateCompany[] = [
       dateSourced: "2026-07-14",
       channel: "Clinical laboratory automation tracking",
       whyEntered:
-        "The binding constraint in fertility treatment is embryologist supply, not clinic capacity or demand. A company automating the laboratory procedure is attacking the actual constraint rather than the visible one, and it has already produced live births from a prototype, which is a far higher bar than a demonstration.",
+        "The binding constraint in fertility treatment is embryologist supply, not clinic capacity or demand. A company automating the laboratory procedure is attacking the actual constraint rather than the visible one, and it has published live births from the automated Day 0 workflow in a peer-reviewed journal, which is a far higher bar than a demonstration.",
       whyTimely:
         "Fertility treatment demand continues to rise while embryologist training pipelines have not expanded, so the gap widens every year regardless of investment in clinics.",
       whyOverlooked:
@@ -787,7 +805,7 @@ export const COMPANIES_G: PrivateCompany[] = [
       whyNotObvious:
         "A search returns a fertility company. It does not distinguish a laboratory automation system from the patient-facing services that dominate the category.",
       evidenceNeeded:
-        "Outcome rates from the 100 patient pilot against a manual comparator, and regulatory clearance status. Neither is public, and the first is decisive.",
+        "Outcome rates from the current AURA validation study against a manual comparator, at a sample size larger than eleven patients, and regulatory clearance status. Neither is public, and the first is decisive.",
       wellRecognised: false,
     },
     financing: {
@@ -827,12 +845,14 @@ export const COMPANIES_G: PrivateCompany[] = [
             "The AURA platform standardises more than 200 laboratory steps, and the Series A of 50 million dollars was led by Advance Venture Partners.",
           sourceId: "conceivable-seriesa",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
-            "18 healthy babies were born from an earlier prototype study, and a 100 patient pilot trial is under way.",
-          sourceId: "conceivable-femtech",
+            "In the Day 0 proof-of-concept study, 11 patients were treated, 12 single warmed blastocysts were transferred from the automated arm, and 5 live births resulted alongside 3 biochemical pregnancies and 1 early loss. Autonomy without human intervention was achieved only in sperm preparation and selected ICSI tasks. Peer reviewed, and sponsored by the company.",
+          sourceId: "conceivable-humrep",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -840,7 +860,7 @@ export const COMPANIES_G: PrivateCompany[] = [
       thirdPartyDependency:
         "Precision instrumentation supply chains and clinical partner sites.",
       milestoneForScale:
-        "Completion of the 100 patient pilot with outcome rates published against a manual comparator, since the prototype births establish feasibility but not comparative performance.",
+        "Outcome rates from the current AURA validation study published against a manual comparator at meaningful sample size, since eleven patients establishes feasibility and not comparative performance.",
       failurePoints: [
         "Automated outcomes below skilled manual outcomes",
         "Regulatory pathway longer than anticipated",
@@ -874,9 +894,10 @@ export const COMPANIES_G: PrivateCompany[] = [
       adoptionEvidence: [
         {
           claim:
-            "United States commercial availability planned for early 2026. No named clinic deployments or revenue are disclosed.",
+            "The company states the current AURA platform is in an IRB-approved validation study and that United States commercial availability was planned for early 2026. No enrolment figures, outcomes, named clinic deployments, or revenue are disclosed for the current platform.",
           sourceId: "conceivable-femtech",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -890,13 +911,13 @@ export const COMPANIES_G: PrivateCompany[] = [
       thesis:
         "Automation aimed at the actual constraint in fertility treatment rather than the visible one, at a stage where the clinical evidence that decides everything does not yet exist publicly.",
       bullCase:
-        "Pilot outcomes match or beat skilled manual procedures, and laboratory capacity stops being bounded by embryologist supply.",
+        "Validation outcomes match or beat skilled manual procedures at scale, and laboratory capacity stops being bounded by embryologist supply.",
       baseCase:
         "A long clinical validation path with adoption following the data slowly.",
       bearCase:
-        "Pilot outcomes fall short of skilled manual work and clinics have no reason to change.",
+        "Validation outcomes fall short of skilled manual work at scale and clinics have no reason to change.",
       catalysts: [
-        "Published outcome rates from the 100 patient pilot",
+        "Published outcome rates from the AURA validation study",
         "Regulatory clearance",
         "A first named clinic deployment",
       ],
@@ -906,11 +927,11 @@ export const COMPANIES_G: PrivateCompany[] = [
         "Clinical practice inertia",
       ],
       invalidators: [
-        "Pilot outcome rates below those of skilled manual procedures",
+        "Validation outcome rates below those of skilled manual procedures",
         "A regulatory pathway materially longer than planned",
       ],
       recommendedNextStep:
-        "Request the pilot trial outcome rates against a manual comparator. Live births from a prototype prove the system can work; only the comparator says whether it should replace an embryologist.",
+        "Request the AURA validation outcome rates against a manual comparator. Five live births from eleven patients proves the system can work. Only a comparator at scale says whether it should replace an embryologist.",
       confidence: "Medium",
     },
     diligence: {
@@ -918,7 +939,7 @@ export const COMPANIES_G: PrivateCompany[] = [
         "Which of the more than 200 laboratory steps are fully automated, and which still require an embryologist?",
       ],
       product: [
-        "What are the pilot trial outcome rates, and against what manual comparator?",
+        "What are the AURA validation study outcome rates, at what enrolment, and against what manual comparator?",
       ],
       customers: ["Which clinics have installed the system, and at what volume?"],
       competition: [
@@ -936,14 +957,14 @@ export const COMPANIES_G: PrivateCompany[] = [
       commercialization: ["What is the sales cycle for a clinical laboratory installation?"],
     },
     outreach:
-      "I have been researching capacity constraints in fertility treatment, and the observation that the limit is embryologist supply rather than clinic capacity is what led me to Conceivable. Automating the laboratory procedure itself is a much harder path than adding software around it, and it is the only one that actually relieves the constraint. Live births from the prototype study are a far higher bar than most automation companies clear. I would like to understand how the pilot outcome rates compare with skilled manual procedures. Would you be open to a conversation?",
+      "I have been researching capacity constraints in fertility treatment, and the observation that the limit is embryologist supply rather than clinic capacity is what led me to Conceivable. Publishing the Day 0 live birth results in Human Reproduction, including the honest note that autonomy was reached only in sperm preparation and selected ICSI tasks, is a far higher bar than most automation companies clear. I would like to understand how the AURA validation outcomes are tracking against a manual comparator. Would you be open to a conversation?",
     factors: {
       technicalDifferentiation: fa(4, "judgment", "Medium",
         "Automating the laboratory procedure itself rather than providing decision support around it.",
         "A materially harder and more consequential approach than the category norm."),
-      technicalEvidence: fa(3, "verified", "Medium",
-        "18 healthy babies born from an earlier prototype study and a 100 patient pilot trial under way, with no outcome rates published against a manual comparator.",
-        "Live births establish feasibility, which is far from nothing, but comparative performance is unpublished.", "conceivable-femtech"),
+      technicalEvidence: fa(4, "verified", "High",
+        "A peer-reviewed proof-of-concept study reporting 5 live births from 12 transfers in the automated arm across 11 patients, with the paper stating that full autonomy was reached only in sperm preparation and selected ICSI tasks. Company sponsored, and published outcomes for the current AURA platform do not exist.",
+        "A peer-reviewed live birth result is the strongest clinical evidence in this universe. The paper is also candid about how much of the workflow was actually autonomous.", "conceivable-humrep"),
       defensibility: fa(3, "judgment", "Low",
         "Instrumentation design and eventual clinical evidence would both be hard to reproduce, and neither is established.",
         "Prospective."),
@@ -953,14 +974,14 @@ export const COMPANIES_G: PrivateCompany[] = [
       commercialReadiness: fa(2, "verified", "Medium",
         "United States commercial availability planned for early 2026, with no disclosed deployments, revenue, pricing, or clearance status.",
         "Approaching commercial with the record still unproven.", "conceivable-femtech"),
-      customerEvidence: fa(2, "verified", "Low",
-        "A 100 patient pilot trial under way, with no named clinic partner or deployment disclosed.",
-        "Patients in a trial are not customers, but they are more than nothing.", "conceivable-femtech"),
+      customerEvidence: fa(2, "verified", "Medium",
+        "Eleven patients treated at a named clinic in the peer-reviewed study, and a company-stated IRB-approved validation study with no enrolment figure. No commercial clinic deployment is disclosed.",
+        "Trial patients at a named site are real, and they are not customers.", "conceivable-humrep"),
       teamCredibility: fa(2, "judgment", "Low",
         "Founders, founding year, and clinical leadership are not established from a primary source.",
         "Rated on incomplete public information."),
       capitalEfficiency: fa(3, "judgment", "Medium",
-        "70 million dollars raised since 2022, reaching live births from a prototype and a 100 patient pilot.",
+        "70 million dollars raised since 2022, reaching a peer-reviewed live birth result from the automated Day 0 workflow.",
         "Reasonable for clinical instrumentation, which is capital hungry by nature."),
       competitiveIntensity: fa(4, "judgment", "Medium",
         "No direct competitor automating the procedure at this scope, though equipment manufacturers are adjacent.",
@@ -977,8 +998,8 @@ export const COMPANIES_G: PrivateCompany[] = [
     },
     dataConfidence: "Medium",
     dataConfidenceNote:
-      "The Series A, its investors, total funding, the AURA platform description, the prototype births, and the pilot trial are supported by the company's own announcement with independent trade press corroboration. Founders, founding year, named deployments, revenue, comparative outcome rates, and regulatory clearance status are not disclosed.",
-    sourceIds: ["conceivable-seriesa", "conceivable-femtech"],
+      "The clinical results are supported by a peer-reviewed paper in Human Reproduction, which is the strongest source on any company in this universe, though the study was sponsored by the company. The Series A, its investors, and total funding come from the company's own announcement. The validation study status and the commercial timeline are company-reported. Founders, founding year, named commercial deployments, revenue, outcome rates for the current platform, and regulatory clearance status are not disclosed.",
+    sourceIds: ["conceivable-humrep", "conceivable-seriesa", "conceivable-femtech"],
     lastReviewed: REVIEWED,
   },
 
@@ -1006,6 +1027,8 @@ export const COMPANIES_G: PrivateCompany[] = [
       "The dataset is the asset. Models are increasingly commoditised while novel sequence data from environments nobody has sampled is not reproducible without repeating the fieldwork.",
     tractionSignal:
       "A genetic medicine collaboration with an academic laboratory was announced alongside the Series B, and the company works with more than 100 biodiversity partners worldwide.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2024-10-09",
     recentCatalyst:
       "60 million dollar Series B led by Singular announced 9 October 2024, alongside a genetic medicine research collaboration, followed by the BaseData product emerging from stealth in June 2025.",
     primaryCompetitors: [
@@ -1076,12 +1099,14 @@ export const COMPANIES_G: PrivateCompany[] = [
             "A 60 million dollar Series B led by Singular, announced alongside a genetic medicine research collaboration with an academic laboratory.",
           sourceId: "basecamp-release",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
-            "The company states its foundational dataset contains 100 times more advanced biological systems than the public databases pharmaceutical researchers use most, and that it works with more than 100 biodiversity partners worldwide.",
+            "The company states its foundational dataset contains 100 times more advanced biological systems than the public databases pharmaceutical researchers use most, and that it works with more than 100 biodiversity partners worldwide. Both figures are the company's own, relayed within independent reporting and not measured by it.",
           sourceId: "basecamp-sifted",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -1128,6 +1153,7 @@ export const COMPANIES_G: PrivateCompany[] = [
             "A genetic medicine research collaboration was announced with the Series B. No commercial customers, licensing terms, or revenue are disclosed.",
           sourceId: "basecamp-release",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:

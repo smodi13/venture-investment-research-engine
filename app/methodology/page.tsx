@@ -11,12 +11,18 @@ import { SOURCES } from "@/lib/sources";
 import { UNIVERSE_STATS } from "@/lib/companies";
 import { MARKET_SIGNAL_DISCLOSURE } from "@/lib/data/market-signals";
 import {
+  CLAIM_PROVENANCE_LEVELS,
+  CLAIM_PROVENANCE_MEANING,
   DATA_CONFIDENCE_LEVELS,
   DATA_CONFIDENCE_MEANING,
   SIGNAL_FRESHNESS_LEVELS,
   SIGNAL_FRESHNESS_MEANING,
 } from "@/lib/types";
-import { ConfidenceBadge, FreshnessBadge } from "@/components/Provenance";
+import {
+  ConfidenceBadge,
+  FreshnessBadge,
+  ProvenanceBadge,
+} from "@/components/Provenance";
 import {
   BulletList,
   DisclosureNote,
@@ -319,6 +325,45 @@ export default function MethodologyPage() {
             oriented so 5 is always most favourable, which on the three risk
             factors means 5 signals low risk. Raising more capital is never
             itself rewarded, and neither is publishing more information.
+          </p>
+        </Section>
+
+        <Section
+          title="How quantified claims are classified"
+          description="Every traction, customer, adoption, benchmark, backlog, contract, member, and clinical figure carries a label saying who is vouching for it."
+        >
+          <div className="space-y-2">
+            {CLAIM_PROVENANCE_LEVELS.map((level) => (
+              <div
+                key={level}
+                className="flex flex-col gap-2 rounded-lg border border-line bg-surface p-4 sm:flex-row sm:items-start sm:gap-4"
+              >
+                <div className="sm:w-52 sm:shrink-0">
+                  <ProvenanceBadge provenance={level} />
+                </div>
+                <p className="text-sm leading-relaxed text-ink-soft">
+                  {CLAIM_PROVENANCE_MEANING[level]}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-ink-soft">
+            The rule that does the work here is that a press release and a
+            publication reprinting that press release are the same voice
+            recorded twice. Both look like third-party coverage in a search
+            result. Only one of them is corroboration, so every registered
+            source additionally records whether its publisher did original
+            reporting or reproduced an announcement, and a claim can only be
+            called independently verified if it rests on original reporting,
+            peer-reviewed research, an official record, or a public technical
+            record anyone can query.
+          </p>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-ink-soft">
+            Company-reported is not a criticism. Most of what is publicly known
+            about a private company comes from the company, and that is the
+            normal state of this kind of research. The label exists so a reader
+            can see the difference at a glance rather than inferring it from the
+            name of a publisher.
           </p>
         </Section>
 

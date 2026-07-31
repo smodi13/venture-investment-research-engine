@@ -23,7 +23,24 @@ export type SourceType =
   | "Business publication"
   | "Regulatory filing"
   | "Government or laboratory"
-  | "Research institution";
+  | "Research institution"
+  | "Public code repository";
+
+/**
+ * How the publisher obtained what it published.
+ *
+ * The distinction that matters is between a publication doing its own
+ * reporting and a publication reprinting a company announcement. Both look
+ * like third-party coverage in a search result. Only the first is corroboration.
+ */
+export type SourceReporting =
+  | "Company statement"
+  | "Wire reproduction"
+  | "Independent reporting"
+  | "Investor statement"
+  | "Government or official record"
+  | "Peer-reviewed research"
+  | "Public technical record";
 
 export interface Source {
   id: string;
@@ -41,6 +58,29 @@ export interface Source {
   supports: string;
   /** Primary sources carry the company's own or an official record. */
   primary: boolean;
+  /** Who did the reporting, which decides what a claim citing it can be called. */
+  reporting: SourceReporting;
+}
+
+/**
+ * The default reporting mode for a source type. Overridden per source where a
+ * publication is reprinting an announcement rather than reporting on it.
+ */
+function defaultReporting(type: SourceType): SourceReporting {
+  switch (type) {
+    case "Official company website":
+    case "Company announcement":
+      return "Company statement";
+    case "Government or laboratory":
+    case "Regulatory filing":
+      return "Government or official record";
+    case "Research institution":
+      return "Peer-reviewed research";
+    case "Public code repository":
+      return "Public technical record";
+    default:
+      return "Independent reporting";
+  }
 }
 
 const ACCESSED = "2026-07-30";
@@ -55,6 +95,7 @@ function s(
   url: string,
   supports: string,
   primary: boolean,
+  reporting?: SourceReporting,
 ): Source {
   return {
     id,
@@ -67,6 +108,7 @@ function s(
     url,
     supports,
     primary,
+    reporting: reporting ?? defaultReporting(type),
   };
 }
 
@@ -128,6 +170,7 @@ export const SOURCES: Source[] = [
     "https://www.prnewswire.com/news-releases/d-matrix-raises-275-million-to-power-the-age-of-ai-inference-302612502.html",
     "Independent distribution of the Series C announcement, including founder names and office locations.",
     false,
+    "Wire reproduction",
   ),
 
   /* --------------------------------------------------------- Ayar Labs */
@@ -259,6 +302,7 @@ export const SOURCES: Source[] = [
     "https://www.hpcwire.com/off-the-wire/atom-computing-raises-more-than-300m-to-accelerate-deployment-of-fault-tolerant-neutral-atom-quantum-computers/",
     "Independent corroboration of the Series C investors and the fault-tolerance roadmap.",
     false,
+    "Wire reproduction",
   ),
 
   /* ----------------------------------------------------- Path Robotics */
@@ -390,6 +434,7 @@ export const SOURCES: Source[] = [
     "https://www.holcim.com/media/company-news/investment-sublime-systems-low-carbon-technology",
     "Independent confirmation of the strategic investment from the investing party's own disclosure.",
     false,
+    "Investor statement",
   ),
 
   /* -------------------------------------------------------- Base Power */
@@ -742,6 +787,7 @@ export const SOURCES: Source[] = [
     "https://arcticstartup.com/rerun-raises-17m-seed/",
     "Independent reporting on the seed round, the Stockholm base, and open-source adoption of the visualisation tools.",
     false,
+    "Wire reproduction",
   ),
 
   /* ----------------------------------------------------------- turbopuffer */
@@ -777,6 +823,7 @@ export const SOURCES: Source[] = [
     "https://softwareengineeringdaily.com/2025/09/30/turbopuffer-with-simon-horup-eskildsen/",
     "The founder's own account of the architecture, the trade-offs it accepts, and the decision not to raise conventional growth financing.",
     false,
+    "Company statement",
   ),
 
   /* --------------------------------------------------------------- Socket */
@@ -825,6 +872,7 @@ export const SOURCES: Source[] = [
     "https://www.startuphub.ai/ai-news/funding-round/2025/zed-raises-32m-to-advance-ai-powered-collaborative-coding",
     "Total funding above 42 million dollars, and the stated 1,100 contributors and more than 150,000 active developers. This publication reproduces the company announcement rather than reporting independently on it, which is why the Zed record is marked low confidence.",
     false,
+    "Wire reproduction",
   ),
 
   /* -------------------------------------------------------------- Inngest */
@@ -1026,6 +1074,7 @@ export const SOURCES: Source[] = [
     "https://a16z.com/announcement/investing-in-counsel-health/",
     "The lead investor's description of the chief executive's clinical and research background and of the physician coverage ratio the company is scaling.",
     true,
+    "Investor statement",
   ),
   s(
     "counsel-hit",
@@ -1037,6 +1086,7 @@ export const SOURCES: Source[] = [
     "https://hitconsultant.net/2025/10/16/counsel-health-raises-25m-to-launch-physician-supervised-ai-care-platform/",
     "Independent reporting on the more than 100,000 members served, the 96 percent issue resolution rate, the two minute response time, and the 381 dollar annual savings figure.",
     false,
+    "Wire reproduction",
   ),
 
   /* ------------------------------------------- Conceivable Life Sciences */
@@ -1061,6 +1111,7 @@ export const SOURCES: Source[] = [
     "https://femtechinsider.com/conceivable-life-sciences-raises-50m-series-a-for-us-launch-of-automated-ivf-lab/",
     "Independent reporting on the prototype study births, the 100 patient pilot trial, and the planned United States commercial availability.",
     false,
+    "Wire reproduction",
   ),
 
   /* ----------------------------------------------------- Basecamp Research */
@@ -1085,6 +1136,67 @@ export const SOURCES: Source[] = [
     "https://sifted.eu/articles/basecamp-research-60m-series-b",
     "Independent reporting on the founders, the London base, the full investor list, the stated dataset scale relative to public databases, and the biodiversity partner network.",
     false,
+  ),
+  /* ------------------------------------------- Conceivable, clinical record */
+  s(
+    "conceivable-humrep",
+    "Conceivable Life Sciences",
+    "Automated oocyte retrieval, denudation, sperm preparation, and ICSI in the IVF laboratory: a proof-of-concept study and report of the first live births",
+    "Human Reproduction, via PubMed Central",
+    "Research institution",
+    "2026-02-01",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC12957933/",
+    "The proof-of-concept study: 11 patients treated between April and October 2024, 12 single warmed blastocyst transfers in the automated arm, 5 live births, 3 biochemical pregnancies, and 1 early loss. The paper also records that autonomy without human intervention was achieved only in sperm preparation and selected ICSI tasks, and that the study was sponsored by the company.",
+    false,
+  ),
+
+  /* ------------------------------------------------- Zed, public code record */
+  s(
+    "zed-github",
+    "Zed Industries",
+    "zed-industries/zed public repository",
+    "GitHub",
+    "Public code repository",
+    "2026-07-31",
+    "https://github.com/zed-industries/zed",
+    "Public repository metrics anyone can query directly through the GitHub API: stars, forks, named contributors, and pull request throughput. Used in place of the company's own active developer figure, which no independent source supports.",
+    false,
+  ),
+
+  /* -------------------------------------------------------------- Perceptic */
+  s(
+    "perceptic-site",
+    "Perceptic",
+    "Perceptic company site",
+    "Perceptic",
+    "Official company website",
+    "2026-07-30",
+    "https://www.perceptic.com/",
+    "The product description as an intelligence layer unifying asset scouting, scientific evaluation, and clinical data across the drug development lifecycle, and the founders' research backgrounds.",
+    true,
+  ),
+  s(
+    "perceptic-fortune",
+    "Perceptic",
+    "Exclusive: Ex-Palantir AI execs raise $12 million seed round for Perceptic, a startup automating drug discovery",
+    "Fortune",
+    "Business publication",
+    "2026-05-26",
+    "https://fortune.com/2026/05/26/exclusive-perceptic-a-startup-automating-drug-discovery-end-to-end-for-big-pharma-emerges-from-stealth-with-12-million-in-seed-funding/",
+    "Original reporting on the 12 million dollar seed round, the lead investor, the three founders and their prior roles building Palantir's life sciences practice, the 2024 London founding, and deployment across pharmaceutical companies and contract research organisations.",
+    false,
+  ),
+  s(
+    "perceptic-airstreet",
+    "Perceptic",
+    "Introducing Perceptic: the AI operating system for drug development",
+    "Air Street Capital",
+    "Company announcement",
+    "2026-05-26",
+    "https://press.airstreet.com/p/introducing-perceptic",
+    "The investor's account of the round, the named customer CSL, and the company-reported performance figures for asset evaluation, screening throughput, and clinical data extraction.",
+    false,
+    "Investor statement",
   ),
 ];
 

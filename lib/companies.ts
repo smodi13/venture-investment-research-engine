@@ -5,6 +5,7 @@ import { COMPANIES_D } from "./data/companies-d";
 import { COMPANIES_E } from "./data/companies-e";
 import { COMPANIES_F } from "./data/companies-f";
 import { COMPANIES_G } from "./data/companies-g";
+import { COMPANIES_H } from "./data/companies-h";
 import type { PrivateCompany, Sector } from "./types";
 
 /**
@@ -27,6 +28,7 @@ export const COMPANIES: PrivateCompany[] = [
   ...COMPANIES_E,
   ...COMPANIES_F,
   ...COMPANIES_G,
+  ...COMPANIES_H,
 ];
 
 export const COMPANY_BY_ID: Record<string, PrivateCompany> = Object.fromEntries(

@@ -36,6 +36,8 @@ export const COMPANIES_E: PrivateCompany[] = [
       "Using thermal noise as the computational primitive inverts the usual engineering objective. Conventional chip design spends power suppressing noise; this design uses it, which is why the energy argument is structural rather than incremental.",
     tractionSignal:
       "The company states it has produced working hardware and has begun placing it with potential customers.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "Signed a letter of intent with the US Department of Commerce for up to 75 million dollars through the CHIPS Research and Development Office on 30 July 2026, to scale the technology and qualify a domestic manufacturing path.",
     primaryCompetitors: [
@@ -100,12 +102,14 @@ export const COMPANIES_E: PrivateCompany[] = [
             "The US Department of Commerce signed a letter of intent for up to 75 million dollars through the CHIPS Research and Development Office to scale and onshore the technology.",
           sourceId: "extropic-nist",
           basis: "verified",
+          provenance: "Government-reported",
         },
         {
           claim:
             "The company states it has working hardware in the hands of potential customers, backed by a 14.1 million dollar seed round.",
           sourceId: "extropic-announcement",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -154,6 +158,7 @@ export const COMPANIES_E: PrivateCompany[] = [
             "The company states working hardware is in the hands of potential customers. No customer is named and no revenue is disclosed.",
           sourceId: "extropic-announcement",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -345,6 +350,8 @@ export const COMPANIES_E: PrivateCompany[] = [
       "Shifting and shaping compute rather than shedding it, so the grid gets flexibility without the operator losing throughput, which is what makes the arrangement acceptable to both sides.",
     tractionSignal:
       "Demonstrated with utility and infrastructure partners under an industry research initiative, with results reported as a 40 percent power reduction achieved in under a minute.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2025-10-30",
     recentCatalyst:
       "Named in a coalition announcing a power-flexible AI factory in Virginia, alongside a partnership with a national grid operator in the United Kingdom for a flexibility demonstration.",
     primaryCompetitors: [
@@ -413,12 +420,14 @@ export const COMPANIES_E: PrivateCompany[] = [
             "Named alongside an accelerator vendor, a research institute, a datacentre operator, and a grid operator in a coalition announcing a power-flexible AI factory.",
           sourceId: "emerald-nvidia",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "A national grid operator in the United Kingdom describes a demonstration project with the company on datacentre flexibility.",
           sourceId: "emerald-fortune",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks:
@@ -469,6 +478,7 @@ export const COMPANIES_E: PrivateCompany[] = [
             "Participation in named demonstration programmes with a grid operator, a datacentre operator, and a research institute.",
           sourceId: "emerald-nvidia",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -659,6 +669,8 @@ export const COMPANIES_E: PrivateCompany[] = [
       "Robotics data is time-aligned across many modalities at once, which general-purpose databases handle badly. Building the storage layer around that shape rather than adapting a general one is the technical bet.",
     tractionSignal:
       "The company states its open source framework has been adopted in the open source work of Meta, Google, Hugging Face's LeRobot, and Unitree.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2025-03-20",
     recentCatalyst:
       "17 million dollar seed round in March 2025 led by Point Nine, bringing total funding to 20.2 million dollars, to build the commercial database offering.",
     primaryCompetitors: [
@@ -727,12 +739,14 @@ export const COMPANIES_E: PrivateCompany[] = [
             "The open source framework has been adopted in open source work by Meta, Google, Hugging Face's LeRobot, and Unitree, per the company's funding announcement.",
           sourceId: "rerun-globenewswire",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "The company describes the multimodal data stack and the commercial database it is building on top of the open source framework.",
           sourceId: "rerun-arctic",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -779,6 +793,7 @@ export const COMPANIES_E: PrivateCompany[] = [
             "Open source framework used inside published work by several major robotics and machine learning organisations.",
           sourceId: "rerun-globenewswire",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -968,6 +983,8 @@ export const COMPANIES_E: PrivateCompany[] = [
     technicalDifferentiation:
       "Putting the index on object storage instead of local disk trades a small amount of latency for an order of magnitude in storage cost, which is the right trade for retrieval corpora that are large and infrequently hot.",
     tractionSignal: NOT_DISCLOSED,
+    tractionProvenance: "Not sufficiently supported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "The founder has publicly described declining conventional Series A financing, raising a small round in January 2025 for engineering hires, and later raising specifically to provide employee liquidity rather than for operations.",
     primaryCompetitors: [
@@ -1031,12 +1048,14 @@ export const COMPANIES_E: PrivateCompany[] = [
             "The company describes a search and vector database built on object storage, with the architecture and its trade-offs published in its own technical documentation.",
           sourceId: "turbopuffer-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "The founder discussed the architecture and the decision not to raise a conventional Series A in a long-form technical interview.",
           sourceId: "turbopuffer-sed",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -1086,6 +1105,7 @@ export const COMPANIES_E: PrivateCompany[] = [
             "The founder has publicly described the company reaching profitability and declining conventional growth financing. Specific revenue and customer figures circulate only in secondary aggregators and are not recorded here.",
           sourceId: "turbopuffer-sed",
           basis: "judgment",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:

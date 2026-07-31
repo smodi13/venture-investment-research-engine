@@ -28,6 +28,8 @@ export const COMPANIES_B: PrivateCompany[] = [
     technicalDifferentiation:
       "Routing optically underneath the dies rather than at the package edge removes the electrical bottleneck at the point where it actually occurs.",
     tractionSignal: NOT_DISCLOSED,
+    tractionProvenance: "Not sufficiently supported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "Series D of 400 million dollars at a reported 4.4 billion dollar valuation, funding commercial rollout of Passage.",
     primaryCompetitors: ["Ayar Labs", "Broadcom", "Marvell Technology"],
@@ -92,12 +94,14 @@ export const COMPANIES_B: PrivateCompany[] = [
             "The company describes the Passage interconnect and Guide light engine products and the silicon photonics approach behind them.",
           sourceId: "lightmatter-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Series D financing and valuation independently reported by technology press.",
           sourceId: "lightmatter-dcd",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -143,6 +147,7 @@ export const COMPANIES_B: PrivateCompany[] = [
             "The Series D was raised to fund commercial rollout of Passage, per independent reporting.",
           sourceId: "lightmatter-dcd",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       implementationBurden:
@@ -332,6 +337,8 @@ export const COMPANIES_B: PrivateCompany[] = [
       "Neutral atoms scale by expanding an optical trapping system rather than by fabricating more devices, which is a materially different cost curve from superconducting approaches.",
     tractionSignal:
       "Selected for Phase B of the DARPA Quantum Benchmarking Initiative and participating in a Japanese national programme, per the company.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "Published a logical-level magic state distillation result in July 2025, a necessary component of fault-tolerant computation, following a financing of more than 230 million dollars in February 2025.",
     primaryCompetitors: [
@@ -402,12 +409,14 @@ export const COMPANIES_B: PrivateCompany[] = [
             "Selected for Phase B of the DARPA Quantum Benchmarking Initiative, per the company site.",
           sourceId: "quera-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Published logical-level magic state distillation in July 2025 and error-corrected algorithm results on logical qubits.",
           sourceId: "quera-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks:
@@ -460,6 +469,7 @@ export const COMPANIES_B: PrivateCompany[] = [
             "Systems available through Amazon Braket and collaborations with national laboratories, per the company.",
           sourceId: "quera-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -652,6 +662,8 @@ export const COMPANIES_B: PrivateCompany[] = [
       "Demonstrated that error rates fall as more qubits are added to a computation, which is the defining property error correction must have and the one most often asserted without evidence.",
     tractionSignal:
       "Sold its first commercial on-premise quantum computer to QuNorth, a Nordic quantum initiative, in 2025.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2025-06-24",
     recentCatalyst:
       "Announced more than 300 million dollars in June 2026, comprising a 100 million dollar Series C and a signed letter of intent with the US Department of Commerce for a further 100 million dollars.",
     primaryCompetitors: [
@@ -720,12 +732,14 @@ export const COMPANIES_B: PrivateCompany[] = [
             "First full demonstration of quantum error correction using a toric code, with errors reducing as more qubits are used.",
           sourceId: "atom-prnewswire",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Independent technology press corroborated the financing and the fault-tolerance roadmap.",
           sourceId: "atom-hpcwire",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks:
@@ -768,6 +782,7 @@ export const COMPANIES_B: PrivateCompany[] = [
             "Sold its first commercial on-premise quantum computer to QuNorth, a Nordic quantum initiative, in 2025.",
           sourceId: "atom-prnewswire",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden: "Very high. On-premise deployment requires specialist operation.",

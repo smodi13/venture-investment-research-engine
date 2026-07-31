@@ -19,6 +19,7 @@ import { baseFields } from "../lib/storage";
 import { THESIS } from "../lib/thesis";
 import { SITE, NAV_LINKS } from "../lib/site";
 import {
+  CLAIM_PROVENANCE_LEVELS,
   DISCOVERY_CHANNELS,
   NOT_DISCLOSED,
   SIGNAL_FRESHNESS_MEANING,
@@ -637,6 +638,156 @@ check(
     "confidence and freshness adjustments never overturn a clear score difference",
     maxAdjustment <= 6 && violation === "",
     `maximum adjustment ${maxAdjustment} points${violation ? "; " + violation : ""}`,
+  );
+}
+
+console.log("\n=== Claim provenance and mandate coverage ===");
+
+/** Every quantified claim on a record: the traction line plus both evidence lists. */
+function quantifiedClaims(c: (typeof COMPANIES)[number]) {
+  return [...c.technology.supportingEvidence, ...c.commercial.adoptionEvidence];
+}
+
+/** Reporting modes that can support an "independently verified" label. */
+const INDEPENDENT_REPORTING = new Set([
+  "Independent reporting",
+  "Peer-reviewed research",
+  "Government or official record",
+  "Public technical record",
+]);
+
+// 15
+{
+  const healthcare = COMPANIES.filter(
+    (c) => c.sector === "Healthcare Technology",
+  );
+  check(
+    "at least six Healthcare Technology companies exist",
+    healthcare.length >= 6,
+    `${healthcare.length}: ${healthcare.map((c) => c.name).join(", ")}`,
+  );
+}
+// 16
+check(
+  "every company classifies the provenance of its traction claim",
+  COMPANIES.every((c) =>
+    CLAIM_PROVENANCE_LEVELS.includes(c.tractionProvenance),
+  ),
+);
+// 17
+check(
+  "every traction claim carries a valid as-of date at or before the snapshot",
+  COMPANIES.every(
+    (c) =>
+      /^\d{4}-\d{2}-\d{2}$/.test(c.tractionAsOf) &&
+      c.tractionAsOf <= "2026-08-01",
+  ),
+  COMPANIES.filter((c) => !/^\d{4}-\d{2}-\d{2}$/.test(c.tractionAsOf))
+    .map((c) => c.name)
+    .join(", "),
+);
+// 18
+{
+  const unclassified = COMPANIES.flatMap((c) =>
+    quantifiedClaims(c)
+      .filter((e) => !CLAIM_PROVENANCE_LEVELS.includes(e.provenance))
+      .map((e) => `${c.name}: ${e.claim.slice(0, 40)}`),
+  );
+  const total = COMPANIES.reduce((n, c) => n + quantifiedClaims(c).length, 0);
+  check(
+    "every quantified claim carries a provenance classification",
+    unclassified.length === 0,
+    `${total} claims classified`,
+  );
+}
+// 19
+{
+  const bad = COMPANIES.flatMap((c) =>
+    quantifiedClaims(c)
+      .filter(
+        (e) =>
+          e.provenance === "Independently verified" &&
+          !INDEPENDENT_REPORTING.has(SOURCE_BY_ID[e.sourceId]?.reporting),
+      )
+      .map(
+        (e) =>
+          `${c.name} cites ${e.sourceId} (${SOURCE_BY_ID[e.sourceId]?.reporting})`,
+      ),
+  );
+  check(
+    "no claim is called independently verified on the strength of a reproduced announcement",
+    bad.length === 0,
+    bad.slice(0, 3).join("; "),
+  );
+}
+// 20
+{
+  const unlabelled = COMPANIES.flatMap((c) =>
+    quantifiedClaims(c)
+      .filter((e) => !SOURCE_BY_ID[e.sourceId])
+      .map((e) => `${c.name}: ${e.sourceId}`),
+  );
+  check(
+    "every classified claim resolves to a registered source",
+    unlabelled.length === 0,
+    unlabelled.join(", "),
+  );
+}
+// 21
+{
+  const unsupported = COMPANIES.flatMap((c) =>
+    quantifiedClaims(c)
+      .filter((e) => e.provenance === "Not sufficiently supported")
+      .map((e) => `${c.name}: ${e.claim.slice(0, 50)}`),
+  );
+  check(
+    "no unsupported quantified claim is used as evidence in production data",
+    unsupported.length === 0,
+    unsupported.join("; "),
+  );
+}
+// 22
+{
+  const claimed = COMPANIES.filter(
+    (c) =>
+      c.tractionProvenance === "Not sufficiently supported" &&
+      c.tractionSignal !== NOT_DISCLOSED,
+  );
+  check(
+    "a company with no supportable traction figure states so rather than asserting one",
+    claimed.length === 0,
+    claimed.map((c) => c.name).join(", "),
+  );
+}
+
+/* Mandate coverage ------------------------------------------------------- */
+
+const EARLY_ONLY = ["Pre-Seed", "Seed", "Series A"];
+
+for (const m of MANDATES) {
+  const top = topRanked(m.id, 6);
+  // 23 to 26
+  check(
+    `${m.name}: produces six ranked companies with non-zero scores`,
+    top.length === 6 && top.every((r) => r.scores[m.id] > 0),
+    top.map((r) => `${r.name} ${r.scores[m.id]}`).join(", "),
+  );
+  const core = top.filter((r) => r.tiers[m.id] === "core").length;
+  check(
+    `${m.name}: at least four of the top six are core to the mandate`,
+    core >= 4,
+    `${core} core`,
+  );
+}
+// 27
+{
+  const top = topRanked("generalist-early-stage", 6).map(
+    (r) => COMPANIES.find((c) => c.id === r.id)!,
+  );
+  check(
+    "Generalist Early Stage top six are all Pre-Seed, Seed, or Series A",
+    top.every((c) => EARLY_ONLY.includes(c.financing.stage)),
+    top.map((c) => `${c.name} (${c.financing.stage})`).join("; "),
   );
 }
 

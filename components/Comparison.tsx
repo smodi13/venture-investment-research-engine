@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { useMandate } from "./MandateProvider";
 import { MandateSelector } from "./MandateSelector";
 import { ScoreBadge, ScoreBar } from "./Score";
-import { ConfidenceBadge, FreshnessBadge } from "./Provenance";
+import { ConfidenceBadge, FreshnessBadge, ProvenanceBadge } from "./Provenance";
 import { RELEVANCE_TIERS } from "@/lib/scoring";
 import { priorityAdjustment, type UniverseRow } from "@/lib/rows";
 import { formatDate } from "@/lib/format";
@@ -83,6 +83,20 @@ const FIELDS: {
         <ConfidenceBadge confidence={r.dataConfidence} />
         <span className="mt-1 block text-xs text-ink-muted">
           {r.sourceCount} source{r.sourceCount === 1 ? "" : "s"}
+        </span>
+      </>
+    ),
+  },
+  {
+    label: "Traction claim",
+    render: (r) => (
+      <>
+        {r.tractionSignal}
+        <span className="mt-1.5 flex flex-wrap items-center gap-1.5">
+          <ProvenanceBadge provenance={r.tractionProvenance} />
+          <span className="text-[11px] text-ink-muted">
+            as of {formatDate(r.tractionAsOf)}
+          </span>
         </span>
       </>
     ),

@@ -38,11 +38,12 @@ const ROUTES = [
   "/thesis", "/intelligence", "/memo", "/methodology",
   "/universe/etched", "/universe/sublime-systems", "/universe/oxide-computer",
   "/universe/quera", "/universe/path-robotics", "/universe/socket",
-  "/universe/anterior", "/universe/rerun",
+  "/universe/anterior", "/universe/rerun", "/universe/perceptic",
+  "/universe/conceivable-life-sciences", "/universe/zed-industries",
 ];
 
 /** Kept in step with lib/companies.ts. */
-const UNIVERSE_SIZE = 33;
+const UNIVERSE_SIZE = 34;
 
 /** Public companies that must never appear as sourcing candidates. */
 const PUBLIC_NAMES = ["NVIDIA", "Broadcom", "Micron", "Advanced Micro Devices", "Vertiv", "Marvell"];
@@ -251,6 +252,77 @@ const FIRMS = ["LDV", "Remoti", "Matchstick", "Magid", "Boston Millennia"];
       body.includes("Additional evidence needed"));
     record("company detail shows a specific disclosed round, not a generic bucket",
       /Most recent disclosed round/.test(body) && !/Most recent disclosed round\s*Later stage/.test(body));
+  }
+
+  /* Claim provenance ---------------------------------------------------- */
+  {
+    await page.goto(BASE + "/universe", { waitUntil: "networkidle" });
+    const provBadges = await page.locator("table tbody tr").locator("text=/^(Independently verified|Company-reported|Investor-reported|Government-reported|Not sufficiently supported)$/").count();
+    record("universe rows label the provenance of the traction claim",
+      provBadges === UNIVERSE_SIZE, `${provBadges} labels for ${UNIVERSE_SIZE} rows`);
+
+    await page.goto(BASE + "/universe/conceivable-life-sciences", { waitUntil: "networkidle" });
+    let body = await page.textContent("body");
+    record("peer-reviewed clinical claim is labelled independently verified",
+      /Independently verified/.test(body) && /Human Reproduction/.test(body));
+    record("live-birth figures are the precise study figures, not a combined total",
+      /5 live births|five live births/i.test(body) && !/18 healthy babies/.test(body));
+    record("the limits of the automation are stated alongside the result",
+      /only in sperm preparation and selected ICSI tasks/.test(body));
+
+    await page.goto(BASE + "/universe/zed-industries", { waitUntil: "networkidle" });
+    body = await page.textContent("body");
+    // The figure may still appear where the record explains that it was
+    // removed. What must not happen is the page asserting it as traction.
+    const asserted = body.replace(/\s+/g, " ").match(/[^.]*150,000 active developers[^.]*\./g) || [];
+    record("unsupported active-developer figure is never asserted as traction",
+      asserted.every((sn) => /has no independent support|was removed|reproduces the company announcement|not used here/i.test(sn)),
+      `${asserted.length} mention(s), all in a removal note`);
+    record("verifiable repository metrics are used instead",
+      /87,800 stars/.test(body) && /482 named contributors/.test(body));
+
+    await page.goto(BASE + "/universe/positron-ai", { waitUntil: "networkidle" });
+    body = await page.textContent("body");
+    record("named-customer claim narrowed to the supported statement",
+      !/Cloudflare/.test(body) && /customer categories including content delivery network operators/.test(body));
+    record("roadmap claim carries a dated company-source label",
+      /company roadmap statement dated 4 February 2026/.test(body));
+
+    await page.goto(BASE + "/universe/counsel-health", { waitUntil: "networkidle" });
+    body = await page.textContent("body");
+    record("member count is labelled company-reported with its dated source",
+      /100,000 members/.test(body) && /Company-reported/.test(body));
+
+    await page.goto(BASE + "/universe/etched", { waitUntil: "networkidle" });
+    body = await page.textContent("body");
+    record("contract-value claim is labelled company-reported",
+      /billion dollars in customer contracts/.test(body) && /Company-reported/.test(body));
+
+    await page.goto(BASE + "/universe/k2-space", { waitUntil: "networkidle" });
+    body = await page.textContent("body");
+    record("backlog claim is labelled company-reported",
+      /500 million dollars in signed contracts/.test(body) && /Company-reported/.test(body));
+
+    await page.goto(BASE + "/methodology", { waitUntil: "networkidle" });
+    body = await page.textContent("body");
+    record("methodology explains all five provenance classifications",
+      ["Independently verified","Company-reported","Investor-reported","Government-reported","Not sufficiently supported"]
+        .every((x) => body.includes(x)));
+    record("methodology states the reproduction rule",
+      /same voice\s+recorded twice|same voice recorded twice/.test(body.replace(/\s+/g," ")));
+  }
+
+  /* Healthcare mandate depth -------------------------------------------- */
+  {
+    await page.goto(BASE + "/universe", { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Healthcare Technology" }).first().click();
+    await page.waitForTimeout(400);
+    const top = (await page.locator("table tbody tr td:nth-child(1) a").allTextContents()).slice(0, 6).map((s) => s.trim());
+    record("healthcare mandate top six are healthcare or life-science companies",
+      top.length === 6 && !top.some((n) => PUBLIC_NAMES.includes(n)), top.join(", "));
+    record("the new healthcare company is in the universe", top.includes("Perceptic") || (await page.locator("table tbody tr td:nth-child(1) a", { hasText: "Perceptic" }).count()) === 1);
+    await page.getByRole("button", { name: "Frontier Technology" }).first().click();
+    await page.waitForTimeout(300);
   }
 
   /* Comparison tool ----------------------------------------------------- */

@@ -28,6 +28,8 @@ export const COMPANIES_F: PrivateCompany[] = [
       "Detecting malicious behaviour on introduction rather than known vulnerabilities after publication. A vulnerability database is always behind an active attacker; behavioural analysis does not have to be.",
     tractionSignal:
       "The company states its platform blocks over 100 software supply chain attacks weekly and secures more than 7,500 organisations and 300,000 repositories.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2024-10-22",
     recentCatalyst:
       "40 million dollar Series B led by Abstract Ventures with Elad Gil and Andreessen Horowitz, bringing total funding to 65 million dollars.",
     primaryCompetitors: [
@@ -90,12 +92,14 @@ export const COMPANIES_F: PrivateCompany[] = [
             "The company states it blocks over 100 supply chain attacks weekly across more than 7,500 organisations and 300,000 repositories.",
           sourceId: "socket-seriesb",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Independent business press covered the Series B and the behavioural detection approach.",
           sourceId: "socket-forbes",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -142,6 +146,7 @@ export const COMPANIES_F: PrivateCompany[] = [
             "More than 7,500 organisations and 300,000 repositories secured, per the company.",
           sourceId: "socket-seriesb",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden: "Low. Integrates into existing code review workflows.",
@@ -278,7 +283,9 @@ export const COMPANIES_F: PrivateCompany[] = [
     technicalDifferentiation:
       "Building the editor from scratch in Rust with the collaboration primitives at the core, rather than adding agents to an architecture that assumed one human author.",
     tractionSignal:
-      "The company states that since going open source in 2024 the editor has attracted 1,100 contributors and more than 150,000 active developers.",
+      "The public repository carries roughly 87,800 stars, 9,800 forks, and 482 named contributors, with pull request numbering past 61,900, all queryable directly through the GitHub API on 31 July 2026. The company has separately claimed a larger contributor count and an active developer figure that no independent source supports. Neither is used here.",
+    tractionProvenance: "Independently verified",
+    tractionAsOf: "2026-07-31",
     recentCatalyst:
       "32 million dollar Series B led by Sequoia Capital announced 20 August 2025, bringing total funding to over 42 million dollars.",
     primaryCompetitors: [
@@ -342,12 +349,14 @@ export const COMPANIES_F: PrivateCompany[] = [
             "The company announced a Series B led by Sequoia Capital to build real-time collaboration between developers and AI agents inside the editor.",
           sourceId: "zed-blog",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
-            "Since going open source in 2024 the editor has attracted 1,100 contributors and more than 150,000 active developers.",
-          sourceId: "zed-startuphub",
+            "Roughly 87,800 stars, 9,800 forks, and 482 named contributors on the public repository, with pull request numbering past 61,900. Queryable directly through the GitHub API rather than asserted by anyone.",
+          sourceId: "zed-github",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -356,7 +365,7 @@ export const COMPANIES_F: PrivateCompany[] = [
       thirdPartyDependency:
         "Language servers and model providers, both supplied by others.",
       milestoneForScale:
-        "A disclosed conversion rate from the 150,000 active developers to the paid service, since that ratio is the only thing turning adoption into revenue.",
+        "A disclosed conversion rate from repository adoption to the paid service, since that ratio is the only thing turning developer interest into revenue.",
       failurePoints: [
         "Extension ecosystem depth never matching incumbents",
         "Incumbent editors adding adequate agent collaboration",
@@ -390,9 +399,10 @@ export const COMPANIES_F: PrivateCompany[] = [
       adoptionEvidence: [
         {
           claim:
-            "More than 150,000 active developers, stated by the company. No paid seats, conversion rate, or revenue are disclosed.",
-          sourceId: "zed-startuphub",
+            "Repository adoption at the scale above. No paid seats, conversion rate, named customers, or revenue are disclosed anywhere, and the company's active developer figure has no independent support, so it is not relied on.",
+          sourceId: "zed-github",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       implementationBurden: "Low. Installing an editor.",
@@ -421,10 +431,10 @@ export const COMPANIES_F: PrivateCompany[] = [
       ],
       invalidators: [
         "An incumbent editor shipping equivalent agent collaboration",
-        "Evidence that paid conversion is negligible at 150,000 active developers",
+        "Evidence that paid conversion is negligible against this level of adoption",
       ],
       recommendedNextStep:
-        "Ask what proportion of the 150,000 active developers pay for the optional service. The model is stated; the only number that matters about it is not.",
+        "Ask how an active developer is counted, and what proportion of them pay for the optional service. The company's own usage figure has no independent support, and the conversion rate behind it has never been stated.",
       confidence: "Low",
     },
     diligence: {
@@ -435,7 +445,7 @@ export const COMPANIES_F: PrivateCompany[] = [
         "How deep is the extension ecosystem relative to what professional teams require?",
       ],
       customers: [
-        "How many developers use the editor daily, and how is that measured?",
+        "How is an active developer counted, and can that definition be audited?",
       ],
       competition: [
         "What agent collaboration have incumbent editors shipped in the last year?",
@@ -459,9 +469,9 @@ export const COMPANIES_F: PrivateCompany[] = [
       technicalDifferentiation: fa(4, "judgment", "Medium",
         "A from-scratch Rust editor with collaboration primitives at the core rather than added on.",
         "A real architectural difference, in a category where architecture rarely decides adoption."),
-      technicalEvidence: fa(4, "verified", "Medium",
-        "A shipping open source editor with 1,100 contributors and more than 150,000 active developers stated by the company. No performance figures published.",
-        "Contributor and user counts are meaningful adoption evidence, self-reported and unaudited.", "zed-startuphub"),
+      technicalEvidence: fa(4, "verified", "High",
+        "A shipping open source editor with roughly 87,800 stars, 9,800 forks, and 482 named contributors, all verifiable directly through the GitHub API. No performance figures published.",
+        "Repository metrics are among the few adoption numbers in this universe a reader can check independently in seconds.", "zed-github"),
       defensibility: fa(2, "judgment", "Low",
         "Open source with a permissive posture and no disclosed proprietary asset.",
         "Weak. The architecture is visible to anyone who wants to copy it."),
@@ -471,15 +481,15 @@ export const COMPANIES_F: PrivateCompany[] = [
       commercialReadiness: fa(2, "verified", "Low",
         "A stated open source model with an optional paid service, and no disclosed pricing, conversion, or revenue.",
         "A mechanism exists; nothing about its performance is public.", "zed-blog"),
-      customerEvidence: fa(2, "verified", "Low",
-        "More than 150,000 active developers stated by the company, with no paid seats, customers, or revenue disclosed.",
-        "Usage without any paying relationship is weak customer evidence.", "zed-startuphub"),
+      customerEvidence: fa(2, "verified", "Medium",
+        "Substantial verifiable repository adoption, with no paid seats, named customers, or revenue disclosed anywhere.",
+        "Developer interest is real and checkable. A paying relationship is entirely absent from the record.", "zed-github"),
       teamCredibility: fa(4, "verified", "Medium",
         "Led by Nathan Sobo, with a long prior record building code editors before this company.",
         "Directly relevant, and the product is itself evidence of execution.", "zed-blog"),
       capitalEfficiency: fa(3, "judgment", "Low",
-        "Over 42 million dollars raised to reach more than 150,000 active developers, with no disclosed revenue.",
-        "Efficient on users, unassessable on revenue."),
+        "Over 42 million dollars raised to reach a top-tier open source repository, with no disclosed revenue.",
+        "Efficient on developer reach, unassessable on revenue."),
       competitiveIntensity: fa(2, "judgment", "Medium",
         "Incumbent editors with enormous ecosystems and better-funded AI-first competitors.",
         "One of the harder competitive positions in developer tools."),
@@ -494,8 +504,8 @@ export const COMPANIES_F: PrivateCompany[] = [
     },
     dataConfidence: "Low",
     dataConfidenceNote:
-      "Financing, lead investor, total raised, the business model, and the product direction come from the company's own announcement, and the adoption figures come from a publication reproducing that announcement rather than reporting on it independently. No independent reporting on this financing was found. Founding year, pricing, revenue, and paid seat counts are not disclosed. This record is marked low confidence for that reason.",
-    sourceIds: ["zed-blog", "zed-startuphub"],
+      "Financing, lead investor, total raised, the business model, and the product direction come from the company's own announcement. No independent reporting on this financing was found, only a publication reproducing the announcement, which is not corroboration. Adoption is measured instead from the public repository, which anyone can query. The company's claim of more than 150,000 active developers has no independent support and was removed rather than repeated. Founding year, pricing, revenue, and paid seat counts are not disclosed.",
+    sourceIds: ["zed-blog", "zed-github", "zed-startuphub"],
     lastReviewed: REVIEWED,
   },
 
@@ -523,6 +533,8 @@ export const COMPANIES_F: PrivateCompany[] = [
       "Durability is provided by the platform rather than assembled by the developer from queues, retries, and a state store, which removes an entire category of failure handling from application code.",
     tractionSignal:
       "The company names SoundCloud, Tripadvisor, Contentful, and Resend as relying on the platform for core workflows.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "21 million dollar Series A led by Altimeter to serve AI workflow automation, following a 6.1 million dollar seed round led by Andreessen Horowitz.",
     primaryCompetitors: [
@@ -584,12 +596,14 @@ export const COMPANIES_F: PrivateCompany[] = [
             "The company names SoundCloud, Tripadvisor, Contentful, and Resend as relying on the platform for core workflows.",
           sourceId: "inngest-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Seed financing led by Andreessen Horowitz was independently reported and announced by the company.",
           sourceId: "inngest-techcrunch",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -634,6 +648,7 @@ export const COMPANIES_F: PrivateCompany[] = [
             "Named companies relying on the platform for core workflows, listed by the company.",
           sourceId: "inngest-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -761,7 +776,9 @@ export const COMPANIES_F: PrivateCompany[] = [
     technicalDifferentiation:
       "Shipping on reconfigurable silicon first let the company get a memory-optimised architecture into customers' hands years before a custom chip could exist, and the architecture is the claim rather than the process node.",
     tractionSignal:
-      "The company names Parasail, SnapServe, and Cloudflare among Atlas customers, and states Atlas delivers 3.5 times better performance per dollar and up to 66 percent lower power than a named incumbent accelerator at 93 percent memory bandwidth utilisation.",
+      "Positron reports Atlas usage across customer categories including content delivery network operators and AI infrastructure providers, and states Atlas delivers 3.5 times better performance per dollar and up to 66 percent lower power than a named incumbent accelerator at 93 percent memory bandwidth utilisation. Independent technology press separately reported a major internet infrastructure operator evaluating Atlas.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "230 million dollar Series B at a post-money valuation above one billion dollars announced 4 February 2026, funding the move from shipping Atlas systems to the Asimov custom silicon generation, with tape-out targeted for late 2026 and production in early 2027.",
     primaryCompetitors: [
@@ -837,18 +854,21 @@ export const COMPANIES_F: PrivateCompany[] = [
             "The company reports 93 percent memory bandwidth utilisation, 3.5 times better performance per dollar, and up to 66 percent lower power than a named incumbent accelerator, with support for models up to 500 billion parameters per two kilowatt server.",
           sourceId: "positron-press",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Independent technology press reported the Atlas power and throughput claims and described a major internet infrastructure operator evaluating the product.",
           sourceId: "positron-toms",
           basis: "verified",
+          provenance: "Independently verified",
         },
         {
           claim:
-            "Atlas systems are in use at Cloudflare, and the Asimov custom silicon generation targets tape-out in late 2026 and production in early 2027.",
+            "The Asimov custom silicon generation targets tape-out in late 2026 and production in early 2027. This is a company roadmap statement dated 4 February 2026, not an independent assessment of schedule risk.",
           sourceId: "positron-seriesb",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks:
@@ -891,9 +911,10 @@ export const COMPANIES_F: PrivateCompany[] = [
       adoptionEvidence: [
         {
           claim:
-            "Parasail, SnapServe, and Cloudflare are named among Atlas customers. No contract value or deployment volume is disclosed.",
+            "Positron reports Atlas usage across customer categories including content delivery network operators and AI infrastructure providers. No contract value or deployment volume is disclosed, and no reliable source establishes the specific commercial relationship behind any individual name.",
           sourceId: "positron-press",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -915,7 +936,7 @@ export const COMPANIES_F: PrivateCompany[] = [
       catalysts: [
         "Custom silicon tape-out and first samples",
         "Independent benchmark reproduction on a customer workload",
-        "A named customer disclosed with volume",
+        "A named production customer disclosed with contract value or volume",
       ],
       risks: [
         "Unshipped custom silicon underpinning the roadmap",
@@ -937,7 +958,9 @@ export const COMPANIES_F: PrivateCompany[] = [
       product: [
         "How does the software stack handle model architectures released after design freeze?",
       ],
-      customers: ["Which operators are running the product, and at what scale?"],
+      customers: [
+        "Which operators run Atlas in production rather than evaluating it, and at what scale?",
+      ],
       competition: [
         "How will the custom silicon compare with purpose-built competitors shipping on the same timeline?",
       ],
@@ -972,11 +995,11 @@ export const COMPANIES_F: PrivateCompany[] = [
         "Inference cost and power are the central economic constraints in AI infrastructure.",
         "On the most important bottleneck in the sector."),
       commercialReadiness: fa(4, "verified", "Medium",
-        "Atlas systems shipping with three named customers.",
-        "Genuinely in market, with the commercial terms not public.", "positron-press"),
-      customerEvidence: fa(4, "verified", "Medium",
-        "Three named Atlas customers including a major internet infrastructure operator, with no contract value or deployment volume disclosed and independent reporting describing that operator as evaluating rather than standardised on the product.",
-        "Named customers are strong evidence for inference silicon at this stage, with the depth of each relationship unclear.", "positron-toms"),
+        "Atlas systems shipping, with the company reporting usage across customer categories and independent press reporting an operator evaluation.",
+        "Genuinely in market, with the commercial terms and the depth of each relationship not public.", "positron-press"),
+      customerEvidence: fa(3, "verified", "Medium",
+        "Company-reported Atlas usage across customer categories including content delivery network operators, plus independent reporting of a major internet infrastructure operator evaluating the product. No named commercial relationship, contract value, or deployment volume is established.",
+        "Evaluation by a demanding operator is meaningful, and it is not the same as a standardised deployment. The record does not support treating it as one.", "positron-toms"),
       teamCredibility: fa(4, "verified", "Medium",
         "Co-founded in 2023 by Thomas Sohmers and Edward Kmett, with a chief executive brought in from a compute infrastructure operator.",
         "Strong technical founding team with an operator added for commercial scale.", "positron-seriesb"),
@@ -998,7 +1021,7 @@ export const COMPANIES_F: PrivateCompany[] = [
     },
     dataConfidence: "Medium",
     dataConfidenceNote:
-      "Founders, founding year, headquarters, both financing rounds, the named customers, the Asimov silicon schedule, and the published performance claims are supported by the company's own materials with independent technology press reporting. Revenue, contract value, total capital raised, and any independent reproduction of the benchmark measurements are not available.",
+      "Founders, founding year, headquarters, and both financing rounds are supported by the company's own materials, with independent technology press reporting on the Atlas performance claims and on an operator evaluation. The customer categories, the Asimov schedule, and the benchmark figures are company-reported and labelled as such throughout. Revenue, contract value, named commercial relationships, total capital raised, and any independent reproduction of the benchmark measurements are not available.",
     sourceIds: ["positron-seriesb", "positron-press", "positron-toms"],
     lastReviewed: REVIEWED,
   },
@@ -1027,6 +1050,8 @@ export const COMPANIES_F: PrivateCompany[] = [
       "Food is deformable, variable, and different every time, which defeats the position-controlled repeatability industrial robots rely on. The control system is built around that variability rather than around a fixed part.",
     tractionSignal:
       "The company states more than 44 million servings have been produced in production using its systems.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2025-03-31",
     recentCatalyst:
       "43.1 million dollar Series A announced 31 March 2025, comprising 20.6 million dollars in equity led by Avataar Ventures and 22.5 million dollars in equipment financing.",
     primaryCompetitors: [
@@ -1097,12 +1122,14 @@ export const COMPANIES_F: PrivateCompany[] = [
             "More than 44 million servings produced in production using the company's systems.",
           sourceId: "chef-prnewswire",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "The Series A structure and the robotics-as-a-service model were independently reported.",
           sourceId: "chef-robotreport",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks:
@@ -1150,6 +1177,7 @@ export const COMPANIES_F: PrivateCompany[] = [
             "More than 44 million servings produced in production, indicating sustained deployment rather than pilots.",
           sourceId: "chef-prnewswire",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -1281,6 +1309,8 @@ export const COMPANIES_F: PrivateCompany[] = [
       "Solar thermal propulsion concentrates sunlight to heat propellant, which the company positions as delivering performance approaching nuclear thermal propulsion without carrying a reactor.",
     tractionSignal:
       "Starburst-1, the company's first orbital vehicle, is manifested on a scheduled rideshare launch, and headcount has grown to roughly 40 with a stated plan to reach 100.",
+    tractionProvenance: "Independently verified",
+    tractionAsOf: "2026-04-09",
     recentCatalyst:
       "50 million dollar Series A announced 9 April 2026, co-led by Geodesic Capital and Mach33, funding a 52,000 square foot production facility in Bothell and the Starburst and Supernova vehicles.",
     primaryCompetitors: [
@@ -1351,12 +1381,14 @@ export const COMPANIES_F: PrivateCompany[] = [
             "The company announced a 50 million dollar Series A to fund a production facility and its Starburst and Supernova missions.",
           sourceId: "portal-seriesa",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Independent space press reported the financing, the facility, and the 2027 first launch schedule.",
           sourceId: "portal-spacenews",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -1401,6 +1433,7 @@ export const COMPANIES_F: PrivateCompany[] = [
             "Funding raised to support named missions. No customer contract is disclosed.",
           sourceId: "portal-spacenews",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       implementationBurden: "Not applicable until a spacecraft flies.",

@@ -12,6 +12,7 @@ import {
   SourceLink,
   Value,
   FreshnessBadge,
+  ProvenanceBadge,
 } from "./Provenance";
 import { BulletList, Field, Section } from "./ui";
 import {
@@ -196,6 +197,12 @@ export function CompanyDetail({ company }: { company: PrivateCompany }) {
           </Field>
           <Field label="Traction signal">
             <Value value={company.tractionSignal} />
+            <span className="mt-2 flex flex-wrap items-center gap-2">
+              <ProvenanceBadge provenance={company.tractionProvenance} />
+              <span className="text-xs text-ink-muted">
+                as of {formatDate(company.tractionAsOf)}
+              </span>
+            </span>
           </Field>
           <Field label="Recent catalyst">{company.recentCatalyst}</Field>
         </dl>

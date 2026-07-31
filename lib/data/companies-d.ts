@@ -35,6 +35,8 @@ export const COMPANIES_D: PrivateCompany[] = [
       "Continuous rebuilding from source at scale, which is an operational commitment rather than a scanning product, and is the reason the vulnerability count stays near zero rather than being reported.",
     tractionSignal:
       "The company reported revenue growth from 5 million to 40 million dollars, more than 100 paying enterprise customers, and catalogue growth from 400 to 1,400 images, in its Series D announcement.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2025-04-30",
     recentCatalyst:
       "Series D of 356 million dollars led by Kleiner Perkins and IVP at a reported 3.5 billion dollar valuation, announced April 2025.",
     primaryCompetitors: [
@@ -106,12 +108,14 @@ export const COMPANIES_D: PrivateCompany[] = [
             "Catalogue growth from 400 to 1,400 images and revenue growth from 5 million to 40 million dollars, disclosed by the company.",
           sourceId: "chainguard-announcement",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Series D amount, valuation, and Kirkland headquarters independently reported.",
           sourceId: "chainguard-geekwire",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -161,6 +165,7 @@ export const COMPANIES_D: PrivateCompany[] = [
             "More than 100 paying enterprise customers and revenue growth from 5 million to 40 million dollars, disclosed at Series D.",
           sourceId: "chainguard-announcement",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -353,6 +358,8 @@ export const COMPANIES_D: PrivateCompany[] = [
       "Replacing the kiln removes both the fuel emissions and the process emissions from limestone, which is the part of cement decarbonisation that efficiency measures cannot reach.",
     tractionSignal:
       "Deploying cement in real-world projects since 2023, operating a pilot plant in Somerville, and developing a first commercial facility in Holyoke, Massachusetts.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "Combined 75 million dollar strategic investment from CRH and Holcim, two of the largest global building materials companies.",
     primaryCompetitors: [
@@ -416,12 +423,14 @@ export const COMPANIES_D: PrivateCompany[] = [
             "The company states its product meets ASTM C1157 and functions as a drop-in replacement for ordinary Portland cement.",
           sourceId: "sublime-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "CRH and Holcim invested a combined 75 million dollars, confirmed independently by Holcim's own disclosure.",
           sourceId: "sublime-holcim",
           basis: "verified",
+          provenance: "Investor-reported",
         },
       ],
       benchmarks:
@@ -472,6 +481,7 @@ export const COMPANIES_D: PrivateCompany[] = [
             "Cement deployed in real-world projects since 2023 and partnerships with large general contractors.",
           sourceId: "sublime-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -664,6 +674,8 @@ export const COMPANIES_D: PrivateCompany[] = [
       "Vertical integration of hardware, installation, and the retail electricity licence, which lets the company monetise the battery through grid services rather than selling it.",
     tractionSignal:
       "The company states it serves more than 30,000 homeowners and holds Texas Public Utility Commission licence number 10338.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "Series C of one billion dollars to build a domestic factory and expand beyond Texas.",
     primaryCompetitors: [
@@ -734,12 +746,14 @@ export const COMPANIES_D: PrivateCompany[] = [
             "Texas Public Utility Commission retail electricity licence number 10338, stated on the company site.",
           sourceId: "base-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Series C of one billion dollars, independently reported, funding a factory and national expansion.",
           sourceId: "base-esgtoday",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -786,6 +800,7 @@ export const COMPANIES_D: PrivateCompany[] = [
             "The company states more than 30,000 homeowners served and operation in Texas with expansion into Illinois.",
           sourceId: "base-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -978,6 +993,8 @@ export const COMPANIES_D: PrivateCompany[] = [
       "Storing energy as heat in carbon avoids the critical mineral supply chains that constrain electrochemical batteries, and carbon is abundant and cheap.",
     tractionSignal:
       "Commissioned a five gigawatt-hour thermal battery project with POET in South Dakota, per the company.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "Series C of 550 million dollars co-led by G2 Venture Partners and Eclipse, funding manufacturing capacity expansion.",
     primaryCompetitors: [
@@ -1048,12 +1065,14 @@ export const COMPANIES_D: PrivateCompany[] = [
             "ARPA-E documented the thermal storage and thermophotovoltaic technology and its federal research support.",
           sourceId: "antora-arpae",
           basis: "verified",
+          provenance: "Government-reported",
         },
         {
           claim:
             "A five gigawatt-hour thermal battery project commissioned with POET in South Dakota, per the company.",
           sourceId: "antora-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -1100,6 +1119,7 @@ export const COMPANIES_D: PrivateCompany[] = [
             "Five gigawatt-hour project commissioned with a named industrial partner.",
           sourceId: "antora-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -1290,6 +1310,8 @@ export const COMPANIES_D: PrivateCompany[] = [
       "Designing for factory mass production and transportability rather than for site construction, which inverts the economics of conventional nuclear.",
     tractionSignal:
       "Scheduled to conduct a fuelled prototype test at the Idaho National Laboratory DOME facility, which is a US Department of Energy demonstration site.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "Raised more than 300 million dollars in December 2025, following a 165 million dollar Series C closed in May 2025.",
     primaryCompetitors: [
@@ -1361,12 +1383,14 @@ export const COMPANIES_D: PrivateCompany[] = [
             "A fuelled prototype test is scheduled at the Idaho National Laboratory DOME facility.",
           sourceId: "radiant-wna",
           basis: "verified",
+          provenance: "Independently verified",
         },
         {
           claim:
             "Series C of 165 million dollars closed May 2025 bringing total venture funding to 225 million dollars, followed by more than 300 million dollars in December 2025.",
           sourceId: "radiant-seriesc",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -1412,6 +1436,7 @@ export const COMPANIES_D: PrivateCompany[] = [
             "Selection for a fuelled test at a Department of Energy demonstration facility.",
           sourceId: "radiant-wna",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       implementationBurden:
@@ -1600,6 +1625,8 @@ export const COMPANIES_D: PrivateCompany[] = [
       "Designing for high power at low cost per watt, which changes what a single satellite can do and reduces the number required for a given mission.",
     tractionSignal:
       "The company states 500 million dollars in signed contracts from commercial and US government customers.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2025-02-11",
     recentCatalyst:
       "Series C of 250 million dollars led by Redpoint at a stated 3 billion dollar valuation, announced December 2025, with the first production satellite planned for launch in March 2026.",
     primaryCompetitors: [
@@ -1669,12 +1696,14 @@ export const COMPANIES_D: PrivateCompany[] = [
             "500 million dollars in signed contracts from commercial and US government customers, and a Torrance factory scaling to up to one hundred satellites per year.",
           sourceId: "k2-prnewswire",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Series C financing and the Mega Class satellite programme independently reported by space trade press.",
           sourceId: "k2-payload",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -1719,6 +1748,7 @@ export const COMPANIES_D: PrivateCompany[] = [
             "500 million dollars in signed contracts stated at the time of the Series C.",
           sourceId: "k2-prnewswire",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -1909,6 +1939,8 @@ export const COMPANIES_D: PrivateCompany[] = [
       "Upper stage reuse, attempted through an actively cooled heat shield and a novel engine configuration, which is the unsolved half of launch reusability.",
     tractionSignal:
       "Refurbishing Launch Complex 14 at Cape Canaveral Space Force Station, with activation scheduled for early 2026.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "Series D of 510 million dollars announced October 2025, extended to 860 million dollars in February 2026, more than doubling total capital raised.",
     primaryCompetitors: [
@@ -1981,12 +2013,14 @@ export const COMPANIES_D: PrivateCompany[] = [
             "Series D of 510 million dollars raised to complete development and demonstrate Nova through first flights, with Launch Complex 14 refurbishment underway.",
           sourceId: "stoke-announcement",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Independent business press corroborated the financing and the Kent, Washington base of operations.",
           sourceId: "stoke-geekwire",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -2028,6 +2062,7 @@ export const COMPANIES_D: PrivateCompany[] = [
             "Launch Complex 14 refurbishment at Cape Canaveral, scheduled for activation in early 2026.",
           sourceId: "stoke-announcement",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -2218,6 +2253,8 @@ export const COMPANIES_D: PrivateCompany[] = [
       "Coupling model predictions to its own wet lab data generation, so that the models improve on the specific protein families customers care about rather than only on public data.",
     tractionSignal:
       "The company names Novo Nordisk, Johnson & Johnson Innovative Medicine, Grifols, and Novozymes as users of its technology.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2025-11-19",
     recentCatalyst:
       "Series B of 73 million dollars led by IVP in November 2024, bringing total funding to more than 100 million dollars.",
     primaryCompetitors: [
@@ -2281,12 +2318,14 @@ export const COMPANIES_D: PrivateCompany[] = [
             "Named enterprise users including Novo Nordisk, Johnson & Johnson Innovative Medicine, Grifols, and Novozymes.",
           sourceId: "cradle-seriesb",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Series B financing and Amsterdam and Zurich operations independently reported.",
           sourceId: "cradle-siliconangle",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -2336,6 +2375,7 @@ export const COMPANIES_D: PrivateCompany[] = [
             "Four named global enterprise users across pharmaceutical, plasma, and enzyme markets.",
           sourceId: "cradle-seriesb",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -2526,6 +2566,8 @@ export const COMPANIES_D: PrivateCompany[] = [
       "Licensed access to major medical journal content combined with retrieval over that literature, which is a content rights position as much as a technical one.",
     tractionSignal:
       "Reported to be used by a large share of United States physicians, with the company describing itself as the fastest-growing application for physicians.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2025-07-15",
     recentCatalyst:
       "Series D of 250 million dollars led by Thrive Capital and DST Global in January 2026, at a reported 12 billion dollar valuation, having relocated headquarters from Cambridge to Miami during 2025.",
     primaryCompetitors: [
@@ -2596,12 +2638,14 @@ export const COMPANIES_D: PrivateCompany[] = [
             "Series D financing, valuation, investor list, and headquarters relocation to Miami, independently reported.",
           sourceId: "openevidence-cnbc",
           basis: "verified",
+          provenance: "Independently verified",
         },
         {
           claim:
             "The company's own announcement describes physician adoption and its financing history.",
           sourceId: "openevidence-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -2645,9 +2689,10 @@ export const COMPANIES_D: PrivateCompany[] = [
       adoptionEvidence: [
         {
           claim:
-            "Widely reported physician adoption at national scale, with the Mayo Clinic among investors.",
+            "Physician adoption at national scale, reported by independent business press but originating as a company figure with no published methodology. The Mayo Clinic being among the investors is independently established.",
           sourceId: "openevidence-cnbc",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:

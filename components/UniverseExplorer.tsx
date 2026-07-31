@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { useMandate } from "./MandateProvider";
 import { MandateSelector } from "./MandateSelector";
 import { RelevanceBadge, ScoreBadge, ScoreBar } from "./Score";
-import { ConfidenceBadge, FreshnessBadge } from "./Provenance";
+import { ConfidenceBadge, FreshnessBadge, ProvenanceBadge } from "./Provenance";
 import { RELEVANCE_ORDER, RELEVANCE_TIERS, mandateRelevance } from "@/lib/scoring";
 import type { UniverseRow } from "@/lib/rows";
 import { downloadCsv, recordsToCsv } from "@/lib/csv";
@@ -389,6 +389,9 @@ export function UniverseExplorer({
                 </td>
                 <td className="py-3 px-3">
                   <ConfidenceBadge confidence={r.dataConfidence} />
+                  <div className="mt-1.5">
+                    <ProvenanceBadge provenance={r.tractionProvenance} />
+                  </div>
                   <div className="mt-1.5 text-xs text-ink-muted">
                     {r.sourceCount} source{r.sourceCount === 1 ? "" : "s"}
                   </div>

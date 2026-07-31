@@ -1,8 +1,10 @@
 import {
+  CLAIM_PROVENANCE_MEANING,
   DATA_CONFIDENCE_MEANING,
   NOT_DISCLOSED,
   SIGNAL_FRESHNESS_MEANING,
   type Basis,
+  type ClaimProvenance,
   type DataConfidence,
   type SignalFreshness,
 } from "@/lib/types";
@@ -75,6 +77,38 @@ export function FreshnessBadge({
   );
 }
 
+const PROVENANCE_TONE: Record<ClaimProvenance, string> = {
+  "Independently verified": "border-emerald-200 bg-emerald-50 text-emerald-800",
+  "Company-reported": "border-amber-200 bg-amber-50 text-amber-800",
+  "Investor-reported": "border-violet-200 bg-violet-50 text-violet-800",
+  "Government-reported": "border-sky-200 bg-sky-50 text-sky-800",
+  "Not sufficiently supported": "border-rose-200 bg-rose-50 text-rose-800",
+};
+
+/**
+ * Who vouches for a quantified claim.
+ *
+ * Rendered against the claim itself, never in a legend, because the whole point
+ * is that a reader should not have to go looking to find out whether a number
+ * was checked by anyone outside the company.
+ */
+export function ProvenanceBadge({
+  provenance,
+  className = "",
+}: {
+  provenance: ClaimProvenance;
+  className?: string;
+}) {
+  return (
+    <span
+      title={CLAIM_PROVENANCE_MEANING[provenance]}
+      className={`inline-flex items-center whitespace-nowrap rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${PROVENANCE_TONE[provenance]} ${className}`}
+    >
+      {provenance}
+    </span>
+  );
+}
+
 export function BasisBadge({ basis }: { basis: Basis }) {
   return (
     <span
@@ -123,15 +157,18 @@ export function EvidenceLine({
   claim,
   sourceId,
   basis,
+  provenance,
 }: {
   claim: string;
   sourceId: string;
   basis: Basis;
+  provenance: ClaimProvenance;
 }) {
   return (
     <li className="flex flex-col gap-1 border-b border-line py-2.5 last:border-0">
       <span className="text-sm leading-relaxed text-ink-soft">{claim}</span>
       <span className="flex flex-wrap items-center gap-2">
+        <ProvenanceBadge provenance={provenance} />
         <BasisBadge basis={basis} />
         <SourceLink sourceId={sourceId} />
       </span>

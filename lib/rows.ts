@@ -4,6 +4,7 @@ import { companyScore, mandateRelevance, type RelevanceTierId } from "./scoring"
 import { signalFreshness } from "./format";
 import type {
   CapitalIntensity,
+  ClaimProvenance,
   DiscoveryChannel,
   SignalFreshness,
   CommercialReadiness,
@@ -38,6 +39,9 @@ export interface UniverseRow {
   capitalIntensity: CapitalIntensity;
   commercialReadiness: CommercialReadiness;
   dataConfidence: DataConfidence;
+  tractionSignal: string;
+  tractionProvenance: ClaimProvenance;
+  tractionAsOf: string;
   lastReviewed: string;
   /** Latest disclosed financing, already resolved to a display string. */
   latestRound: string;
@@ -96,6 +100,9 @@ function toRow(c: PrivateCompany): UniverseRow {
             ? "Prototype"
             : "Research",
     dataConfidence: c.dataConfidence,
+    tractionSignal: String(c.tractionSignal),
+    tractionProvenance: c.tractionProvenance,
+    tractionAsOf: c.tractionAsOf,
     lastReviewed: c.lastReviewed,
     latestRound: c.financing.latestRound,
     latestRoundDate: c.financing.latestRoundDate,

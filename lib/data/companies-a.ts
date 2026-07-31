@@ -41,6 +41,8 @@ export const COMPANIES_A: PrivateCompany[] = [
       "Burning one model architecture into silicon removes the generality that costs a general-purpose accelerator area and power. The trade is severe and deliberate: the part is useless for anything that is not a transformer.",
     tractionSignal:
       "The company states more than one billion dollars in customer contracts and that first racks ship this summer.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "Exited stealth on 30 June 2026 disclosing capital raised, a working chip, and contracted demand, having previously operated with unannounced financings.",
     primaryCompetitors: [
@@ -113,12 +115,14 @@ export const COMPANIES_A: PrivateCompany[] = [
             "The company states a working Sohu chip, first racks shipping, and more than one billion dollars in customer contracts.",
           sourceId: "etched-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Independent technology press covered the original transformer-only ASIC approach and the Series A financing that funded it.",
           sourceId: "etched-eenews",
           basis: "verified",
+          provenance: "Independently verified",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -171,6 +175,7 @@ export const COMPANIES_A: PrivateCompany[] = [
             "The company states more than one billion dollars in signed customer contracts and that production is underway.",
           sourceId: "etched-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -364,6 +369,8 @@ export const COMPANIES_A: PrivateCompany[] = [
       "Performing multiplication inside the memory array attacks the movement of model weights, which is the dominant energy cost in inference, rather than the arithmetic, which is not.",
     tractionSignal:
       "The company states Corsair entered full production and announced a rack-scale system with named ecosystem partners including Supermicro, Arista Networks, and Broadcom.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2025-11-12",
     recentCatalyst:
       "Closed a 275 million dollar Series C in November 2025 with participation from Microsoft's venture arm and Singapore's Temasek, bringing disclosed total funding to 450 million dollars.",
     primaryCompetitors: [
@@ -434,12 +441,14 @@ export const COMPANIES_A: PrivateCompany[] = [
             "The company states Corsair entered full production and describes the digital in-memory compute and stacked DRAM architecture.",
           sourceId: "dmatrix-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "The Series C announcement names ecosystem partners for the rack-scale system including Supermicro, Arista Networks, and Broadcom.",
           sourceId: "dmatrix-announcement",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks:
@@ -493,12 +502,14 @@ export const COMPANIES_A: PrivateCompany[] = [
             "The company states Corsair is in full production to meet customer demand.",
           sourceId: "dmatrix-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "Named ecosystem partners for the rack-scale product, disclosed in the financing announcement.",
           sourceId: "dmatrix-announcement",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:
@@ -693,6 +704,8 @@ export const COMPANIES_A: PrivateCompany[] = [
       "Moving the optical conversion onto the package rather than the faceplate removes an electrical hop that costs power and limits reach, which is the constraint that binds as accelerator counts per rack rise.",
     tractionSignal:
       "The company lists AMD, NVIDIA, Alchip, GUC, MediaTek, and Wiwynn as investors and ecosystem partners, and states membership of the NVIDIA NVLink Fusion ecosystem.",
+    tractionProvenance: "Company-reported",
+    tractionAsOf: "2026-07-30",
     recentCatalyst:
       "Closed a 500 million dollar Series E led by Neuberger Berman on 3 March 2026, bringing total capital raised to approximately 870 million dollars.",
     primaryCompetitors: [
@@ -764,12 +777,14 @@ export const COMPANIES_A: PrivateCompany[] = [
             "The company describes the TeraPHY optical engine and SuperNova remote light source and states membership of the NVIDIA NVLink Fusion ecosystem.",
           sourceId: "ayar-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
         {
           claim:
             "AMD and NVIDIA are both listed as investors and partners on the company site.",
           sourceId: "ayar-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       benchmarks: NOT_DISCLOSED,
@@ -821,6 +836,7 @@ export const COMPANIES_A: PrivateCompany[] = [
             "Ecosystem membership and named partnerships with accelerator vendors and system manufacturers, stated by the company.",
           sourceId: "ayar-site",
           basis: "verified",
+          provenance: "Company-reported",
         },
       ],
       implementationBurden:

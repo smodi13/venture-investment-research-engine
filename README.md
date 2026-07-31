@@ -50,12 +50,14 @@ reject a specific rating and see exactly which source decided it.
 
 ## Real-company research policy
 
-The sourcing universe contains **33 real private companies**. There are no
+The sourcing universe contains **34 real private companies**. There are no
 fictional companies anywhere in production data.
 
 The universe is deliberately weighted toward the stages a sourcing process
-actually works at: 10 of the 33 companies (30 percent) are Seed or Series A,
-and only 6 (18 percent) are past Series C. Every record names the specific
+actually works at: 11 of the 34 companies (32 percent) are Seed or Series A,
+and only 6 (18 percent) are past Series C. Six are Healthcare Technology
+companies, which is what gives that mandate a top six drawn entirely from its
+own sector. Every record names the specific
 disclosed round rather than a generic bucket, so a company grouped as later
 stage for mandate purposes still shows the round it actually announced.
 
@@ -125,6 +127,32 @@ up to three points for data confidence and up to three for signal freshness.
 The cap is deliberate. A six point maximum cannot overturn a clear score
 difference, and the integrity suite asserts exactly that. Both the underlying
 score and the adjustment are printed on every card.
+
+## Claim provenance
+
+Every quantified traction, customer, adoption, benchmark, backlog, contract,
+member, and clinical claim carries a label saying who is vouching for it.
+
+| Classification | Meaning |
+| --- | --- |
+| Independently verified | Original reporting, peer-reviewed research, an official record, or a public technical record anyone can query |
+| Company-reported | The company said it. It may well be accurate, and nobody else has checked it |
+| Investor-reported | An investor in the company said it |
+| Government-reported | Published by a government body or public laboratory as an official record |
+| Not sufficiently supported | No source meets the standard, so the claim is not used in any rating |
+
+The rule that does the work is that **a press release and a publication
+reprinting that press release are the same voice recorded twice**. Both look
+like third-party coverage in a search result. Only one is corroboration. Every
+registered source therefore also records whether its publisher did original
+reporting or reproduced an announcement, and the integrity suite fails if a
+claim is called independently verified while resting on a reproduction.
+
+Across the universe, 105 claims are classified: 25 independently verified, 74
+company-reported, 4 investor-reported, and 2 government-reported.
+Company-reported is not a criticism. Most of what is publicly known about a
+private company comes from the company. The label exists so the difference is
+visible at a glance.
 
 ## Comparison
 
@@ -208,7 +236,7 @@ Confidence describes how certain the conclusion is, not how good the company is.
 
 ## Source registry
 
-Eighty-six registered sources, each with subject, title, publisher, type, publication
+Ninety-one registered sources, each with subject, title, publisher, type, publication
 date, access date, URL, and the specific fact it supports. Only primary sources
 and independent corroborating publications are registered. Every link was
 checked, opens in a new tab, and uses `rel="noopener noreferrer"`. No
@@ -264,6 +292,14 @@ sentinel, that no firm-specific name or em dash appears, that the GitHub link is
 present where required, and that no credential pattern or environment variable
 appears anywhere.
 
+It also asserts claim provenance: that every quantified claim carries a
+classification, that every classified claim resolves to a registered source,
+that no claim is called independently verified on the strength of a reproduced
+announcement, that no unsupported quantified claim is used as evidence, that at
+least six Healthcare Technology companies exist, that every mandate produces
+six ranked companies with at least four core to it, and that the Generalist
+Early Stage top six are all Pre-Seed, Seed, or Series A.
+
 It also asserts the portfolio-construction rules: at least 28 companies, at
 least a quarter of them at Seed or Series A, no more than a quarter past Series
 C, no generic stage bucket standing in for a disclosed round, a valid discovery
@@ -272,7 +308,7 @@ database search would miss, named remaining evidence, sector-appropriate top
 fives under each mandate, and that the confidence and freshness adjustments can
 never overturn a clear score difference.
 
-The **end-to-end suite** runs 81 checks in an isolated headless Chromium
+The **end-to-end suite** runs 96 checks in an isolated headless Chromium
 profile: navigation, mandate switching and recalculation, search, filters,
 sorting including sort by signal freshness, company details, the comparison
 tool and its four-company cap, pipeline editing, local storage persistence, CSV

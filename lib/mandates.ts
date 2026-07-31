@@ -266,16 +266,16 @@ export const MANDATES: Mandate[] = [
       sourcingOriginality: 2,
     },
     sectorAffinity: {
-      "AI Infrastructure": 4,
+      "AI Infrastructure": 5,
       "Semiconductors & Advanced Computing": 3,
-      "Robotics & Autonomy": 4,
+      "Robotics & Autonomy": 5,
       "Quantum Computing": 2,
-      "Biotechnology & Research Tools": 4,
-      "Energy Systems": 4,
+      "Biotechnology & Research Tools": 5,
+      "Energy Systems": 5,
       "Advanced Materials": 3,
       "Space & Aerospace": 3,
       "Enterprise Infrastructure Software": 5,
-      "Healthcare Technology": 4,
+      "Healthcare Technology": 5,
     },
     stageAffinity: {
       "Pre-Seed": 5,
@@ -295,7 +295,7 @@ export const MANDATES: Mandate[] = [
       "How many months of runway does the current plan assume, and what is the smallest result that would make the next round straightforward?",
     ],
     scoringNote:
-      "Team credibility carries 19 of the 100 quality points and market importance 15, the heaviest weights any profile assigns to either. At pre-seed and seed the product will change, so the model deliberately weights the people and the market over the current artefact. The stage affinities are narrow: anything past Series A falls out of relevance quickly.",
+      "Team credibility carries 19 of the 100 quality points and market importance 15, the heaviest weights any profile assigns to either. At pre-seed and seed the product will change, so the model deliberately weights the people and the market over the current artefact. The stage affinities are narrow: anything past Series A falls out of relevance quickly. Sector affinity is deliberately flat across most of the universe, because a generalist mandate that discriminated by sector would not be a generalist mandate. The three exceptions are semiconductors, quantum computing, and space, which stay below full affinity for a reason that is about stage rather than taste: at seed they need capital and time to first revenue on a scale a generalist early-stage cheque does not cover. Scope here comes from stage, not from sector preference.",
   },
 ];
 

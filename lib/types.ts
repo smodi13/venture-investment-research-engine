@@ -57,12 +57,50 @@ export const DATA_CONFIDENCE_MEANING: Record<DataConfidence, string> = {
   Low: "Public disclosure is thin. The company may still be interesting, and the conclusion is correspondingly less certain.",
 };
 
-/** A claim with the source that supports it. */
+/**
+ * How a quantified claim is supported.
+ *
+ * This is separate from `Basis`, which says whether a rating rests on a fact or
+ * on analyst judgment. Provenance says who is vouching for the number. A
+ * company announcement and a wire reproduction of that same announcement are
+ * the same voice repeated twice, so a reproduction never upgrades a claim to
+ * independently verified.
+ */
+export type ClaimProvenance =
+  | "Independently verified"
+  | "Company-reported"
+  | "Investor-reported"
+  | "Government-reported"
+  | "Not sufficiently supported";
+
+export const CLAIM_PROVENANCE_LEVELS: ClaimProvenance[] = [
+  "Independently verified",
+  "Company-reported",
+  "Investor-reported",
+  "Government-reported",
+  "Not sufficiently supported",
+];
+
+export const CLAIM_PROVENANCE_MEANING: Record<ClaimProvenance, string> = {
+  "Independently verified":
+    "A party with no stake in the company published or measured this: a journalist doing original reporting, a peer-reviewed paper, or a public technical record anyone can query directly.",
+  "Company-reported":
+    "The company stated it. It may well be accurate, and it has not been checked by anyone else. A press release reproduced elsewhere is still only the company saying it.",
+  "Investor-reported":
+    "An investor in the company stated it. Interested, and usually closer to the numbers than the press is.",
+  "Government-reported":
+    "A government body or public laboratory published it as an official record.",
+  "Not sufficiently supported":
+    "No source meets the standard for this claim. It is not used in any rating and is recorded here only so the gap is visible.",
+};
+
+/** A claim with the source that supports it and who is vouching for it. */
 export interface Evidence {
   claim: string;
   /** Id into the source registry. */
   sourceId: string;
   basis: Basis;
+  provenance: ClaimProvenance;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -442,6 +480,10 @@ export interface PrivateCompany {
   businessModel: string;
   technicalDifferentiation: string;
   tractionSignal: Sourced<string>;
+  /** Who vouches for the traction figures above. */
+  tractionProvenance: ClaimProvenance;
+  /** ISO date of the source behind the traction claim. */
+  tractionAsOf: string;
   recentCatalyst: string;
   primaryCompetitors: string[];
   mainTechnicalRisk: string;
